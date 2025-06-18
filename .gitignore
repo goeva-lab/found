@@ -1,0 +1,9 @@
+docs/_build
+
+**/*.egg-info
+**/__pycache__
+**/.venv
+
+uv.lock
+
+.DS_Store

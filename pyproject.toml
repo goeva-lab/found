@@ -1,0 +1,17 @@
+[project]
+name = "found"
+version = "0.1"
+dependencies = ["anndata", "scikit-learn", "scanpy", "pandas"]
+
+[project.optional-dependencies]
+dev = [
+    "sphinx",
+    "pydata-sphinx-theme",
+    "myst-nb",
+    "myst-parser",
+    "sphinx-autobuild",
+    "jupytext",
+    "seaborn",
+    "ipykernel",
+    "sphinx-autodoc-typehints",
+]
