@@ -6,6 +6,6 @@ NumArr = np.ndarray[tuple[int], np.dtype[np.number]]
 
 FloatMtx = np.ndarray[tuple[int, int], np.dtype[np.floating]]
 IntMtx = np.ndarray[tuple[int, int], np.dtype[np.integer]]
-SparseMtx = sp.csr_array | sp.csr_matrix | sp.csc_array | sp.csc_matrix
+SparseMtx = sp.csr_array | sp.csc_array
 
 MatrixLike = FloatMtx | IntMtx | SparseMtx

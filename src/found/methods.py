@@ -2,6 +2,7 @@ import warnings
 from numbers import Real
 
 import numpy as np
+import scipy.sparse as sp
 from scipy.stats import ks_2samp, mannwhitneyu
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
@@ -27,13 +28,19 @@ def set_seed(seed: int | None):
     _RAND_SEED = seed
 
 
-def norm_log1p(X: MatrixLike) -> MatrixLike:
+def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     """
     implements a size factor scaled log1p transform as recommended in `Ahlmann-Eltze et al. <https://doi.org/10.1038/s41592-023-01814-1>`_.
 
     :param X: input cell by gene matrix
     :return: ``log((X / s) + 1)`` where ``s`` is the per-cell size factors of ``X``
     """
+
+    # if dealing with spmatrix types, convert to sparray equivalents
+    if isinstance(X, sp.csr_matrix):
+        X = sp.csr_array(X)
+    if isinstance(X, sp.csc_array):
+        X = sp.csc_array(X)
 
     per_cell_sum = X.sum(axis=1)
     avg_counts_per_cell = per_cell_sum.mean()
@@ -49,6 +56,9 @@ def norm_log1p(X: MatrixLike) -> MatrixLike:
         # because method is addded dynamically, as observed here:
         # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
         # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52
+
+    # make sure we're not introducing sp.spmatrix type further into the pipeline
+    assert not isinstance(X, sp.spmatrix)
 
     return X
 
