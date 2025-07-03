@@ -1,6 +1,6 @@
 [project]
 name = "found"
-version = "0.1"
+version = "0.1.0"
 dependencies = ["anndata", "scikit-learn", "scanpy", "pandas"]
 
 [project.optional-dependencies]
@@ -15,3 +15,7 @@ dev = [
     "ipykernel",
     "sphinx-autodoc-typehints",
 ]
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
