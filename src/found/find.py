@@ -9,7 +9,7 @@ from .types import MatrixLike, NumArr
 
 
 def find(
-    adata: ad.AnnData,
+    x: ad.AnnData,
     cond_col: str,
     control_val: Any,
     algo: Pipeline = LogNormPCALogRegKMeansKSScore,
@@ -32,12 +32,12 @@ def find(
         - 1-d array of prediction outputs by model
         - binarized labels from prediction values
     """
-    X = adata.X if layer is None else adata.layers[layer]
+    X = x.X if layer is None else x.layers[layer]
 
     if not isinstance(X, strip_generic(MatrixLike)):
         raise ValueError(f"type of expression matrix: {type(X)} is not currently supported")
-    y_hat, new_ann, _ = heuristic_loop(algo, k_range, X=X, V=(adata.obs[cond_col] != control_val).to_numpy(), **kwargs)
-    new_ann = np.where(new_ann, adata.obs[cond_col], control_val)
+    y_hat, new_ann, _ = heuristic_loop(algo, k_range, X=X, V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
+    new_ann = np.where(new_ann, x.obs[cond_col], control_val)
 
     return (
         y_hat,

@@ -5,13 +5,9 @@ from types import UnionType, resolve_bases
 from typing import Any, Callable, Iterable, Self, Union, get_args
 
 import anndata as ad
+from scipy import sparse as sp
 
-from .types import (
-    BoolArr,
-    FloatMtx,
-    MatrixLike,
-    NumArr,
-)
+from .types import BoolArr, FloatMtx, MatrixLike, NumArr
 
 
 # TODO: determine if there's a better way to do this
@@ -138,6 +134,13 @@ class Pipeline:
             else:
                 norm = adata.layers[norm_key]
                 msg = f"expected adata.X to be of type {MatrixLike}, got {type(norm)} instead"
+
+            # convert from spmatrix to sparray
+            if isinstance(norm, sp.csr_matrix):
+                norm = sp.csr_array(norm)
+            if isinstance(norm, sp.csc_matrix):
+                norm = sp.csc_array(norm)
+
             assert isinstance(norm, strip_generic(MatrixLike)), msg
             return norm  # pyright: ignore
             # ignore NECESSITY - isinstance check through strip_generic not understood by type checker

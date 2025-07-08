@@ -9,7 +9,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils import sparsefuncs
 
-from .types import BoolArr, FloatMtx, MatrixLike, NumArr, SparseMtx
+from .types import BoolArr, FloatMtx, MatrixLike, NumArr
 
 # TODO: should this be behind a multiprocessing.Lock (?)
 _RAND_SEED = None
@@ -39,7 +39,7 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     # if dealing with spmatrix types, convert to sparray equivalents
     if isinstance(X, sp.csr_matrix):
         X = sp.csr_array(X)
-    if isinstance(X, sp.csc_array):
+    if isinstance(X, sp.csc_matrix):
         X = sp.csc_array(X)
 
     per_cell_sum = X.sum(axis=1)
@@ -63,7 +63,12 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     return X
 
 
-def per_gene_scale(N: MatrixLike) -> FloatMtx:
+def per_gene_scale(N: MatrixLike, center: bool = True, scale: bool = True) -> FloatMtx:
+    if not (center or scale):
+        if not isinstance(N, np.ndarray):
+            return N.todense()  # pyright: ignore
+        return N.astype(float)
+
     if isinstance(N, np.ndarray):
         mean = np.mean(N, axis=0)
         stdev = np.std(N, axis=0)
@@ -73,13 +78,16 @@ def per_gene_scale(N: MatrixLike) -> FloatMtx:
         # Unknown, however type is documented to be 2-tuple given these arguments
         stdev = np.sqrt(var)
 
-    scaled = N - mean
+    scaled = N
 
-    # silence division by zero error, then fill NaN with 0
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        scaled = scaled / stdev
-    scaled = np.nan_to_num(scaled, nan=0.0)
+    if center:
+        scaled = N - mean
+    if scale:
+        # silence division by zero error, then fill NaN with 0
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            scaled = scaled / stdev
+        scaled = np.nan_to_num(scaled, nan=0.0)
 
     return scaled
 
