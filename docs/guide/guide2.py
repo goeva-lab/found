@@ -10,9 +10,10 @@
 
 
 # %%
-import warnings
+
 from io import BytesIO
 from urllib.request import urlopen
+from warnings import catch_warnings
 
 import anndata as ad
 
@@ -22,8 +23,7 @@ with urlopen("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE276570&format=fi
     h = BytesIO(f.read())
 
 # silence anndata warning re: adjacency matrix in .uns["neighbors"] being moved to .obsp
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
+with catch_warnings(action="ignore", category=FutureWarning):
     adata = ad.read_h5ad(h)  # pyright: ignore - read_h5ad type hint too restrictive, BytesIO is also valid
 
 print(adata)

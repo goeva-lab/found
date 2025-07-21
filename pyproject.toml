@@ -1,19 +1,23 @@
 [project]
 name = "found"
 version = "0.1.0"
-dependencies = ["anndata", "scikit-learn", "scanpy", "pandas"]
+dependencies = ["anndata>=0.12", "scikit-learn", "scipy", "numpy"]
+requires-python = ">=3.12"
 
 [project.optional-dependencies]
 dev = [
     "sphinx",
+    "sphinx-autobuild",
+    "sphinx-autodoc-typehints",
     "pydata-sphinx-theme",
     "myst-nb",
     "myst-parser",
-    "sphinx-autobuild",
     "jupytext",
-    "seaborn",
     "ipykernel",
-    "sphinx-autodoc-typehints",
+    "scanpy[leiden]",
+    "pandas",
+    "harmonypy",
+    "seaborn",
 ]
 
 [build-system]

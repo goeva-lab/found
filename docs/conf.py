@@ -30,6 +30,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "python": ("https://docs.python.org/3/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "sklearn": ("http://scikit-learn.org/stable", None),
 }
 
 typehints_use_rtype = False

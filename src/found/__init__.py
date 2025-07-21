@@ -1,4 +1,4 @@
-from .find import find
-from .methods import set_seed
+from .find import find, findt
+from .seed import set_seed
 
-__all__ = ["find", "set_seed"]
+__all__ = ["find", "findt", "set_seed"]

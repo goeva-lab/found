@@ -7,7 +7,8 @@
 
 # %% [markdown]
 # # myeloma analysis
-#
+
+# %% [markdown]
 # we first load the provided gene expression matrix and
 # associated metadata provided in GSE193531 into an anndata object
 
@@ -24,8 +25,8 @@ import scipy.sparse as sp
 import seaborn.objects as so
 
 import found
-from found.methods import kmeans_bin
-from found.pipelines import LogNormPCALogRegKMeansKSScore
+import found.methods as m
+from found.adapters import Pipeline
 from found.types import BoolArr, NumArr
 
 RANDOM_STATE = 42
@@ -47,8 +48,13 @@ adata = ad.AnnData(
     .set_index("index")
     .loc[gex.index],
 )
-# use CSR matrix for counts to improve memory use
+
+# subset to only disease stages of interest
+adata = adata[adata.obs["disease_stage"].isin(["MM", "NBM", "SMM"])].copy()  # pyright: ignore
+
+# use CSR array for counts to improve memory use
 adata.X = sp.csr_array(adata.X)
+
 print(adata)
 
 # %% [markdown]
@@ -57,9 +63,8 @@ print(adata)
 
 # %%
 found.set_seed(RANDOM_STATE)  # set a fixed seed for replicability
-adata_sub = adata[adata.obs["disease_stage"].isin(["MM", "NBM", "SMM"])]  # pyright: ignore
-p_hat, labs = found.find(adata_sub, "disease_stage", "NBM", k_range=[30])
-
+algo = Pipeline(m.run_lognorm_pca, m.log_reg, m.kmeans_bin, True)
+p_hat, labs = found.find(adata, "disease_stage", "NBM", algo, k=30, X=adata.X, regopt_maxiter=300, regopt_solver="newton-cg")
 
 # %% [markdown]
 # we define a utility function which plots levels of neoplastic cells per prediction source (e.g. manual vs HiDDEN)
@@ -115,7 +120,7 @@ def plot_res(adata: ad.AnnData, p_hat: NumArr, labs: np.ndarray[tuple[int], Any]
 # of neoplastic cells as compared to the "ground truth" manual annotations:
 
 # %%
-plot_res(adata_sub, p_hat, labs).show()
+plot_res(adata, p_hat, labs).show()
 
 
 # %% [markdown]
@@ -143,7 +148,7 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
         mask = patient_meta.eq(patient).to_numpy()
         if not V[mask].any():
             continue
-        out[mask] = kmeans_bin(
+        out[mask] = m.kmeans_bin(
             Y[mask],  # pyright: ignore
             V[mask],  # pyright: ignore
         )
@@ -152,25 +157,28 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
 
 
 # we use the `.update` method which returns a new version of the pipeline based off an existing with specified components replaced
-algo = LogNormPCALogRegKMeansKSScore.update(binr_fn=per_patient_kmeans_bin)
+algo = algo.update(binr_fn=per_patient_kmeans_bin)
 
 # important! we need to "inject" the patient metadata value into our pipeline
 p_hat, labs = found.find(
-    adata_sub,
+    adata,
     "disease_stage",
     "NBM",
-    algo=algo,  # note: we must now specify our pipeline since we have a modified component
-    k_range=[30],
+    algo,
+    k=30,
+    X=adata.X,
+    regopt_maxiter=300,
+    regopt_solver="newton-cg",
     #
     #  introduction of new variables/data into pipeline
-    #  is done via extra arguments at invokation point
+    #  is done via extra arguments at invocation point
     #     |
     #     V
-    patient_meta=adata_sub.obs["sample_ID"],
+    patient_meta=adata.obs["sample_ID"],
 )
 
 # %% [markdown]
 # assessing the new predictions, as expected, we see almost no difference with our initial results, with anything slightly worse performance on SMM-5:
 
 # %%
-plot_res(adata_sub, p_hat, labs).show()
+plot_res(adata, p_hat, labs).show()

@@ -19,7 +19,7 @@ very unfinished, more testing is needed before general use can be advised, API i
 
 [`uv`](https://docs.astral.sh/uv/getting-started/installation/) is used for package management and installation
 
-found can be installed via the following commmand:
+found can be installed via the following command:
 
 ```bash
 uv pip install 'git+ssh://git@github.com/goeva-lab/found'

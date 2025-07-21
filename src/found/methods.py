@@ -1,31 +1,72 @@
-import warnings
-from numbers import Real
+from typing import Literal
+from warnings import catch_warnings
 
 import numpy as np
 import scipy.sparse as sp
-from scipy.stats import ks_2samp, mannwhitneyu
 from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
+from sklearn.decomposition import NMF, PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.utils import sparsefuncs
 
+from .adapters import step_fn
+from .seed import get_seed
 from .types import BoolArr, FloatMtx, MatrixLike, NumArr
 
-# TODO: should this be behind a multiprocessing.Lock (?)
-_RAND_SEED = None
+
+def mult_preserve_type[T: MatrixLike](lhs: T, rhs: np.ndarray) -> T:
+    o = lhs * rhs
+
+    if isinstance(lhs, sp.csr_array):
+        o = o.tocsr()  # pyright: ignore
+    elif isinstance(lhs, sp.csc_array):
+        o = o.tocsc()  # pyright: ignore
+
+    return o  # pyright: ignore
 
 
-def set_seed(seed: int | None):
+def scale_rs[T: MatrixLike](X: T) -> T:
     """
-    conveninence function used to set a singular random seed for all methods utilized in this module, with the aim of guaranteeing reproducibility.
+    returns scaled version of input matrix with row-wise sums of 1
 
-    :param seed: integer seed, must be within [0, 4294967295], set to None to remove fixed seeding
+    :param X: input matrix
+    :return: scaled matrix
     """
-    global _RAND_SEED
-    if seed is not None:
-        if seed < 0 or seed > 4294967295:
-            raise ValueError(f"provided seed {seed} outside of allowed range [0, 4294967295]")
-    _RAND_SEED = seed
+    per_cell_sum = X.sum(axis=1)
+    avg_counts_per_cell = per_cell_sum.mean()
+    size_fact = per_cell_sum / avg_counts_per_cell
+
+    # silence warnings about reciprocal for zero, filled with zeros elsewhere
+    with catch_warnings(action="ignore", category=RuntimeWarning):
+        recip = np.reciprocal(size_fact)
+    recip = np.where(size_fact > 0, recip, 0.0)
+
+    return mult_preserve_type(X, recip[:, np.newaxis])  # pyright: ignore
+    # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
+
+
+def scale_sd[T: MatrixLike](X: T) -> T:
+    """
+    returns scaled version of input matrix with column-wise standard deviation of 1
+
+    :param X: input matrix
+    :return: scaled matrix
+    """
+
+    if isinstance(X, np.ndarray):
+        stdev = np.std(X, axis=0)
+    else:
+        _, var = sparsefuncs.mean_variance_axis(X, axis=0)  # pyright: ignore
+        # ignore NECESSITY - sparsefuncs.mean_variance_axis return type set to
+        # Unknown, however type is documented to be 2-tuple given these arguments
+        stdev = np.sqrt(var)
+
+    # silence warnings about reciprocal for zero, filled with zeros elsewhere
+    with catch_warnings(action="ignore", category=RuntimeWarning):
+        recip = np.reciprocal(stdev)
+    recip = np.where(stdev > 0, recip, 0.0)
+
+    return mult_preserve_type(X, recip[np.newaxis, :])  # pyright: ignore
+    # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
 
 
 def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
@@ -42,10 +83,7 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     if isinstance(X, sp.csc_matrix):
         X = sp.csc_array(X)
 
-    per_cell_sum = X.sum(axis=1)
-    avg_counts_per_cell = per_cell_sum.mean()
-    size_fact = per_cell_sum / avg_counts_per_cell
-    X = X / size_fact[:, np.newaxis]
+    X = scale_rs(X)
 
     if isinstance(X, np.ndarray):
         X = np.log1p(X)  # pyright: ignore
@@ -53,7 +91,7 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     else:
         X = X.tocsr().log1p()  # pyright: ignore
         # ignore NECESSITY - pyright can't detect log1p method on sparse matrix types
-        # because method is addded dynamically, as observed here:
+        # because method is added dynamically, as observed here:
         # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
         # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52
 
@@ -63,38 +101,9 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     return X
 
 
-def per_gene_scale(N: MatrixLike, center: bool = True, scale: bool = True) -> FloatMtx:
-    if not (center or scale):
-        if not isinstance(N, np.ndarray):
-            return N.todense()  # pyright: ignore
-        return N.astype(float)
-
-    if isinstance(N, np.ndarray):
-        mean = np.mean(N, axis=0)
-        stdev = np.std(N, axis=0)
-    else:
-        mean, var = sparsefuncs.mean_variance_axis(N, axis=0)  # pyright: ignore
-        # ignore NECESSITY - sparsefuncs.mean_variance_axis return type set to
-        # Unknown, however type is documented to be 2-tuple given these arguments
-        stdev = np.sqrt(var)
-
-    scaled = N
-
-    if center:
-        scaled = N - mean
-    if scale:
-        # silence division by zero error, then fill NaN with 0
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            scaled = scaled / stdev
-        scaled = np.nan_to_num(scaled, nan=0.0)
-
-    return scaled
-
-
-def run_pca(N: MatrixLike, k: int) -> FloatMtx:
+def run_pca(N: MatrixLike, k: int, scale: bool = True) -> FloatMtx:
     """
-    runs PCA to provide PC-space coordinates for each cell.
+    runs PCA to provide PC-space coordinates for input matrix, first applying a centering and scaling transformn.
 
     :param N: cell by gene matrix
     :param k: dimensionality of the PCA to run
@@ -102,26 +111,97 @@ def run_pca(N: MatrixLike, k: int) -> FloatMtx:
     """
 
     # return PCA output
-    return PCA(k, svd_solver="arpack", random_state=_RAND_SEED).fit_transform(per_gene_scale(N))
+    # centering is not needed since arpack solver centers pre-PCA
+    return PCA(k, svd_solver="arpack", random_state=get_seed()).fit_transform(
+        scale_sd(N) if scale else N  # pyright: ignore
+    )
+    # ignore NECESSITY - sparray also works for PCA, but is not documented
 
 
-def log_reg(Z: FloatMtx, V: BoolArr) -> NumArr:
+def run_lognorm_pca(X: MatrixLike | sp.csc_matrix | sp.csr_matrix, k: int, scale: bool = True):
+    """
+    runs PCA to provide PC-space coordinates for each cell, first applying a log1p w/ scaling transform, then centering and scaling.
+
+    :param X: cell by gene matrix
+    :param k: dimensionality of the PCA to run
+    :return: cell by k matrix representing cells in PC-space
+    """
+    return run_pca(norm_log1p(X), k, scale)
+
+
+@step_fn("Z", "NMF_p")
+def run_nmf(
+    X: MatrixLike,
+    k: int,
+    sf_obs_scale: bool = True,
+    sd_var_scale: bool = True,
+    nmf_lreg: tuple[float, float] = (0.0, 0.0),
+    nmf_l1l2ratio: float = 0.0,
+) -> tuple[FloatMtx, FloatMtx]:
+    """
+    runs NMF (decomposition of ``X^T`` into ``w @ h``) as implemented in :py:class:`~sklearn.decomposition.NMF` to provide NMF-cell-by-k-space coordinates for each cell.
+    important note: to match argument meaning / standards with NMF literature, we provide the **transpose** of X as input to :py:meth:`~sklearn.decomposition.NMF.fit_transform`
+
+    note:
+
+    - ``w`` refers to the gene by k matrix
+    - ``h`` refers to the k by cell matrix
+
+    see :py:class:`~sklearn.decomposition.NMF` documentation for more details on meaning of arguments.
+
+    :param X: cell by gene matrix
+    :param k: k, specifying number of NMF components/programs
+    :param sf_obs_scale: should row-wise size factor scaling be applied
+    :param sd_var_scale: should column-wise standard deviation scaling be applied
+    :param nmf_lreg: tuple of penalty terms for w and h matrices, respectively (0 meaning no regularization is applied)
+    :param nmf_l1l2ratio: regularization mixing parameter, indicating weight of l1 vs l2 penalty (0 means only l2 penalty, 1 means only l1 penalty)
+    :return: 2-tuple of:
+
+        - cell by k matrix representing cells in NMF-cell-by-k-space (e.g. ``h^T``)
+        - gene by k matrix representing NMF-computed gene programs (e.g. ``w``)
+    """
+
+    if sf_obs_scale:
+        X = scale_rs(X)
+    if sd_var_scale:
+        X = scale_sd(X)
+
+    m = NMF(k, random_state=get_seed(), alpha_W=nmf_lreg[0], alpha_H=nmf_lreg[1], l1_ratio=nmf_l1l2ratio)
+    z = m.fit_transform(X.T)  # pyright: ignore
+
+    return m.components_.T, z
+
+
+@step_fn("Y", "log_reg_mod")
+def log_reg(
+    Z: FloatMtx,
+    V: BoolArr,
+    regopt_solver: Literal["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"] = "saga",
+    regopt_maxiter: int = 100,
+) -> NumArr:
     """
     runs a logistic regression to score cells as affected/unaffected by the condition.
 
     :param Z: cell by k matrix (where k is some number of dimensions)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
+    :param regopt_solver: solver to use to optimize logistic regression problem, see ``solver`` argument to :py:class:`~sklearn.linear_model.LogisticRegression`
+    :param regopt_solver: maximum number of iterations allowed for the solver to converge, see ``max_iter`` argument to :py:class:`~sklearn.linear_model.LogisticRegression`
     :return: 1-d float array of probability scores from the fitted logistic regression model
     """
-    return (
-        LogisticRegression(
-            penalty=None,  # pyright: ignore
-            # ignore NECESSITY - penalty can be None but type set to str
-            random_state=_RAND_SEED,
-        )
-        .fit(Z, V)
-        .predict_proba(Z)[:, 1]
-    )
+    model = LogisticRegression(
+        penalty=None,  # pyright: ignore
+        # ignore NECESSITY - penalty can be None but type set to str
+        solver=regopt_solver,
+        max_iter=regopt_maxiter,
+        random_state=get_seed(),
+    ).fit(Z, V)
+
+    # classes_ is generated by np.unique, which returns the classes
+    # in sorted order, so True should always be the second class
+    # however we still perform the `.index` operation as a sanity check
+    return model.predict_proba(Z)[:, model.classes_.tolist().index(True)], model  # pyright: ignore
+    # ignore NECESSITY - predict_proba will be a 2-d array,
+    # which when indexed with [:, int] will return a 1-d array
 
 
 def kmeans_bin(Y: NumArr, V: BoolArr) -> BoolArr:
@@ -134,7 +214,13 @@ def kmeans_bin(Y: NumArr, V: BoolArr) -> BoolArr:
     """
     case_only = Y[V]
     clusts: BoolArr = (
-        KMeans(n_clusters=2, n_init="auto", random_state=_RAND_SEED).fit_predict(case_only.reshape(-1, 1)).astype(bool)
+        KMeans(
+            n_clusters=2,
+            n_init="auto",
+            random_state=get_seed(),
+        )
+        .fit_predict(case_only.reshape(-1, 1))
+        .astype(bool)
     )
 
     new_labs = V.copy()
@@ -142,53 +228,8 @@ def kmeans_bin(Y: NumArr, V: BoolArr) -> BoolArr:
     # cluster 0/1 doesn't necessarily match True/False label so
     # check we check correspondence by using the mean of p_hat in each
     clust_0_has_lower_mean = case_only[~clusts].mean() < case_only[clusts].mean()
+
+    # we only reassign cells
     new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts
 
     return new_labs
-
-
-def score_deg(X: MatrixLike, V: BoolArr, W: BoolArr) -> Real:
-    """
-    implements a heuristic to score label adjustment based on number of DEGs produced by new labels.
-
-    :param X: input cell by gene matrix
-    :param V: 1-d boolean array of condition labels (True correspons to case, False to control)
-    :param W: 1-d boolean array of adjusted condition labels (True correspons to case, False to control)
-    :return: number of DEGs between conditions (as determined by a bonferroni-corrected mann-whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
-    """
-    unaffected = X[W, :]
-    affected = X[~W, :]
-
-    ngenes = X.shape[1]  # pyright: ignore
-    # ignore NECESSITY - spmatrix.shape is not annotated
-    # to be a tuple, inferred annotations set it to None
-
-    abs_lfc = np.log2(np.mean(affected, axis=0) / np.mean(unaffected, axis=1)).abs()
-
-    # TODO: find way to vectorize (if even possible ?)
-    # for loop over dimension of matrix is a bad pattern
-    return sum(
-        (mannwhitneyu(unaffected[:, col], affected[:, col]).pvalue * ngenes < 0.05) and abs_lfc[col] > 1.5
-        for col in range(ngenes)
-    )  # pyright: ignore
-    # ignore NECESSITY - int not assignable to Real
-
-
-def score_ks(Y: NumArr, V: BoolArr, W: BoolArr) -> Real:
-    """
-    implements a heuristic to score label adjustment based on the Kolmogorov-Smirnov test statistic between p_hat values in the case condition.
-
-    :param Y: 1-d float array of condition scores
-    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
-    :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)
-    :return: 2 sample Kolmogorov-Smirnov test statistic value between ``Y`` values for unaffected vs affected in the originally labelled case condition.
-    """
-    case_only_pred = Y[V]
-    case_only_vhat = W[V]
-    return ks_2samp(
-        case_only_pred[~case_only_vhat],  # Y values from labelled unaffected
-        case_only_pred[case_only_vhat],  #  Y values from labelled affected
-        alternative="greater",
-    ).statistic  # pyright:ignore
-    # ignore NECESSITY - scipy.stats.ks_2samp lacking proper
-    # annotation on return type (currently set to _)

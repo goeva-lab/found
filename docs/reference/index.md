@@ -5,8 +5,8 @@
 
 self
 methods
-pipelines
 adapters
+tune
 ```
 
 ```{eval-rst}
