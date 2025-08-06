@@ -7,3 +7,6 @@ docs/_build
 uv.lock
 
 .DS_Store
+
+R/man
+R/NAMESPACE

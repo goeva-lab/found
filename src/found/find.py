@@ -12,6 +12,8 @@ from .types import BoolArr, NumArr
 
 def remap[T: np.ndarray[tuple[int], Any]](adj_bool: BoolArr, orig_label: T | pd.Series, control_val: Any) -> T:
     return np.where(adj_bool, orig_label, control_val)  # pyright: ignore
+    # ignore NECESSITY - np.where broadcasting does
+    # not maintain array size in type information
 
 
 def find(
@@ -37,12 +39,7 @@ def find(
 
     y_hat, new_ann, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
-    return (
-        y_hat,
-        remap(new_ann, x.obs[cond_col], control_val),
-        # ignore NECESSITY - np.where broadcasting does
-        # not maintain array size in type information
-    )
+    return (y_hat, remap(new_ann, x.obs[cond_col], control_val))
 
 
 def findt[P, S](
@@ -74,9 +71,4 @@ def findt[P, S](
 
     best_k, outs = tuner(algo, V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
-    return (
-        best_k,
-        {k: (Y, remap(W, x.obs[cond_col], control_val), s) for k, (Y, W, s) in outs.items()},
-        # ignore NECESSITY - np.where broadcasting does
-        # not maintain array size in type information
-    )
+    return (best_k, {k: (Y, remap(W, x.obs[cond_col], control_val), s) for k, (Y, W, s) in outs.items()})

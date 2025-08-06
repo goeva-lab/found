@@ -176,7 +176,7 @@ def run_nmf(
 def log_reg(
     Z: FloatMtx,
     V: BoolArr,
-    regopt_solver: Literal["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"] = "saga",
+    regopt_solver: Literal["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"] = "newton-cg",
     regopt_maxiter: int = 100,
 ) -> NumArr:
     """
@@ -223,13 +223,15 @@ def kmeans_bin(Y: NumArr, V: BoolArr) -> BoolArr:
         .astype(bool)
     )
 
-    new_labs = V.copy()
+    new_labs = np.array(V, copy=True)
 
     # cluster 0/1 doesn't necessarily match True/False label so
     # check we check correspondence by using the mean of p_hat in each
     clust_0_has_lower_mean = case_only[~clusts].mean() < case_only[clusts].mean()
 
-    # we only reassign cells
-    new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts
+    # we only reassign cells in the case condition
+    new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts  # pyright: ignore
+    # ignore NECESSITY - ???
 
-    return new_labs
+    return new_labs  # pyright: ignore
+    # ignore NECESSITY - np.array does not preserve shape/dtype information on V

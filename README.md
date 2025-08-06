@@ -1,6 +1,11 @@
 # found: HiDDEN implementation
 
-this package implements a method for refining case-control labels in sc-RNAseq data, as decribed in [Goeva et al, 2024](https://doi.org/10.1038/s41467-024-53666-8)
+this repository provides an implementation of a method for refining case-control labels in sc-RNAseq data, as decribed in [Goeva et al, 2024](https://doi.org/10.1038/s41467-024-53666-8)
+
+## R bridge
+
+an R package providing high-level bindings to the python package is provided, for more documentation on it, please see [`./R/README.md`](./R/README.md).
+documentation below is all regarding the python package.
 
 ## disclaimer
 
@@ -12,7 +17,6 @@ very unfinished, more testing is needed before general use can be advised, API i
 - add more methods
 - host documentation on GH pages
 - create GHA to re-build/test/lint/deploy on push to main
-- bridge to R
 - support for more underlying data types (e.g. zarr arrays, HDF5 arrays, etc.)
 
 ## installation

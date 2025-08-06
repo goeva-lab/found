@@ -17,12 +17,11 @@
 
 from typing import Any
 
+import altair as alt
 import anndata as ad
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.sparse as sp
-import seaborn.objects as so
 
 import found
 import found.methods as m
@@ -64,14 +63,14 @@ print(adata)
 # %%
 found.set_seed(RANDOM_STATE)  # set a fixed seed for replicability
 algo = Pipeline(m.run_lognorm_pca, m.log_reg, m.kmeans_bin, True)
-p_hat, labs = found.find(adata, "disease_stage", "NBM", algo, k=30, X=adata.X, regopt_maxiter=300, regopt_solver="newton-cg")
+p_hat, labs = found.find(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
 
 # %% [markdown]
 # we define a utility function which plots levels of neoplastic cells per prediction source (e.g. manual vs HiDDEN)
 
 
 # %%
-def plot_res(adata: ad.AnnData, p_hat: NumArr, labs: np.ndarray[tuple[int], Any]) -> so.Plot:
+def plot_res(adata: ad.AnnData, p_hat: NumArr, labs: np.ndarray[tuple[int], Any]) -> alt.Chart | alt.LayerChart:
     eval_df = (
         pd.DataFrame(
             {
@@ -85,33 +84,28 @@ def plot_res(adata: ad.AnnData, p_hat: NumArr, labs: np.ndarray[tuple[int], Any]
         .groupby("patient")[["ground_truth", "prediction"]]
         .agg(lambda x: 1 - (x.eq("normal").sum() / x.size))
         .reset_index()
-        .melt(id_vars="patient", value_name="pct.neoplastic", var_name="source")
+        .melt(id_vars="patient", value_name="pct_neoplastic", var_name="source")
         .sort_values(by="source")
         .sort_values(by="patient", key=lambda s: pd.to_numeric(s.str.split("-", n=2, expand=True)[1]), kind="stable")
         .sort_values(by="patient", key=lambda s: s.str.split("-", n=2, expand=True)[0], kind="stable", ascending=False)
     )
 
-    plt.rcParams["figure.dpi"] = 100
-    plt.rcParams["figure.figsize"] = (8, 6)
-    _, ax = plt.subplots()
-    g = (
-        so.Plot(
-            eval_df,
-            x="patient",
-            y="pct.neoplastic",
-        )
-        .add(so.Dot(alpha=0.8), color="source", marker="source")
-        .add(
-            so.Line(color="0.5", linestyle=":", alpha=0.5),
-            group="patient",
-        )
-        .limit(y=(0, 1.05))
-        .label(x="", y="percent neoplastic cells")
-        .layout(extent=(0, 0, 0.82, 1), engine="tight")
-        .on(ax)
+    c = alt.Chart(eval_df).encode(
+        alt.X("patient").title(None).sort(None),
+        alt.Y("pct_neoplastic").title("percent neoplastic cells"),
     )
-    ax.tick_params(axis="x", labelrotation=90)
-    return g
+
+    return c.mark_line(
+        strokeDash=(4, 4),
+    ).encode(
+        alt.Detail("patient"),
+    ) + c.mark_point(
+        filled=True,
+        opacity=0.8,
+    ).encode(
+        alt.Color("source"),
+        alt.Shape("source"),
+    )
 
 
 # %% [markdown]
@@ -120,7 +114,7 @@ def plot_res(adata: ad.AnnData, p_hat: NumArr, labs: np.ndarray[tuple[int], Any]
 # of neoplastic cells as compared to the "ground truth" manual annotations:
 
 # %%
-plot_res(adata, p_hat, labs).show()
+plot_res(adata, p_hat, labs)
 
 
 # %% [markdown]
@@ -142,6 +136,7 @@ plot_res(adata, p_hat, labs).show()
 #                                                       |
 #                                                       V
 def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> BoolArr:
+    assert isinstance(V, np.ndarray)
     out = np.full_like(V, np.nan)
 
     for patient in patient_meta.unique():
@@ -167,8 +162,6 @@ p_hat, labs = found.find(
     algo,
     k=30,
     X=adata.X,
-    regopt_maxiter=300,
-    regopt_solver="newton-cg",
     #
     #  introduction of new variables/data into pipeline
     #  is done via extra arguments at invocation point
@@ -181,4 +174,4 @@ p_hat, labs = found.find(
 # assessing the new predictions, as expected, we see almost no difference with our initial results, with anything slightly worse performance on SMM-5:
 
 # %%
-plot_res(adata, p_hat, labs).show()
+plot_res(adata, p_hat, labs)

@@ -1,0 +1,20 @@
+Package: found
+Title: HiDDEN implementation
+Version: 0.1
+Authors@R:
+    person("Goeva Lab", email = "aleksandrina.goeva@utoronto.ca", role = c("aut", "cre"))
+Description: R interface to the python found package.
+License: EUPL-1.2
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    S7,
+    SeuratObject,
+    SingleCellExperiment,
+    reticulate
+Suggests:
+    irlba,
+    Seurat,
+    SeuratData,
+    devtools
