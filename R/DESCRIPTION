@@ -17,4 +17,6 @@ Suggests:
     irlba,
     Seurat,
     SeuratData,
-    devtools
+    devtools,
+    pkgdown,
+    pak

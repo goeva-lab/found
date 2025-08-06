@@ -57,6 +57,8 @@ to_step <- function(fn) {
   py_str$w(z)
 }
 
+#' HiDDEN
+#'
 #' HiDDEN entrypoint
 #'
 #' @usage
@@ -74,7 +76,10 @@ to_step <- function(fn) {
 #' @param ... extra arguments passed into pipeline
 #'
 #' @examplesIf requireNamespace("irlba", quietly = TRUE) && requireNamespace("Seurat", quietly = TRUE) && requireNamespace("SeuratObject", quietly = TRUE) && requireNamespace("SeuratData", quietly = TRUE) && ("ifnb" %in% SeuratData::InstalledData()[["Dataset"]])
-#' so <- Seurat::SCTransform(SeuratData::LoadData("ifnb"))
+#' so <- SeuratData::LoadData("ifnb") |>
+#'   Seurat::SCTransform(verbose = FALSE) |>
+#'   suppressWarnings() |>
+#'   suppressMessages()
 #' sct_pca <- function(so, k) {
 #'   irlba::prcomp_irlba(
 #'     t(SeuratObject::LayerData(so, assay = "SCT", layer = "scale.data")),
@@ -133,6 +138,8 @@ S7::method(HiDDEN, S7::class_function) <- function(
   )
 }
 
+#' HiDDENt
+#'
 #' HiDDEN entrypoint w/ automatic hyperparameter tuning
 #'
 #' @usage
@@ -140,7 +147,10 @@ S7::method(HiDDEN, S7::class_function) <- function(
 #' HiDDENt(sce, cond_col, control_val, algo, tuner, ...)
 #'
 #' @examplesIf requireNamespace("irlba", quietly = TRUE) && requireNamespace("Seurat", quietly = TRUE) && requireNamespace("SeuratObject", quietly = TRUE) && requireNamespace("SeuratData", quietly = TRUE) && ("ifnb" %in% SeuratData::InstalledData()[["Dataset"]])
-#' so <- Seurat::SCTransform(SeuratData::LoadData("ifnb"))
+#' so <- SeuratData::LoadData("ifnb") |>
+#'   Seurat::SCTransform(verbose = FALSE) |>
+#'   suppressWarnings() |>
+#'   suppressMessages()
 #' sct_pca <- function(so, k) {
 #'   irlba::prcomp_irlba(
 #'     t(SeuratObject::LayerData(so, assay = "SCT", layer = "scale.data")),
