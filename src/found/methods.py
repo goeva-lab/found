@@ -139,13 +139,13 @@ def run_nmf(
     nmf_l1l2ratio: float = 0.0,
 ) -> tuple[FloatMtx, FloatMtx]:
     """
-    runs NMF (decomposition of ``X^T`` into ``w @ h``) as implemented in :py:class:`~sklearn.decomposition.NMF` to provide NMF-cell-by-k-space coordinates for each cell.
+    runs NMF (decomposition of ``X`` into ``w @ h``) as implemented in :py:class:`~sklearn.decomposition.NMF` to provide NMF-cell-by-k-space coordinates for each cell.
     important note: to match argument meaning / standards with NMF literature, we provide the **transpose** of X as input to :py:meth:`~sklearn.decomposition.NMF.fit_transform`
 
     note:
 
-    - ``w`` refers to the gene by k matrix
-    - ``h`` refers to the k by cell matrix
+    - ``w`` refers to the cell by k matrix
+    - ``h`` refers to the k by gene matrix
 
     see :py:class:`~sklearn.decomposition.NMF` documentation for more details on meaning of arguments.
 
@@ -157,8 +157,8 @@ def run_nmf(
     :param nmf_l1l2ratio: regularization mixing parameter, indicating weight of l1 vs l2 penalty (0 means only l2 penalty, 1 means only l1 penalty)
     :return: 2-tuple of:
 
-        - cell by k matrix representing cells in NMF-cell-by-k-space (e.g. ``h^T``)
-        - gene by k matrix representing NMF-computed gene programs (e.g. ``w``)
+        - cell by k matrix representing cells in NMF-cell-by-k-space (e.g. ``w``)
+        - gene by k matrix representing NMF-computed gene programs (e.g. ``h^T``)
     """
 
     if sf_obs_scale:
@@ -167,9 +167,9 @@ def run_nmf(
         X = scale_sd(X)
 
     m = NMF(k, random_state=get_seed(), alpha_W=nmf_lreg[0], alpha_H=nmf_lreg[1], l1_ratio=nmf_l1l2ratio)
-    z = m.fit_transform(X.T)  # pyright: ignore
+    z = m.fit_transform(X)  # pyright: ignore
 
-    return m.components_.T, z
+    return z, m.components_.T
 
 
 @step_fn("Y", "log_reg_mod")
