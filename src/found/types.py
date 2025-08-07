@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 
-BoolArr = np.ndarray[tuple[int], np.dtype[np.bool_]] | list[bool]
+BoolArr = np.ndarray[tuple[int], np.dtype[np.bool_]]
 NumArr = np.ndarray[tuple[int], np.dtype[np.number]]
 
 FloatMtx = np.ndarray[tuple[int, int], np.dtype[np.floating]]

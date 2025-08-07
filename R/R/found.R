@@ -124,9 +124,10 @@ S7::method(HiDDEN, methods::getClass("Seurat")) <- function(
   }, cond_col, control_val, algo, ...)
 }
 
+# implementation method where `x` is a function which returns a metadata column
 S7::method(HiDDEN, S7::class_function) <- function(
     x, cond_col, control_val, algo, ...) {
-  out <- algo(V = x(cond_col) != control_val, ...)
+  out <- algo(V = as.array(x(cond_col) != control_val), ...)
 
   list(
     "p_hat" = reticulate::py_to_r(out[0]),
@@ -211,9 +212,10 @@ S7::method(HiDDENt, methods::getClass("Seurat")) <- function(
   }, cond_col, control_val, algo, tuner, ...)
 }
 
+# implementation method where `x` is a function which returns a metadata column
 S7::method(HiDDENt, S7::class_function) <- function(
     x, cond_col, control_val, algo, tuner, ...) {
-  outs <- tuner(algo, V = x(cond_col) != control_val, ...)
+  outs <- tuner(algo, V = as.array(x(cond_col) != control_val), ...)
 
   chosen <- reticulate::py_to_r(outs[0])
   out_l <- lapply(reticulate::py_to_r(outs[1]), function(out) {

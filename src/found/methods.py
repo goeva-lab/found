@@ -223,15 +223,13 @@ def kmeans_bin(Y: NumArr, V: BoolArr) -> BoolArr:
         .astype(bool)
     )
 
-    new_labs = np.array(V, copy=True)
+    new_labs = V.copy()
 
     # cluster 0/1 doesn't necessarily match True/False label so
     # check we check correspondence by using the mean of p_hat in each
     clust_0_has_lower_mean = case_only[~clusts].mean() < case_only[clusts].mean()
 
     # we only reassign cells in the case condition
-    new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts  # pyright: ignore
-    # ignore NECESSITY - ???
+    new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts
 
-    return new_labs  # pyright: ignore
-    # ignore NECESSITY - np.array does not preserve shape/dtype information on V
+    return new_labs

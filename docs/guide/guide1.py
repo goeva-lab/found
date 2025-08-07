@@ -63,7 +63,7 @@ print(adata)
 # %%
 found.set_seed(RANDOM_STATE)  # set a fixed seed for replicability
 algo = Pipeline(m.run_lognorm_pca, m.log_reg, m.kmeans_bin, True)
-p_hat, labs = found.find(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
+p_hat, labs = found.HiDDEN(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
 
 # %% [markdown]
 # we define a utility function which plots levels of neoplastic cells per prediction source (e.g. manual vs HiDDEN)
@@ -136,7 +136,6 @@ plot_res(adata, p_hat, labs)
 #                                                       |
 #                                                       V
 def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> BoolArr:
-    assert isinstance(V, np.ndarray)
     out = np.full_like(V, np.nan)
 
     for patient in patient_meta.unique():
@@ -155,7 +154,7 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
 algo = algo.update(binr_fn=per_patient_kmeans_bin)
 
 # important! we need to "inject" the patient metadata value into our pipeline
-p_hat, labs = found.find(
+p_hat, labs = found.HiDDEN(
     adata,
     "disease_stage",
     "NBM",

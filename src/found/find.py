@@ -16,7 +16,7 @@ def remap[T: np.ndarray[tuple[int], Any]](adj_bool: BoolArr, orig_label: T | pd.
     # not maintain array size in type information
 
 
-def find(
+def HiDDEN(
     x: ad.AnnData,
     cond_col: str,
     control_val: Any,
@@ -42,7 +42,7 @@ def find(
     return (y_hat, remap(new_ann, x.obs[cond_col], control_val))
 
 
-def findt[P, S](
+def HiDDENt[P, S](
     x: ad.AnnData,
     cond_col: str,
     control_val: Any,
