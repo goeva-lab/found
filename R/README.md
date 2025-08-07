@@ -29,9 +29,8 @@ devtools::document()
 devtools::build_manual()
 ```
 
-[`pkgdown`](https://pkgdown.r-lib.org/#installation) can then be used to build a documentation site, which can be built and previewed locally at [localhost:8000](http://localhost:8000) via the following commands (assuming current directory is the [`./R`](.) subdirectory of a clone of this repository):
+[`pkgdown`](https://pkgdown.r-lib.org/#installation) can then be used to build a documentation site, which can be built and previewed locally at [localhost:8000](http://localhost:8000) via the following command (assuming current directory is the [`./R`](.) subdirectory of a clone of this repository):
 
 ```bash
-R -q -e 'pkgdown::build_site(new_process = FALSE)' # new_process needs to be disabled due to reticulate threading issue
-python -m http.server -b localhost -d docs 8000
+R -q -e 'pkgdown::build_site()' && python -m http.server -b localhost -d docs 8000
 ```

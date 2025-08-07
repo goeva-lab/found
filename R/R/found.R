@@ -1,20 +1,3 @@
-py <- reticulate::import("found", convert = FALSE)
-
-#' adapters module from python package
-#'
-#' @export
-adapters <- py$adapters
-
-#' methods module from python package
-#'
-#' @export
-methods <- py$methods
-
-#' tune module from python package
-#'
-#' @export
-tune <- py$tune
-
 #' wrapper function which allows injection of R functions into found Pipelines
 #'
 #' @param fn function
@@ -87,7 +70,7 @@ to_step <- function(fn) {
 #'   )$x
 #' }
 #' algo <- adapters$Pipeline(to_step(sct_pca), methods$log_reg, methods$kmeans_bin)
-#' out <- HiDDEN(so, "stim", "CTRL", algo, so = so, k = 15)
+#' out <- HiDDEN(so, "stim", "CTRL", algo, so = so, k = 15L)
 #' names(out)
 #'
 #' @returns HiDDEN output - list of two elements w/ names:
@@ -242,4 +225,32 @@ S7::method(HiDDENt, S7::class_function) <- function(
     "chosen" = chosen,
     "outs" = out_l
   )
+}
+
+#' found.adapters
+#'
+#' adapters module from found python package
+#'
+#' @export
+adapters <- NULL
+
+#' found.methods
+#'
+#' methods module from found python package
+#'
+#' @export
+methods <- NULL
+
+#' found.tune
+#'
+#' tune module from found python package
+#'
+#' @export
+tune <- NULL
+
+.onLoad <- function(libname, pkgname) {
+  reticulate::py_require("found")
+  adapters <<- reticulate::import("found.adapters", delay_load = TRUE, convert = FALSE)
+  methods <<- reticulate::import("found.methods", delay_load = TRUE, convert = FALSE)
+  tune <<- reticulate::import("found.tune", delay_load = TRUE, convert = FALSE)
 }
