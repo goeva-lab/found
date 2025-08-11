@@ -6,7 +6,7 @@
 # ---
 
 # %% [markdown]
-# # myeloma analysis
+# # found basics and pipeline customization
 
 # %% [markdown]
 # we first load the provided gene expression matrix and
