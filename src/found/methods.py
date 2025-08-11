@@ -140,7 +140,6 @@ def run_nmf(
 ) -> tuple[FloatMtx, FloatMtx]:
     """
     runs NMF (decomposition of ``X`` into ``w @ h``) as implemented in :py:class:`~sklearn.decomposition.NMF` to provide NMF-cell-by-k-space coordinates for each cell.
-    important note: to match argument meaning / standards with NMF literature, we provide the **transpose** of X as input to :py:meth:`~sklearn.decomposition.NMF.fit_transform`
 
     note:
 
