@@ -1,11 +1,14 @@
+from collections.abc import Callable, Collection, Generator, Iterable
 from dataclasses import dataclass
 from functools import wraps
+from inspect import Parameter, signature
 from inspect import _empty as iempty
-from inspect import signature
 from types import UnionType, resolve_bases
-from typing import Any, Callable, Literal, Self, Union, get_args, get_origin
+from typing import Any, Literal, Protocol, Self, Union, get_args, get_origin
 
 import anndata as ad
+import numpy as np
+import pandas as pd
 
 from .types import BoolArr, FloatMtx, NumArr
 
@@ -21,22 +24,26 @@ def strip_generic(tp: Any) -> Any:
     return resolve_bases([tp])[0]
 
 
+def check(w: dict[str, Any], p: Parameter, name: str):
+    if p.annotation is not iempty:
+        if get_origin(p.annotation) is Literal:
+            chk = w[p.name] in get_args(p.annotation)
+        else:
+            chk = isinstance(w[p.name], strip_generic(p.annotation))
+        if not chk:
+            raise TypeError(
+                f"function: `{name}` expected value of type "
+                f"`{p.annotation}` to be provided for argument `{p.name}`, but "
+                f"value {w[p.name]} of type {type(w[p.name])} was provided instead"
+            )
+
+
 def wcall[T](w: dict[str, Any], fn: Callable[..., T], strict: bool) -> T:
     kwargs = dict()
     for p in signature(fn).parameters.values():
         if p.name in w:
             if strict:
-                if p.annotation is not iempty:
-                    if get_origin(p.annotation) is Literal:
-                        chk = w[p.name] in get_args(p.annotation)
-                    else:
-                        chk = isinstance(w[p.name], strip_generic(p.annotation))
-                    if not chk:
-                        raise TypeError(
-                            f"function: `{fn.__name__}` expected value of type "
-                            f"`{p.annotation}` to be provided for argument `{p.name}`, but "
-                            f"a value of type {w[p.name]} was provided instead"
-                        )
+                check(w, p, fn.__name__)
             kwargs[p.name] = w[p.name]
 
     return fn(**kwargs)
@@ -94,7 +101,7 @@ class Pipeline:
     cachable_dimr: bool = False
     strict: bool = True
 
-    def check(self, w: dict[str, type]):
+    def check(self, w: dict[str, Any]):
         """
         convenience function, given a set of provided arguments, validates if the pipeline can run
         returns if yes, raises :py:class:`~ValueError` if no
@@ -103,7 +110,7 @@ class Pipeline:
         """
 
         added = set()
-        # __FOUND_WRAPPED_INTERNAL_NAMES
+
         for fn, out in [
             (self.dimr_fn, set(getattr(self.dimr_fn, _INTERNAL_WRAP_ATTR_NAME))),
             (self.regr_fn, set(getattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME))),
@@ -115,20 +122,7 @@ class Pipeline:
                         f"pipeline called with missing arguments, provided function {fn.__name__} expects presence of {p.name}, but it was not provided"
                     )
                 if self.strict and (p.name not in added) and (p.name in w):
-                    if p.annotation is not iempty:
-                        try:
-                            chk = issubclass(w[p.name], strip_generic(p.annotation))
-                        except TypeError:
-                            # issubclass can fail on dependent types like Literal, so we
-                            # ignore this case since check can only be done once value is known
-                            pass
-                        else:
-                            if not chk:
-                                raise TypeError(
-                                    f"function: `{fn.__name__}` expected value of type "
-                                    f"`{p.annotation}` to be provided for argument `{p.name}`, but "
-                                    f"a value of type {w[p.name]} was provided instead"
-                                )
+                    check(w, p, fn.__name__)
             added = added.union(out)
 
     def __post_init__(self):
@@ -148,7 +142,7 @@ class Pipeline:
     def __call__(self, **kwargs) -> tuple[NumArr, BoolArr, dict[str, Any]]:
         w = kwargs
 
-        self.check({k: type(v) for k, v in w.items()})
+        self.check(w)
 
         w |= wcall(w, out_to_dict(self.dimr_fn, getattr(self.dimr_fn, _INTERNAL_WRAP_ATTR_NAME)), self.strict)
         w |= wcall(w, out_to_dict(self.regr_fn, getattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME)), self.strict)
@@ -219,3 +213,18 @@ class Pipeline:
             # `:`-index keeps first dimension, and `:k`-index also preserves second dimension
 
         return cls(dimr_fn, regr_fn, binr_fn, True, *([] if strict is None else [strict]))
+
+
+# create protocol since Callable does not allow specifying keyword only arguments
+class GroupbyOut[T](Protocol):
+    def __call__(
+        self, grp: pd.Series | Iterable[np.ndarray[tuple[int], np.dtype[np.integer]]], /, **kwargs
+    ) -> Generator[T]: ...
+
+
+def groupby[T](fn: Callable[..., T], grp_args: Collection[str]) -> GroupbyOut[T]:
+    def w(grp: pd.Series | Iterable[np.ndarray[tuple[int], np.dtype[np.integer]]], /, **kwargs) -> Generator[T]:
+        for idx in grp.groupby(grp).indices.values() if isinstance(grp, pd.Series) else grp:
+            yield fn(**(kwargs | {k: kwargs[k][idx] for k in grp_args}))
+
+    return w
