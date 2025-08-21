@@ -87,12 +87,18 @@ def score_deg2(
     deg_cutoff: float = 1.5,
 ) -> Integral:
     """
-    implements a heuristic to score label adjustment based on number of DEGs produced by new labels.
+    implements a heuristic to score label adjustment based on number of DEGs produced by new labels using two comparisons.
+    specifically two comparisons are run, and the return value is a weighted difference of:
+
+    1) case cells labelled affected vs case cells labelled unaffected (difference should be as large as possible)
+    2) control cells vs case cells labelled unaffected (difference should be as small as possible)
 
     :param X: input cell by gene matrix
-    :param V: 1-d boolean array of condition labels (True corresponds to case, False to control)
-    :param W: 1-d boolean array of adjusted condition labels (True correspons to case, False to control)
-    :return: number of DEGs between conditions (as determined by a bonferroni-corrected mann-whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
+    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
+    :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)
+    :param score_weight_relab: weight given to number of DEGs in first comparison
+    :param score_weight_vsctl: weight given to number of DEGs in second comparison
+    :return: ``score_weight_relab`` * number of DEGs in first comparison - ``score_weight_vsctl`` * number of DEGs in second comparison
     """
     case_only_expr = X[V, :]
     case_only_vhat = W[V]
