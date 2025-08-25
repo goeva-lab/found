@@ -11,3 +11,4 @@ uv.lock
 R/man
 R/NAMESPACE
 R/docs
+R/_pkgdown.yml

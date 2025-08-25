@@ -31,5 +31,5 @@ R -q -e 'devtools::build_manual()'
 a documentation site can be built (using [`pkgdown`](https://pkgdown.r-lib.org/#installation)) and previewed locally at [localhost:8000](http://localhost:8000) via the following command:
 
 ```bash
-R -q -e 'pkgdown::build_site()' && python -m http.server -b localhost -d docs 8000
+sh pkgdown.sh _pkgdown.yml && R -q -e 'pkgdown::build_site()' && python -m http.server -b localhost -d docs 8000
 ```
