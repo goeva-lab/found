@@ -1,0 +1,7 @@
+template:
+  bootstrap: 5
+  light-switch: true
+repo:
+  url:
+    source: 'https://github.com/goeva-lab/found/tree/main/R'
+    home: 'https://github.com/goeva-lab/found/'

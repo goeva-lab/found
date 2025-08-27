@@ -41,7 +41,7 @@ adata = sc.AnnData(
             ]
         ]
     ).T,
-    obs=pd.read_csv(f"{base_url}?acc=GSE96583&format=file&file=GSE96583_batch2.total.tsne.df.tsv.gz", sep="\t")
+    obs=pd.read_csv(f"{base_url}?acc=GSE96583&format=file&file=GSE96583_batch2.total.tsne.df.tsv.gz", sep="\t")  # pyright: ignore
     .reset_index(names="barcode", drop=False)
     .assign(barcode=lambda x: x["stim"] + "_" + x["barcode"].str.extract("([ACTG]+-1)", expand=False))
     .set_index("barcode")[["stim", "cluster", "cell", "multiplets"]],

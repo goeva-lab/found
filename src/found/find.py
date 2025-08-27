@@ -39,7 +39,14 @@ def HiDDEN(
 
     y_hat, new_ann, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
-    return (y_hat, remap(new_ann, x.obs[cond_col], control_val))
+    return (
+        y_hat,
+        remap(
+            new_ann,
+            x.obs[cond_col],  # pyright: ignore
+            control_val,
+        ),
+    )
 
 
 def HiDDENt[P, S](
@@ -71,4 +78,18 @@ def HiDDENt[P, S](
 
     best_k, outs = tuner(algo, V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
-    return (best_k, {k: (Y, remap(W, x.obs[cond_col], control_val), s) for k, (Y, W, s) in outs.items()})
+    return (
+        best_k,
+        {
+            k: (
+                Y,
+                remap(
+                    W,
+                    x.obs[cond_col],  # pyright: ignore
+                    control_val,
+                ),
+                s,
+            )
+            for k, (Y, W, s) in outs.items()
+        },
+    )

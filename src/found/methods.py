@@ -165,7 +165,13 @@ def run_nmf(
     if sd_var_scale:
         X = scale_sd(X)
 
-    m = NMF(k, random_state=get_seed(), alpha_W=nmf_lreg[0], alpha_H=nmf_lreg[1], l1_ratio=nmf_l1l2ratio)
+    m = NMF(
+        k,  # pyright: ignore
+        random_state=get_seed(),
+        alpha_W=nmf_lreg[0],
+        alpha_H=nmf_lreg[1],  # pyright: ignore
+        l1_ratio=nmf_l1l2ratio,
+    )
     z = m.fit_transform(X)  # pyright: ignore
 
     return z, m.components_.T

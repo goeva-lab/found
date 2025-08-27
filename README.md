@@ -15,8 +15,6 @@ very unfinished, more testing is needed before general use can be advised, API i
 
 - add more documentation
 - add more methods
-- host documentation on GH pages
-- create GHA to re-build/test/lint/deploy on push to main
 - support for more underlying data types (e.g. zarr arrays, HDF5 arrays, etc.)
 
 ## installation

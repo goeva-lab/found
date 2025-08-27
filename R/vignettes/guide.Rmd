@@ -8,6 +8,9 @@ vignette: >
 ---
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  # `eval` set to FALSE if within CI since GHA runner does not have enough computational resources to render guide
+  # @TODO: look into using self-hosted runners depending on future hardware access
+  eval = Sys.getenv("CI") == "",
   collapse = TRUE,
   comment = "#>"
 )

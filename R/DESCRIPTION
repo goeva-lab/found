@@ -17,7 +17,12 @@ Suggests:
     irlba,
     Seurat,
     SeuratData,
+    ifnb.SeuratData,
     devtools,
     pkgdown,
     pak
+Remotes:
+    bioc::SingleCellExperiment,
+    SeuratData=github::satijalab/seurat-data,
+    ifnb.SeuratData=url::https://seurat.nygenome.org/src/contrib/ifnb.SeuratData_3.1.0.tar.gz
 URL: https://goeva-lab.github.io/found/R, https://github.com/goeva-lab/found/R

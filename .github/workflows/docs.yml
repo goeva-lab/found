@@ -1,0 +1,60 @@
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build_docs:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'write'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'astral-sh/setup-uv@v6'
+        with:
+          activate-environment: true
+      - run: |
+          uv pip install '.[dev]'
+      - uses: r-lib/actions/setup-tinytex@v2
+      - uses: r-lib/actions/setup-pandoc@v2
+      - uses: 'r-lib/actions/setup-r@v2'
+      - uses: 'r-lib/actions/setup-r-dependencies@v2'
+        with:
+          working-directory: './R'
+          cache: 'always'
+      - run: |
+          mkdir dist && touch dist/.nojekyll
+      # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
+      # @TODO: look into using self-hosted runners depending on future hardware access
+      - run: |
+          python -m ipykernel install --user --name found && (sphinx-build -D nb_execution_mode=off -b dirhtml -n docs dist/py || cat /tmp/sphinx-err-*)
+      # `examples` set to FALSE because runner does not have enough computational resources to render examples
+      # @TODO: look into using self-hosted runners depending on future hardware access
+      - run: |
+          devtools::document()
+          devtools::install(dependencies = FALSE)
+          devtools::build_manual(path = ".")
+          pkgdown::build_site(
+            examples = FALSE,
+            override = list(
+              destination = "../dist/R",
+              repo = list(url = list(source = sprintf("https://github.com/goeva-lab/found/tree/%s/R", system("git rev-parse main", intern = TRUE))))
+            )
+          )
+        working-directory: './R'
+        shell: Rscript {0}
+      - run: |
+          git subtree add --prefix dist origin gh-pages
+        continue-on-error: true
+      - run: |
+          git add -f dist
+      - run: |
+          git config user.email "$(git log -1 --pretty=format:%ce)" && git config user.name "$(git log -1 --pretty=format:%cn)"
+      - run: |
+          if [[ ! -z "$(git diff --staged dist)" ]]; then git commit -m "publish: ${{ github.sha }}" && git subtree push --prefix dist origin gh-pages; fi
+      - run: |
+          echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> "${GITHUB_ENV}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "found_${{ github.sha }}_R_manual.pdf"
+          path: "R/found_${{ env.FOUND_R_PACKAGE_VERSION }}.pdf"

@@ -24,7 +24,8 @@ html_static_path = ["static"]
 html_css_files = ["custom.css"]
 
 nb_custom_formats = {".py": ["jupytext.reads", {"fmt": "py:percent"}]}
-nb_execution_timeout = 0
+nb_execution_timeout = -1
+nb_execution_show_tb = True
 
 intersphinx_mapping = {
     "anndata": ("https://anndata.readthedocs.io/en/stable/", None),
