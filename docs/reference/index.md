@@ -7,6 +7,7 @@ self
 methods
 adapters
 tune
+pl
 ```
 
 ```{eval-rst}

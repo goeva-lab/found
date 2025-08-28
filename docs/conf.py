@@ -32,7 +32,9 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "python": ("https://docs.python.org/3/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
-    "sklearn": ("http://scikit-learn.org/stable", None),
+    "sklearn": ("http://scikit-learn.org/stable/", None),
+    "altair": ("https://altair-viz.github.io/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
 }
 
 typehints_use_rtype = False
