@@ -181,7 +181,7 @@ def score_phatdiff(
     # annotation on return type (currently set to _)
 
 
-@dataclass
+@dataclass(frozen=True)
 class NaiveMinScoreTuner(Tuner):
     """
     tuner class which attempts to select for an optimal k by selecting the k with maximal
@@ -226,7 +226,7 @@ class NaiveMinScoreTuner(Tuner):
         return keep, res
 
 
-@dataclass
+@dataclass(frozen=True)
 class FixPointTuner[T: float](Tuner):
     """
     tuner class which attempts to select for an optimal k (k_opt) > ``self.start_k`` such that
@@ -276,7 +276,7 @@ class FixPointTuner[T: float](Tuner):
                 nonlocal cache
                 if k > cache.shape[1]:
                     cache = run_dimr(k + self.min_stable)
-                return cache[:, k]
+                return cache[:, :k]
 
             algo = algo.update(dimr_fn=dimr)
 
