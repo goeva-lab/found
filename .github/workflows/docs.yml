@@ -27,7 +27,7 @@ jobs:
       # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
       # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
-          python -m ipykernel install --user --name found && (sphinx-build -D nb_execution_mode=off -b dirhtml -n docs dist/py || cat /tmp/sphinx-err-*)
+          python -m ipykernel install --user --name found && sphinx-build -D nb_execution_mode=off -b dirhtml -n docs docs/_build/html && mv docs/_build/html dist/py
       # `examples` set to FALSE because runner does not have enough computational resources to render examples
       # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
@@ -56,5 +56,5 @@ jobs:
           echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> "${GITHUB_ENV}"
       - uses: actions/upload-artifact@v4
         with:
-          name: "found_${{ github.sha }}_R_manual.pdf"
+          name: "R manual"
           path: "R/found_${{ env.FOUND_R_PACKAGE_VERSION }}.pdf"
