@@ -44,16 +44,16 @@ jobs:
         working-directory: './R'
         shell: Rscript {0}
       - run: |
-          git subtree add --prefix dist origin gh-pages
-        continue-on-error: true
+          set -euxo pipefail
+          
+          git init -b gh-pages
+          git add .
+          git config user.name 'github-actions[bot]' && git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m 'publish: ${{ github.sha }}'
+          git push -f 'https://git:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git' gh-pages
+        working-directory: './dist'
       - run: |
-          git add -f dist
-      - run: |
-          git config user.email "$(git log -1 --pretty=format:%ce)" && git config user.name "$(git log -1 --pretty=format:%cn)"
-      - run: |
-          if [[ ! -z "$(git diff --staged dist)" ]]; then git commit -m "publish: ${{ github.sha }}" && git subtree push --prefix dist origin gh-pages; fi
-      - run: |
-          echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> "${GITHUB_ENV}"
+          echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> '${{ github.env }}'
       - uses: actions/upload-artifact@v4
         with:
           name: "R manual"
