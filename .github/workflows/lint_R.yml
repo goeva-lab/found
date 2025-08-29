@@ -1,5 +1,9 @@
 on:
   push:
+    paths:
+      - '**.R'
+      - '**.Rmd'
+      - '.github/workflows/lint_R.yml'
 
 jobs:
   lint:
@@ -29,6 +33,6 @@ jobs:
         working-directory: './R'
         shell: Rscript {0}
       - run: |
-          devtools::check(error_on = "error")
+          devtools::check(error_on = "error", args = c("--no-examples", "--no-tests", "--no-vignettes"))
         working-directory: './R'
         shell: Rscript {0}

@@ -1,6 +1,8 @@
 on:
   push:
-
+    paths:
+      - '**.py'
+      - '.github/workflows/lint_py.yml'
 jobs:
   lint:
     runs-on: 'ubuntu-latest'
