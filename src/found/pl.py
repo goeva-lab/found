@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, Self
 
@@ -352,7 +352,7 @@ class PlotTunerOutput:
     """
 
     adata: ad.AnnData
-    outs: dict
+    outs: Mapping
     sel: Any
 
     def __getitem__(self, k) -> PlotHiDDENOutput:

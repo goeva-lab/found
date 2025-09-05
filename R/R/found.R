@@ -1,3 +1,26 @@
+#' found.adapters
+#'
+#' adapters module from found python package
+#'
+#' @export
+adapters <- NULL
+
+#' found.methods
+#'
+#' methods module from found python package
+#'
+#' @export
+methods <- NULL
+
+#' found.tune
+#'
+#' tune module from found python package
+#'
+#' @export
+tune <- NULL
+
+ad.AnnData <- NULL
+
 #' wrapper function which allows injection of R functions into found Pipelines
 #'
 #' @param fn function
@@ -40,6 +63,28 @@ to_step <- function(fn) {
   py_str$w(z)
 }
 
+sce_s4_class <- methods::getClass("SingleCellExperiment")
+seurat_s4_class <- methods::getClass("Seurat")
+
+conv_HiDDEN <- function(HiDDEN_out) {
+  list("p_hat" = reticulate::py_to_r(HiDDEN_out[0]), "labs" = reticulate::py_to_r(HiDDEN_out[1]))
+}
+
+conv_HiDDENt <- function(HiDDENt_outs) {
+  chosen <- reticulate::py_to_r(HiDDENt_outs[0])
+  out_l <- lapply(
+    reticulate::py_to_r(HiDDENt_outs[1]),
+    function(out) list("p_hat" = out[[1]], "labs" = out[[2]], "score" = out[[3]])
+  )
+
+  names(out_l) <- tryCatch(
+    lapply(names(out_l), function(x) as(x, class(chosen))),
+    error = function(e) names(out_l)
+  )
+
+  list("chosen" = chosen, "outs" = out_l)
+}
+
 #' HiDDEN
 #'
 #' HiDDEN entrypoint
@@ -73,7 +118,7 @@ to_step <- function(fn) {
 #' out <- HiDDEN(so, "stim", "CTRL", algo, so = so, k = 15L)
 #' names(out)
 #'
-#' @returns HiDDEN output - list of two elements w/ names:
+#' @returns HiDDEN output - list of two (2) elements w/ names:
 #' - `p_hat`: HiDDEN pipeline per-cell score values
 #' - `labs`: HiDDEN-adjusted per-cell condition labels
 #'
@@ -84,42 +129,21 @@ HiDDEN <- S7::new_generic("HiDDEN", "x")
 #' @name HiDDEN
 #' @method HiDDEN SingleCellExperiment
 #'
-#' @importClassesFrom SingleCellExperiment SingleCellExperiment
-#' @importFrom  SingleCellExperiment SingleCellExperiment
+#' @importFrom  SingleCellExperiment colData
 #'
-S7::method(HiDDEN, methods::getClass("SingleCellExperiment")) <- function(
-    x, cond_col, control_val, algo, ...) {
-  HiDDEN(function(e) {
-    SingleCellExperiment::colData(x)[[e]]
-  }, cond_col, control_val, algo, ...)
+S7::method(HiDDEN, sce_s4_class) <- function(
+    x, cond_col, control_val, ...) {
+  HiDDEN(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col)]]), cond_col, control_val, ...)
 }
 
 #' @name HiDDEN
 #' @method HiDDEN Seurat
 #'
 #' @importClassesFrom SeuratObject Seurat
-#' @importFrom  SeuratObject CreateSeuratObject
 #'
-S7::method(HiDDEN, methods::getClass("Seurat")) <- function(
-    x, cond_col, control_val, algo, ...) {
-  HiDDEN(function(e) {
-    x[[e]][, ]
-  }, cond_col, control_val, algo, ...)
-}
-
-# implementation method where `x` is a function which returns a metadata column
-S7::method(HiDDEN, S7::class_function) <- function(
-    x, cond_col, control_val, algo, ...) {
-  out <- algo(V = as.array(x(cond_col) != control_val), ...)
-
-  list(
-    "p_hat" = reticulate::py_to_r(out[0]),
-    "labs" = ifelse(
-      reticulate::py_to_r(out[1]),
-      x(cond_col),
-      control_val
-    )
-  )
+S7::method(HiDDEN, seurat_s4_class) <- function(
+    x, cond_col, control_val, ...) {
+  HiDDEN(ad.AnnData(obs = x[[c(cond_col)]]), cond_col, control_val, ...)
 }
 
 #' HiDDENt
@@ -158,9 +182,9 @@ S7::method(HiDDEN, S7::class_function) <- function(
 #' @param tuner Tuner
 #' @param ... extra arguments passed into pipeline
 #'
-#' @returns HiDDEN tuner output - list of two elements, w/ names:
+#' @returns HiDDENt output - list of two (2) elements, w/ names:
 #' - `chosen`: hyperparameter selected by provided tuner
-#' - `outs`: list with names being tested hyper-parameters, values a list of 3 elements, w/ names:
+#' - `outs`: list of three (3) elements w/ names:
 #'    - `p_hat`: HiDDEN pipeline per-cell score values
 #'    - `labs`: HiDDEN-adjusted per-cell condition labels
 #'    - `score`: tuner score value associated with selected hyper-parameters
@@ -170,87 +194,202 @@ S7::method(HiDDEN, S7::class_function) <- function(
 HiDDENt <- S7::new_generic("HiDDENt", "x")
 
 #' @name HiDDENt
-#' @method HiDDEN SingleCellExperiment
+#' @method HiDDENt SingleCellExperiment
 #'
-#' @importClassesFrom SingleCellExperiment SingleCellExperiment
-#' @importFrom  SingleCellExperiment SingleCellExperiment
+#' @importFrom  SingleCellExperiment colData
 #'
-S7::method(HiDDENt, methods::getClass("SingleCellExperiment")) <- function(
-    x, cond_col, control_val, algo, tuner, ...) {
-  HiDDENt(function(e) {
-    SingleCellExperiment::colData(x)[[e]]
-  }, cond_col, control_val, algo, tuner, ...)
+S7::method(HiDDENt, sce_s4_class) <- function(
+    x, cond_col, control_val, ...) {
+  HiDDENt(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col)]]), cond_col, control_val, ...)
 }
 
 #' @name HiDDENt
-#' @method HiDDEN Seurat
+#' @method HiDDENt Seurat
 #'
 #' @importClassesFrom SeuratObject Seurat
-#' @importFrom  SeuratObject CreateSeuratObject
 #'
-S7::method(HiDDENt, methods::getClass("Seurat")) <- function(
-    x, cond_col, control_val, algo, tuner, ...) {
-  HiDDENt(function(e) {
-    x[[e]][, ]
-  }, cond_col, control_val, algo, tuner, ...)
+S7::method(HiDDENt, seurat_s4_class) <- function(
+    x, cond_col, control_val, ...) {
+  HiDDENt(ad.AnnData(obs = x[[c(cond_col)]]), cond_col, control_val, ...)
 }
 
-# implementation method where `x` is a function which returns a metadata column
-S7::method(HiDDENt, S7::class_function) <- function(
-    x, cond_col, control_val, algo, tuner, ...) {
-  outs <- tuner(algo, V = as.array(x(cond_col) != control_val), ...)
+#' HiDDENg
+#'
+#' HiDDEN entrypoint w/ grouping
+#'
+#' @usage
+#' # method for SingleCellExperiment
+#' HiDDENg(sce, cond_col, control_val, group_by, algo, which_grouped, grp_specific_args, ...)
+#'
+#' @usage
+#' # method for Seurat
+#' HiDDENg(so, cond_col, control_val, group_by, algo, which_grouped, grp_specific_args, ...)
+#'
+#' @param x input object
+#' @param cond_col character
+#' @param control_val character
+#' @param algo Pipeline
+#' @param which_grouped character
+#' vector of argument names from the pipeline need to be grouped
+#' (by default will be determined automatically by checking which ones support indexing)
+#' @param grp_specific_args list
+#' any arguments that need to be provided on a group-specific basis
+#' (list w/ names being groups, values being lists w/ names being arguments)
+#' (by default will be determined automatically by checking which ones support indexing)
+#' @param ... extra arguments passed into pipeline
+#'
+#' @examplesIf requireNamespace("irlba", quietly = TRUE) && requireNamespace("Seurat", quietly = TRUE) && requireNamespace("SeuratObject", quietly = TRUE) && requireNamespace("SeuratData", quietly = TRUE) && ("ifnb" %in% SeuratData::InstalledData()[["Dataset"]])
+#' so <- SeuratData::LoadData("ifnb") |>
+#'   Seurat::SCTransform(verbose = FALSE) |>
+#'   suppressWarnings() |>
+#'   suppressMessages()
+#' sct_pca <- function(so, k) {
+#'   irlba::prcomp_irlba(
+#'     t(SeuratObject::LayerData(so, assay = "SCT", layer = "scale.data")),
+#'     n = k
+#'   )$x
+#' }
+#' algo <- adapters$Pipeline(to_step(sct_pca), methods$log_reg, methods$kmeans_bin)
+#' out <- HiDDENg(so, "stim", "CTRL", "seurat_annotations", algo, so = so, k = 15L)
+#' names(out)
+#'
+#' @returns HiDDEN output - list of two (2) elements w/ names:
+#' - `p_hat`: HiDDEN pipeline per-cell score values
+#' - `labs`: HiDDEN-adjusted per-cell condition labels
+#'
+#' @export
+#'
+HiDDENg <- S7::new_generic("HiDDENg", "x")
 
-  chosen <- reticulate::py_to_r(outs[0])
-  out_l <- lapply(reticulate::py_to_r(outs[1]), function(out) {
-    list(
-      "p_hat" = out[[1]],
-      "labs" = ifelse(out[[2]], x(cond_col), control_val),
-      "score" = out[[3]]
-    )
-  })
-
-  names(out_l) <- tryCatch(
-    lapply(
-      names(out_l),
-      function(x) {
-        as(x, class(chosen))
-      }
-    ),
-    error = function(e) {
-      names(out_l)
-    }
-  )
-
-  list(
-    "chosen" = chosen,
-    "outs" = out_l
-  )
+#' @name HiDDENg
+#' @method HiDDENg SingleCellExperiment
+#'
+#' @importFrom  SingleCellExperiment colData
+#'
+S7::method(HiDDENg, sce_s4_class) <- function(
+    x, cond_col, control_val, group_by, ...) {
+  HiDDENg(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+}
+#' @name HiDDENg
+#' @method HiDDENg Seurat
+#'
+#' @importClassesFrom SeuratObject Seurat
+#'
+S7::method(HiDDENg, seurat_s4_class) <- function(
+    x, cond_col, control_val, group_by, ...) {
+  HiDDENg(ad.AnnData(obs = x[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
 }
 
-#' found.adapters
+#' HiDDENgt
 #'
-#' adapters module from found python package
+#' HiDDEN entrypoint w/ grouping and automatic hyper-parameter tuning
 #'
+#' @usage
+#' # method for SingleCellExperiment
+#' HiDDENgt(sce, cond_col, control_val, group_by, algo, tuner, which_grouped, grp_specific_args, ...)
+#'
+#' @usage
+#' # method for Seurat
+#' HiDDENgt(so, cond_col, control_val, group_by, algo, tuner, which_grouped, grp_specific_args, ...)
+#'
+#' @param x input object
+#' @param cond_col character
+#' @param control_val character
+#' @param algo Pipeline
+#' @param tuner Tuner
+#' @param which_grouped character
+#' vector of argument names from the pipeline need to be grouped
+#' (by default will be determined automatically by checking which ones support indexing)
+#' @param grp_specific_args list
+#' any arguments that need to be provided on a group-specific basis
+#' (list w/ names being groups, values being lists w/ names being arguments names, values being associated value)
+#' (by default will be determined automatically by checking which ones support indexing)
+#' @param ... extra arguments passed into pipeline
+#'
+#' @examplesIf requireNamespace("irlba", quietly = TRUE) && requireNamespace("Seurat", quietly = TRUE) && requireNamespace("SeuratObject", quietly = TRUE) && requireNamespace("SeuratData", quietly = TRUE) && ("ifnb" %in% SeuratData::InstalledData()[["Dataset"]])
+#' so <- SeuratData::LoadData("ifnb") |>
+#'   Seurat::SCTransform(verbose = FALSE) |>
+#'   suppressWarnings() |>
+#'   suppressMessages()
+#' sct_pca <- function(so, k) {
+#'   irlba::prcomp_irlba(
+#'     t(SeuratObject::LayerData(so, assay = "SCT", layer = "scale.data")),
+#'     n = k
+#'   )$x
+#' }
+#' algo <- adapters$Pipeline(to_step(sct_pca), methods$log_reg, methods$kmeans_bin)
+#' tuner <- tune$FixPointTuner(5, 8, 0.04)
+#' out <- HiDDENgt(so, "stim", "CTRL", "seurat_annotations", algo, tuner, so = so)
+#' names(out)
+#' names(out[["by_param"]](out[["chosen"]]))
+#' names(out[["by_grp"]](names(out[["chosen"]][[1]])))
+#'
+#' @returns HiDDENgt output - list of three (3) elements w/ names:
+#' - `chosen`: mapping from each group to selected hyper-parameter for that group
+#' - `by_param`: accessor function which given a mapping of groups to hyper-parameters
+#' (and an optional default hyper-parameter for unspecified groups), returns a list of three (3) elements w/ names:
+#'    - `p_hat`: 1-d array of prediction outputs by model, ordered by their original order within the provided
+#'    - `labs`: model adjusted labels
+#'    - `score`: mapping of group to score value given provided configuration
+#' - `by_grp`: accessor function which given a specific group, returns HiDDENt-style output for just that group
 #' @export
-adapters <- NULL
+#'
+HiDDENgt <- S7::new_generic("HiDDENgt", "x")
 
-#' found.methods
+#' @name HiDDENgt
+#' @method HiDDENgt SingleCellExperiment
 #'
-#' methods module from found python package
+#' @importFrom  SingleCellExperiment colData
 #'
-#' @export
-methods <- NULL
+S7::method(HiDDENgt, sce_s4_class) <- function(
+    x, cond_col, control_val, group_by, ...) {
+  HiDDENgt(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+}
 
-#' found.tune
+#' @name HiDDENgt
+#' @method HiDDENgt Seurat
 #'
-#' tune module from found python package
+#' @importClassesFrom SeuratObject Seurat
 #'
-#' @export
-tune <- NULL
+S7::method(HiDDENgt, seurat_s4_class) <- function(
+    x, cond_col, control_val, group_by, ...) {
+  HiDDENgt(ad.AnnData(obs = x[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+}
 
 .onLoad <- function(libname, pkgname) {
-  reticulate::py_require("found")
+  reticulate::py_require(c("anndata", "found"))
+
+  ad.AnnData <<- reticulate::import("anndata", delay_load = TRUE, convert = FALSE)$AnnData
+  found.find <- reticulate::import("found.find", delay_load = TRUE, convert = FALSE)
+
   adapters <<- reticulate::import("found.adapters", delay_load = TRUE, convert = FALSE)
   methods <<- reticulate::import("found.methods", delay_load = TRUE, convert = FALSE)
   tune <<- reticulate::import("found.tune", delay_load = TRUE, convert = FALSE)
+
+  anndata_s3_class <- S7::new_S3_class(nameOfClass(ad.AnnData))
+
+  S7::method(HiDDEN, anndata_s3_class) <- function(x, cond_col, control_val, ...) {
+    conv_HiDDEN(found.find$HiDDEN(x, cond_col, control_val, ...))
+  }
+
+  S7::method(HiDDENt, anndata_s3_class) <- function(x, cond_col, control_val, ...) {
+    conv_HiDDENt(found.find$HiDDENt(x, cond_col, control_val, ...))
+  }
+
+  S7::method(HiDDENg, anndata_s3_class) <- function(x, cond_col, control_val, group_by, ...) {
+    conv_HiDDEN(found.find$HiDDENg(x, cond_col, control_val, group_by, ...))
+  }
+
+  S7::method(HiDDENgt, anndata_s3_class) <- function(x, cond_col, control_val, group_by, ...) {
+    outs <- found.find$HiDDENgt(x, cond_col, control_val, group_by, ...)
+
+    list(
+      "chosen" = reticulate::py_to_r(outs[0]),
+      "by_param" = function(mapping = NULL, default = NULL) {
+        out <- outs[1](if (is.null(mapping)) NULL else reticulate::dict(mapping), default)
+        append(conv_HiDDEN(reticulate::tuple(out[0], out[1])), list("score" = reticulate::py_to_r(out[2])))
+      },
+      "by_grp" = function(grp) conv_HiDDENt(reticulate::tuple(outs[0][grp], outs[2](grp)))[["outs"]]
+    )
+  }
 }

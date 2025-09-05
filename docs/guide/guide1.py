@@ -10,7 +10,8 @@
 # %% [markdown]
 # we first load the provided gene expression matrix and
 # associated metadata provided in GSE193531 into an anndata object
-# %% import dependencies and load data
+# %%
+# import dependencies and load data
 
 from pathlib import Path
 

@@ -81,7 +81,7 @@ sel, outs = found.HiDDENt(
     "ctrl",
     algo,
     tuner,
-    # ⚠️ the `from_proc_ad` constructor
+    # ⚠️  the `from_proc_ad` constructor
     #     creates a pipeline which expects
     #     an adata initializing argument
     #     so we must provide it here

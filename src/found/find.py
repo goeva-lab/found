@@ -1,10 +1,13 @@
+from collections import defaultdict
+from collections.abc import Callable, Collection, Mapping
+from functools import partial
 from typing import Any
 
 import anndata as ad
 import numpy as np
 import pandas as pd
 
-from .adapters import Pipeline
+from .adapters import Pipeline, wrap_gby_fn
 from .methods import kmeans_bin, log_reg, run_lognorm_pca
 from .tune import FixPointTuner, Tuner
 from .types import BoolArr, NumArr
@@ -14,6 +17,32 @@ def remap[T: np.ndarray[tuple[int], Any]](adj_bool: BoolArr, orig_label: T | pd.
     return np.where(adj_bool, orig_label, control_val)  # pyright: ignore
     # ignore NECESSITY - np.where broadcasting does
     # not maintain array size in type information
+
+
+def prep_grps(
+    obs: pd.DataFrame, grp_by: str | tuple[str], which_grouped: str | Collection[str] | None, kwargs: dict
+) -> tuple[
+    Mapping[Any, np.ndarray[tuple[int], np.dtype[np.integer]]],
+    np.ndarray[tuple[int], np.dtype[np.integer]],
+    list[str],
+]:
+    grp_idx = obs.groupby(list(grp_by) if isinstance(grp_by, tuple) else grp_by, sort=True, dropna=False, observed=True).indices
+    out_ord = np.argsort(np.concat(list(grp_idx.values())))
+
+    if which_grouped is None:
+        which_grouped = [k for k, v in kwargs.items() if hasattr(v, "__getitem__")]
+    elif isinstance(which_grouped, str):
+        which_grouped = [which_grouped]
+    else:
+        which_grouped = list(which_grouped)
+
+    which_grouped.append("V")
+
+    return (
+        grp_idx,
+        out_ord,  # pyright: ignore
+        which_grouped,
+    )
 
 
 def HiDDEN(
@@ -26,7 +55,7 @@ def HiDDEN(
     """
     runs HiDDEN on a given :py:class:`~anndata.AnnData` object.
 
-    :param adata: input :py:class:`~anndata.AnnData` object
+    :param x: input :py:class:`~anndata.AnnData` object
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
     :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
@@ -36,13 +65,60 @@ def HiDDEN(
         - 1-d array of prediction outputs by model
         - binarized labels from prediction values
     """
-
     y_hat, new_ann, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
     return (
         y_hat,
         remap(
             new_ann,
+            x.obs[cond_col],  # pyright: ignore
+            control_val,
+        ),
+    )
+
+
+def HiDDENg(
+    x: ad.AnnData,
+    cond_col: str,
+    control_val: Any,
+    group_by: str | tuple[str],
+    algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
+    which_grouped: str | Collection[str] | None = None,
+    grp_specific_args: Mapping[Any, dict[str, Any]] | None = None,
+    **kwargs,
+) -> tuple[NumArr, np.ndarray[tuple[int], Any]]:
+    """
+    runs HiDDEN on a given :py:class:`~anndata.AnnData` object, given some set of grouping factors.
+
+    :param x: input :py:class:`~anndata.AnnData` object
+    :param cond_col: string indicating obs column in adata representing condition value
+    :param control_val: value representing the control condition in the provided condition column
+    :param group_by: set of column names in ``x.obs`` specifiying grouping
+    :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
+    :param which_grouped: set of pipeline arguments which should be indexed by grouping (set to None to group all pipeline arguments which support indexing)
+    :param grp_specific_args: any additional arguments that are to be provided on a group-specific basis
+    :param kwargs: additional variables to pass into pipeline across every group
+    :return: 2-tuple consisting of:
+
+        - 1-d array of prediction outputs by model
+        - binarized labels from prediction values
+    """
+    assert isinstance(x.obs, pd.DataFrame)
+
+    if grp_specific_args is None:
+        grp_specific_args = defaultdict(dict)
+
+    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs)
+
+    gfn = wrap_gby_fn(algo, which_grouped, grp_idx)
+    yhat, labs, _ = zip(
+        *(gfn(grp, **(kwargs | {"V": (x.obs[cond_col] != control_val).to_numpy()} | grp_specific_args[grp])) for grp in grp_idx)
+    )
+
+    return (
+        np.concat(yhat)[out_ord],  # pyright: ignore
+        remap(
+            np.concat(labs)[out_ord],  # pyright: ignore
             x.obs[cond_col],  # pyright: ignore
             control_val,
         ),
@@ -56,11 +132,11 @@ def HiDDENt[P, S](
     algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
     tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
     **kwargs,
-) -> tuple[P, dict[P, tuple[NumArr, np.ndarray[tuple[int], Any], S]]]:
+) -> tuple[P, Mapping[P, tuple[NumArr, np.ndarray[tuple[int], Any], S]]]:
     """
     runs HiDDEN on a given :py:class:`~anndata.AnnData` object, trying to optimize for a specific set of dimensions using provided :py:class:`~found.tune.Tuner`.
 
-    :param adata: input :py:class:`~anndata.AnnData` object
+    :param x: input :py:class:`~anndata.AnnData` object
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
     :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
@@ -75,11 +151,10 @@ def HiDDENt[P, S](
             - optional scoring value generated by tuner for specific hyperparameter configuration
 
     """
-
-    best_k, outs = tuner(algo, V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
+    best_param, outs = tuner(algo, V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
     return (
-        best_k,
+        best_param,
         {
             k: (
                 Y,
@@ -93,3 +168,96 @@ def HiDDENt[P, S](
             for k, (Y, W, s) in outs.items()
         },
     )
+
+
+def HiDDENgt[P, S, G](
+    x: ad.AnnData,
+    cond_col: str,
+    control_val: Any,
+    group_by: str | tuple[str],
+    algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
+    tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
+    which_grouped: str | Collection[str] | None = None,
+    grp_specific_args: Mapping[G, dict[str, Any]] | None = None,
+    **kwargs,
+) -> tuple[
+    Mapping[G, P],
+    Callable[[Mapping[G, P] | None, P | None], tuple[NumArr, np.ndarray[tuple[int], Any], Mapping[G, S]]],
+    Callable[[G], Mapping[P, tuple[NumArr, np.ndarray[tuple[int], Any], S]]],
+]:
+    """
+    runs HiDDEN on a given :py:class:`~anndata.AnnData` object, given some set of grouping factors, trying to optimize for a specific set of dimensions using provided :py:class:`~found.tune.Tuner`.
+
+    :param x: input :py:class:`~anndata.AnnData` object
+    :param cond_col: string indicating obs column in adata representing condition value
+    :param control_val: value representing the control condition in the provided condition column
+    :param group_by: set of column names in ``x.obs`` specifiying grouping
+    :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
+    :param tuner: provided tuner which attempts to optimize pipeline for a specific hyperparameter
+    :param which_grouped: set of pipeline arguments which should be indexed by grouping (set to None to group all pipeline argumnents which support indexing)
+    :param grp_specific_args: any additional arguments that are to be provided on a group-specific basis
+    :param kwargs: additional variables to pass into pipeline across every group
+    :return: 3-tuple consisting of:
+
+        - mapping from each group to selected hyper-parameter for that group
+        - accessor function which given a mapping of groups to hyper-parameters (and an optional default hyper-parameter for unspecified groups), returns a 3-tuple of:
+            - 1-d array of prediction outputs by model, ordered by their original order within the provided
+            - model adjusted labels
+            - mapping of group to score value given provided configuration
+        - accessor function which given a specific group, returns a HiDDENt-style output dictionary for just that group
+    """
+    assert isinstance(x.obs, pd.DataFrame)
+
+    if grp_specific_args is None:
+        grp_specific_args = defaultdict(dict)
+
+    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs)
+
+    gfn = wrap_gby_fn(partial(tuner, algo), which_grouped, grp_idx)
+    best_params, outs = zip(
+        *(gfn(grp, **(kwargs | {"V": (x.obs[cond_col] != control_val).to_numpy()} | grp_specific_args[grp])) for grp in grp_idx)
+    )
+    best_params = {g: h for g, h in zip(grp_idx.keys(), best_params, strict=True)}
+    outs = {g: o for g, o in zip(grp_idx.keys(), outs, strict=True)}
+
+    def acc_by_param(
+        mapping: Mapping[G, P] | None = None, default: P | None = None
+    ) -> tuple[NumArr, np.ndarray[tuple[int], Any], Mapping[G, S]]:
+        if mapping is None:
+            mapping = dict()
+        if default is None:
+            if set(mapping.keys()) != set(grp_idx.keys()):
+                raise ValueError(
+                    f"provided mapping {mapping} does not span all present groups {grp_idx.keys()} and no default was provided"
+                )
+
+        def get(g: G) -> P:
+            out = mapping[g] if g in mapping else default
+            assert out is not None
+            return out
+
+        return (
+            np.concat([outs[g][get(g)][0] for g in grp_idx.keys()])[out_ord],  # pyright: ignore
+            remap(
+                np.concat([outs[g][get(g)][1] for g in grp_idx.keys()])[out_ord],  # pyright: ignore
+                x.obs[cond_col],  # pyright: ignore
+                control_val,
+            ),
+            {g: outs[g][get(g)][2] for g in grp_idx.keys()},
+        )
+
+    def acc_by_grp(grp: G) -> Mapping[P, tuple[NumArr, np.ndarray[tuple[int], Any], S]]:
+        return {
+            k: (
+                Y,
+                remap(
+                    W,
+                    x[grp_idx[grp]].obs[cond_col],  # pyright: ignore
+                    control_val,
+                ),
+                s,
+            )
+            for k, (Y, W, s) in outs[grp].items()
+        }
+
+    return (best_params, acc_by_param, acc_by_grp)

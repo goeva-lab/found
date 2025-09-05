@@ -1,4 +1,4 @@
-from collections.abc import Callable, Collection, Generator, Iterable
+from collections.abc import Callable, Collection, Mapping
 from dataclasses import dataclass
 from functools import wraps
 from inspect import Parameter, signature
@@ -8,14 +8,13 @@ from typing import Any, Literal, Protocol, Self, Union, get_args, get_origin
 
 import anndata as ad
 import numpy as np
-import pandas as pd
 
 from .types import BoolArr, FloatMtx, NumArr
 
 _INTERNAL_WRAP_ATTR_NAME = "__FOUND_WRAPPED_INTERNAL_NAMES"
 
 
-# TODO: determine if there's a better way to do this
+# @TODO: determine if there's a better way to do this
 def strip_generic(tp: Any) -> Any:
     # recursive case for handling UnionType
     if isinstance(tp, UnionType):
@@ -36,6 +35,7 @@ def check(w: dict[str, Any], p: Parameter, name: str):
                 f"`{p.annotation}` to be provided for argument `{p.name}`, but "
                 f"value {w[p.name]} of type {type(w[p.name])} was provided instead"
             )
+        return chk
 
 
 def wcall[T](w: dict[str, Any], fn: Callable[..., T], strict: bool) -> T:
@@ -216,15 +216,23 @@ class Pipeline:
 
 
 # create protocol since Callable does not allow specifying keyword only arguments
-class GroupbyOut[T](Protocol):
-    def __call__(
-        self, grp: pd.Series | Iterable[np.ndarray[tuple[int], np.dtype[np.integer]]], /, **kwargs
-    ) -> Generator[T]: ...
+class GroupbyOut[T, G](Protocol):
+    def __call__(self, grp: G, /, **kwargs) -> T: ...
 
 
-def groupby[T](fn: Callable[..., T], grp_args: Collection[str]) -> GroupbyOut[T]:
-    def w(grp: pd.Series | Iterable[np.ndarray[tuple[int], np.dtype[np.integer]]], /, **kwargs) -> Generator[T]:
-        for idx in grp.groupby(grp).indices.values() if isinstance(grp, pd.Series) else grp:
-            yield fn(**(kwargs | {k: kwargs[k][idx] for k in grp_args}))
+def wrap_gby_fn[T, G](
+    fn: Callable[..., T], which_args: Collection[str], grps: Mapping[G, np.ndarray[tuple[int], np.dtype[np.integer]]]
+) -> GroupbyOut[T, G]:
+    def f(grp: G, /, **kwargs) -> T:
+        new_args = {k: kwargs[k][grps[grp]] for k in which_args}
 
-    return w
+        for k in new_args:
+            # materialize anndata view before it is repeatedly accessed downstream
+            if isinstance(new_args[k], ad.AnnData):
+                new_args[k] = new_args[k].copy()
+
+            # more specializations here
+
+        return fn(**(kwargs | new_args))
+
+    return f
