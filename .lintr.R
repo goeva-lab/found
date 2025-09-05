@@ -5,6 +5,7 @@ linters <- linters_with_defaults(
 
 exclusions <- list(
   "R/R/found.R" = list(
-    line_length_linter = c(61, 133)
+    # roxygen2 examplesIf clause can't be multiple lines, so disable line length lints on those lines
+    line_length_linter = which(startsWith(readLines("R/R/found.R"), "#' @examplesIf "))
   )
 )
