@@ -14,7 +14,7 @@ from .types import BoolArr, NumArr
 
 
 def remap[T: np.ndarray[tuple[int], Any]](adj_bool: BoolArr, orig_label: T | pd.Series, control_val: Any) -> T:
-    return np.where(adj_bool, orig_label, control_val)  # pyright: ignore
+    return np.where(adj_bool, orig_label, control_val)  # pyright: ignore[reportReturnType]
     # ignore NECESSITY - np.where broadcasting does
     # not maintain array size in type information
 
@@ -26,6 +26,13 @@ def prep_grps(
     np.ndarray[tuple[int], np.dtype[np.integer]],
     list[str],
 ]:
+    assert not (  # pyright: ignore[reportGeneralTypeIssues]
+        obs[grp_by]
+        .isna()
+        .any(
+            axis=None,  # pyright: ignore[reportArgumentType]
+        )
+    ), "group by adapters cannot be used on columns containing na values."
     grp_idx = obs.groupby(list(grp_by) if isinstance(grp_by, tuple) else grp_by, sort=True, dropna=False, observed=True).indices
     out_ord = np.argsort(np.concat(list(grp_idx.values())))
 
@@ -40,7 +47,7 @@ def prep_grps(
 
     return (
         grp_idx,
-        out_ord,  # pyright: ignore
+        out_ord,  # pyright: ignore[reportReturnType]
         which_grouped,
     )
 
@@ -71,7 +78,7 @@ def HiDDEN(
         y_hat,
         remap(
             new_ann,
-            x.obs[cond_col],  # pyright: ignore
+            x.obs[cond_col],  # pyright: ignore[reportArgumentType]
             control_val,
         ),
     )
@@ -116,10 +123,10 @@ def HiDDENg(
     )
 
     return (
-        np.concat(yhat)[out_ord],  # pyright: ignore
+        np.concat(yhat)[out_ord],  # pyright: ignore[reportReturnType]
         remap(
-            np.concat(labs)[out_ord],  # pyright: ignore
-            x.obs[cond_col],  # pyright: ignore
+            np.concat(labs)[out_ord],  # pyright: ignore[reportArgumentType]
+            x.obs[cond_col],  # pyright: ignore[reportArgumentType]
             control_val,
         ),
     )
@@ -160,7 +167,7 @@ def HiDDENt[P, S](
                 Y,
                 remap(
                     W,
-                    x.obs[cond_col],  # pyright: ignore
+                    x.obs[cond_col],  # pyright: ignore[reportArgumentType]
                     control_val,
                 ),
                 s,
@@ -237,10 +244,10 @@ def HiDDENgt[P, S, G](
             return out
 
         return (
-            np.concat([outs[g][get(g)][0] for g in grp_idx.keys()])[out_ord],  # pyright: ignore
+            np.concat([outs[g][get(g)][0] for g in grp_idx.keys()])[out_ord],  # pyright: ignore[reportReturnType]
             remap(
-                np.concat([outs[g][get(g)][1] for g in grp_idx.keys()])[out_ord],  # pyright: ignore
-                x.obs[cond_col],  # pyright: ignore
+                np.concat([outs[g][get(g)][1] for g in grp_idx.keys()])[out_ord],  # pyright: ignore[reportArgumentType]
+                x.obs[cond_col],  # pyright: ignore[reportArgumentType]
                 control_val,
             ),
             {g: outs[g][get(g)][2] for g in grp_idx.keys()},
@@ -252,7 +259,7 @@ def HiDDENgt[P, S, G](
                 Y,
                 remap(
                     W,
-                    x[grp_idx[grp]].obs[cond_col],  # pyright: ignore
+                    x[grp_idx[grp]].obs[cond_col],  # pyright: ignore[reportArgumentType]
                     control_val,
                 ),
                 s,

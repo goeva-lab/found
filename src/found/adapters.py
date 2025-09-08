@@ -72,7 +72,7 @@ def step_fn[Fn: Callable](*out_names: str) -> Callable[[Fn], Fn]:
 
         setattr(c, _INTERNAL_WRAP_ATTR_NAME, out_names)
 
-        return c  # pyright: ignore
+        return c  # pyright: ignore[reportReturnType]
         # ignore NECESSITY - from the definition of c, we can
         # see that it will replicate the type signature of func
 
@@ -199,7 +199,7 @@ class Pipeline:
         """
 
         def dimr_fn(adata: ad.AnnData, k: int | None = None) -> FloatMtx:
-            dimr: FloatMtx = adata.obsm[dimr_key]  # pyright: ignore
+            dimr: FloatMtx = adata.obsm[dimr_key]  # pyright: ignore[reportAssignmentType]
             # ignore NECESSITY - isinstance check through strip_generic not understood by type checker
             assert isinstance(dimr, strip_generic(FloatMtx)), (
                 f'expected adata.obsm["{dimr}"] to be of type {FloatMtx}, got {type(dimr)} instead'
@@ -208,7 +208,7 @@ class Pipeline:
                 assert dimr.shape[1] >= k, (
                     f'provided dimensionality reduction matrix in adata.obsm["{dimr}"] is of shape {dimr.shape}, but a {k}-d space was queried'
                 )
-            return dimr[:, :k]  # pyright: ignore
+            return dimr[:, :k]  # pyright: ignore[reportReturnType]
             # ignore NECESSITY - numpy indexing does not preserve array shape
             # `:`-index keeps first dimension, and `:k`-index also preserves second dimension
 

@@ -17,11 +17,11 @@ def mult_preserve_type[T: MatrixLike](lhs: T, rhs: np.ndarray) -> T:
     o = lhs * rhs
 
     if isinstance(lhs, sp.csr_array):
-        o = o.tocsr()  # pyright: ignore
+        o = o.tocsr()  # pyright: ignore[reportAttributeAccessIssue]
     elif isinstance(lhs, sp.csc_array):
-        o = o.tocsc()  # pyright: ignore
+        o = o.tocsc()  # pyright: ignore[reportAttributeAccessIssue]
 
-    return o  # pyright: ignore
+    return o  # pyright: ignore[reportReturnType]
 
 
 def scale_rs[T: MatrixLike](X: T) -> T:
@@ -40,7 +40,7 @@ def scale_rs[T: MatrixLike](X: T) -> T:
         recip = np.reciprocal(size_fact)
     recip = np.where(size_fact > 0, recip, 0.0)
 
-    return mult_preserve_type(X, recip[:, np.newaxis])  # pyright: ignore
+    return mult_preserve_type(X, recip[:, np.newaxis])  # pyright: ignore[reportReturnType]
     # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
 
 
@@ -55,7 +55,7 @@ def scale_sd[T: MatrixLike](X: T) -> T:
     if isinstance(X, np.ndarray):
         stdev = np.std(X, axis=0)
     else:
-        _, var = sparsefuncs.mean_variance_axis(X, axis=0)  # pyright: ignore
+        _, var = sparsefuncs.mean_variance_axis(X, axis=0)  # pyright: ignore[reportArgumentType, reportAssignmentType, reportGeneralTypeIssues]
         # ignore NECESSITY - sparsefuncs.mean_variance_axis return type set to
         # Unknown, however type is documented to be 2-tuple given these arguments
         stdev = np.sqrt(var)
@@ -65,7 +65,7 @@ def scale_sd[T: MatrixLike](X: T) -> T:
         recip = np.reciprocal(stdev)
     recip = np.where(stdev > 0, recip, 0.0)
 
-    return mult_preserve_type(X, recip[np.newaxis, :])  # pyright: ignore
+    return mult_preserve_type(X, recip[np.newaxis, :])  # pyright: ignore[reportReturnType]
     # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
 
 
@@ -86,10 +86,10 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     X = scale_rs(X)
 
     if isinstance(X, np.ndarray):
-        X = np.log1p(X)  # pyright: ignore
+        X = np.log1p(X)  # pyright: ignore[reportAssignmentType]
         # ignore NECESSITY - log1p method type hint does not preserve shape type hint
     else:
-        X = X.tocsr().log1p()  # pyright: ignore
+        X = X.tocsr().log1p()  # pyright: ignore[reportAttributeAccessIssue]
         # ignore NECESSITY - pyright can't detect log1p method on sparse matrix types
         # because method is added dynamically, as observed here:
         # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
@@ -113,7 +113,7 @@ def run_pca(N: MatrixLike, k: int, scale: bool = True) -> FloatMtx:
     # return PCA output
     # centering is not needed since arpack solver centers pre-PCA
     return PCA(k, svd_solver="arpack", random_state=get_seed()).fit_transform(
-        scale_sd(N) if scale else N  # pyright: ignore
+        scale_sd(N) if scale else N  # pyright: ignore[reportArgumentType]
     )
     # ignore NECESSITY - sparray also works for PCA, but is not documented
 
@@ -166,13 +166,13 @@ def run_nmf(
         X = scale_sd(X)
 
     m = NMF(
-        k,  # pyright: ignore
+        k,  # pyright: ignore[reportArgumentType]
         random_state=get_seed(),
         alpha_W=nmf_lreg[0],
-        alpha_H=nmf_lreg[1],  # pyright: ignore
+        alpha_H=nmf_lreg[1],  # pyright: ignore[reportArgumentType]
         l1_ratio=nmf_l1l2ratio,
     )
-    z = m.fit_transform(X)  # pyright: ignore
+    z = m.fit_transform(X)  # pyright: ignore[reportArgumentType]
 
     return z, m.components_.T
 
@@ -194,7 +194,7 @@ def log_reg(
     :return: 1-d float array of probability scores from the fitted logistic regression model
     """
     model = LogisticRegression(
-        penalty=None,  # pyright: ignore
+        penalty=None,  # pyright: ignore[reportArgumentType]
         # ignore NECESSITY - penalty can be None but type set to str
         solver=regopt_solver,
         max_iter=regopt_maxiter,
@@ -205,7 +205,7 @@ def log_reg(
     # in sorted order, so True should always be the second class
     # however we still perform the `.index` operation as a sanity check
     return (
-        model.predict_proba(Z)[:, model.classes_.tolist().index(True)],  # pyright: ignore
+        model.predict_proba(Z)[:, model.classes_.tolist().index(True)],  # pyright: ignore[reportReturnType]
         # ignore NECESSITY - predict_proba will be a 2-d array,
         # which when indexed with [:, int] will return a 1-d array
         model,

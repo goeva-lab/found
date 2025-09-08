@@ -20,7 +20,7 @@ def mk_range(d, n: int) -> np.ndarray[tuple[int], np.dtype[np.floating]]:
 
 def kde(d, n: int) -> np.ndarray[tuple[int], np.dtype[np.floating]]:
     if d.size <= 1:
-        return np.repeat(1.0, n)  # pyright: ignore
+        return np.repeat(1.0, n)  # pyright: ignore[reportReturnType]
     return gaussian_kde(d)(mk_range(d, n))
 
 
@@ -57,7 +57,7 @@ class PlotAdata:
         if key in self.__idx:
             o = self.__mtx[:, self.__idx.get_loc(key)]
             if isinstance(o, sp.sparray | sp.spmatrix):
-                o = o.todense()  # pyright: ignore
+                o = o.todense()  # pyright: ignore[reportAttributeAccessIssue]
                 o = np.array(o).reshape(-1)
             return self.__ret_cache(key, o)
 
@@ -92,8 +92,8 @@ class PlotAdata:
                     pass
                 else:
                     schema = schema.sort(
-                        np.unique(
-                            to_num,  # pyright: ignore
+                        np.unique(  # pyright: ignore[reportCallIssue]
+                            to_num,  # pyright: ignore[reportArgumentType]
                         )
                         .astype(type(df[schema._kwds["shorthand"]][0]))
                         .tolist()
@@ -241,8 +241,8 @@ class PlotHiDDENOutput:
 
         return type(self)(
             self.adata[idx],
-            self.phat[idx],  # pyright: ignore
-            self.labs[idx],  # pyright: ignore
+            self.phat[idx],  # pyright: ignore[reportArgumentType]
+            self.labs[idx],  # pyright: ignore[reportArgumentType]
         )
 
     def phat_vln(
@@ -362,21 +362,19 @@ class PlotTunerOutput:
             )
         return PlotHiDDENOutput(self.adata, self.outs[k][0], self.outs[k][1])
 
-    def plot_scores(self) -> alt.Chart:
+    def plot_scores(self) -> alt.Chart | alt.LayerChart:
         """
         method used to generate a line plot of scores for tested hyperparameters
         """
         params = sorted(self.outs.keys())
-        return (
-            alt.Chart(
-                pd.DataFrame(
-                    {
-                        "hyperparameter": params,
-                        "score": [self.outs[k][2] for k in params],
-                        "selected": [p == self.sel for p in params],
-                    }
-                )
+        c = alt.Chart(
+            pd.DataFrame(
+                {
+                    "hyperparameter": params,
+                    "score": [self.outs[k][2] for k in params],
+                    "selected": [p == self.sel for p in params],
+                }
             )
-            .encode(alt.X("hyperparameter"), alt.Y("score"), alt.Shape("selected"))
-            .mark_line(point=True)
-        )
+        ).encode(alt.X("hyperparameter"), alt.Y("score"))
+
+        return c.mark_line() + c.encode(alt.Color("selected")).mark_point(filled=True, opacity=1)

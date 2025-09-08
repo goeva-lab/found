@@ -22,16 +22,16 @@ class Tuner[HyperparameterType, ScoreType](ABC):
 
 
 def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, deg_cutoff: float) -> Integral:
-    assert lhs.shape[1] == rhs.shape[1], (  # pyright: ignore
+    assert lhs.shape[1] == rhs.shape[1], (  # pyright: ignore[reportOptionalSubscript]
         # ignore NECESSITY - spmatrix.shape is not annotated
         "lhs/rhs number of features must be equal"
     )
 
-    ngenes = lhs.shape[1]  # pyright: ignore
+    ngenes = lhs.shape[1]  # pyright: ignore[reportOptionalSubscript]
     # ignore NECESSITY - spmatrix.shape is not annotated
 
     if isinstance(lhs, np.ndarray):
-        lhs_mean, rhs_mean = np.mean(lhs, axis=0), np.mean(rhs, axis=0)  # pyright: ignore
+        lhs_mean, rhs_mean = np.mean(lhs, axis=0), np.mean(rhs, axis=0)  # pyright: ignore[reportCallIssue, reportArgumentType]
 
     else:
         lhs_mean, rhs_mean = lhs.mean(axis=0), rhs.mean(axis=0)
@@ -42,13 +42,13 @@ def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, deg_cutoff: float) -> Integ
     # remove genes where log2FC is less than 1.5
     lfc = np.abs(np.log2(rhs_mean[gtz] / lhs_mean[gtz])) > deg_cutoff
 
-    lhs, rhs = lhs[:, gtz][:, lfc], rhs[:, gtz][:, lfc]  # pyright: ignore
+    lhs, rhs = lhs[:, gtz][:, lfc], rhs[:, gtz][:, lfc]  # pyright: ignore[reportAssignmentType]
     # ignore NECESSITY - pyright can't tell that lhs/rhs are of type MatrixLike
     # due to type hints on indexing not sufficiently preserving type info
 
     # mannwhitneyu does not work on sparse arrays
     if not isinstance(lhs, np.ndarray):
-        lhs, rhs = lhs.todense(), rhs.todense()  # pyright: ignore
+        lhs, rhs = lhs.todense(), rhs.todense()  # pyright: ignore[reportAssignmentType, reportAttributeAccessIssue]
         # ignore NECESSITY - pyright can't tell that lhs/rhs are of type sparray
 
     return np.sum((mannwhitneyu(lhs, rhs, axis=0).pvalue * ngenes) < 0.05)
@@ -70,8 +70,8 @@ def score_deg(
 
     lhs, rhs = X[~W, :], X[W, :]
     return mannwhitneyu_ndeg(
-        lhs,  # pyright: ignore
-        rhs,  # pyright: ignore
+        lhs,  # pyright: ignore[reportArgumentType]
+        rhs,  # pyright: ignore[reportArgumentType]
         # ignore NECESSITY - pyright can't tell that lhs/rhs are of type MatrixLike
         # due to type hints on indexing not sufficiently preserving type info
         deg_cutoff,
@@ -107,18 +107,18 @@ def score_deg2(
     return (
         mannwhitneyu_ndeg(
             # X values from labeled unaffected
-            case_only_expr[~case_only_vhat],  # pyright: ignore
+            case_only_expr[~case_only_vhat],  # pyright: ignore[reportOperatorIssue, reportArgumentType]
             # X values from labeled affected
-            case_only_expr[case_only_vhat],  # pyright: ignore
+            case_only_expr[case_only_vhat],  # pyright: ignore[reportArgumentType]
             deg_cutoff,
         )
         * score_weight_relab
     ) - (
         mannwhitneyu_ndeg(
             # X values from true control
-            ctl_only_expr,  # pyright: ignore
+            ctl_only_expr,  # pyright: ignore[reportArgumentType]
             # X values from labeled unaffected
-            case_only_expr[~case_only_vhat],  # pyright: ignore
+            case_only_expr[~case_only_vhat],  # pyright: ignore[reportArgumentType]
             deg_cutoff,
         )
         * score_weight_vsctl
@@ -166,7 +166,7 @@ def score_phatdiff(
             # distribution less than that of labeled affected cells,
             # the alternative argument is set to "greater", as
             # the trend for their respective CDFs would be inverted
-        ).statistic  # pyright: ignore
+        ).statistic  # pyright: ignore[reportAttributeAccessIssue]
         * score_weight_relab
     ) - (
         ks_2samp(
@@ -174,7 +174,7 @@ def score_phatdiff(
             ctl_only_pred,
             # Y values from labeled unaffected
             case_only_pred[~case_only_vhat],
-        ).statistic  # pyright: ignore
+        ).statistic  # pyright: ignore[reportAttributeAccessIssue]
         * score_weight_vsctl
     )
     # ignore NECESSITY - scipy.stats.ks_2samp lacking proper
