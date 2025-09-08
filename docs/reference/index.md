@@ -1,4 +1,4 @@
-# API
+# API - entrypoints
 
 ```{toctree}
 :hidden:
@@ -8,9 +8,11 @@ methods
 adapters
 tune
 pl
+seed
 ```
 
 ```{eval-rst}
-.. automodule:: found
+.. automodule:: found.find
   :members:
+  :member-order: bysource
 ```
