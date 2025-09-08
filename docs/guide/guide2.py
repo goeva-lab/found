@@ -3,6 +3,7 @@
 #   kernelspec:
 #     display_name: found
 #     name: found
+#     language: python
 # ---
 
 # %% [markdown]
@@ -11,7 +12,7 @@
 # %% [markdown]
 # we first load the provided gene expression matrix and
 # associated metadata provided in GSE96583 into an anndata object
-# %%
+# %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
 
 from gzip import decompress

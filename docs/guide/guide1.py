@@ -3,6 +3,7 @@
 #   kernelspec:
 #     display_name: found
 #     name: found
+#     language: python
 # ---
 
 # %% [markdown]
@@ -10,9 +11,8 @@
 # %% [markdown]
 # we first load the provided gene expression matrix and
 # associated metadata provided in GSE193531 into an anndata object
-# %%
+# %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
-
 from pathlib import Path
 
 import anndata as ad
@@ -48,8 +48,6 @@ else:
     pth.parent.mkdir(parents=True, exist_ok=True)
     adata.write_h5ad(pth)
 
-print(adata)
-
 # create a set of labels adjusted using original annotations
 adata.obs["disease_stage_gt"] = np.where(adata.obs["normal_or_neoplastic"] == "neoplastic", adata.obs["disease_stage"], "NBM")
 adata.obs["sample_ID"] = pd.Categorical(
@@ -60,6 +58,9 @@ adata.obs["sample_ID"] = pd.Categorical(
     ),
     ordered=True,
 )
+
+print(adata)
+
 # %% [markdown]
 # we run the standard HiDDEN pipeline to classify affected cells on:
 # normal bone marrow, smoldering multiple myeloma, and multiple myeloma patients
