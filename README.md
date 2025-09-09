@@ -42,3 +42,6 @@ uv run -m ipykernel install --user --name found
 ```bash
 uv run sphinx-autobuild docs docs/_build/html -b dirhtml -n --watch ./src
 ```
+
+note: this will run and execute all guide vignettes, which can be very computationally expensive.
+to avoid doing this, you can pass `-D nb_execution_mode=off` to the above `sphinx-autobuild` command as an additional argument.

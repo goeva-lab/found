@@ -1,4 +1,4 @@
-# API - entrypoints
+# API
 
 ```{toctree}
 :hidden:
@@ -12,7 +12,8 @@ seed
 ```
 
 ```{eval-rst}
-.. automodule:: found.find
-  :members:
-  :member-order: bysource
+.. autofunction:: found.find.HiDDEN
+.. autofunction:: found.find.HiDDENg
+.. autofunction:: found.find.HiDDENt
+.. autofunction:: found.find.HiDDENgt
 ```

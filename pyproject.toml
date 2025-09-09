@@ -24,7 +24,7 @@ dev = [
     "scanpy[leiden]",
     "scikit-misc",
     "pandas",
-    "harmonypy",
+    "pyLemur",
 ]
 
 [build-system]

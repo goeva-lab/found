@@ -9,3 +9,5 @@ IntMtx = np.ndarray[tuple[int, int], np.dtype[np.integer]]
 SparseMtx = sp.csr_array | sp.csc_array
 
 MatrixLike = FloatMtx | IntMtx | SparseMtx
+
+NumericScalar = int | float | np.number

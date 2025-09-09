@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
-from numbers import Integral, Real
-from typing import Callable, Iterable, Mapping
+from numbers import Integral
 
 import numpy as np
 from scipy.stats import ks_2samp, mannwhitneyu
 
-from .adapters import _INTERNAL_WRAP_ATTR_NAME, Pipeline, out_to_dict, wcall
-from .types import BoolArr, FloatMtx, MatrixLike, NumArr
+from .adapters import _INTERNAL_WRAP_ATTR_NAME, Pipeline, out_to_dict, strip_generic, wcall
+from .types import BoolArr, FloatMtx, MatrixLike, NumArr, NumericScalar
 
 
 class Tuner[HyperparameterType, ScoreType](ABC):
@@ -133,7 +133,7 @@ def score_phatdiff(
     W: BoolArr,
     score_weight_relab: float = 1.0,
     score_weight_vsctl: float = 1.0,
-) -> Real:
+) -> NumericScalar:
     """
     implements a heuristic to score label adjustment based on the distribution difference, using the Kolmogorov-Smirnov (or KS) statistic, between p_hat values.
     specifically two comparisons are run, and the return value is a weighted difference of:
@@ -182,7 +182,7 @@ def score_phatdiff(
 
 
 @dataclass(frozen=True)
-class NaiveMinScoreTuner(Tuner):
+class NaiveMaxScoreTuner(Tuner):
     """
     tuner class which attempts to select for an optimal k by selecting the k with maximal
     score as calculated by ``self.score_fn`` for each provided k in ``self.k_range``
@@ -194,10 +194,10 @@ class NaiveMinScoreTuner(Tuner):
     :param k_range: iterable collection of dimensions over which pipeline should be run to determine optimal k
     """
 
-    score_fn: Callable[..., Real]
+    score_fn: Callable[..., NumericScalar]
     k_range: Iterable[int]
 
-    def __call__(self, algo: Pipeline, **kwargs) -> tuple[int, Mapping[int, tuple[NumArr, BoolArr, Real]]]:
+    def __call__(self, algo: Pipeline, **kwargs) -> tuple[int, Mapping[int, tuple[NumArr, BoolArr, NumericScalar]]]:
         k_range = list(self.k_range)
 
         # run an explicit check before starting pipeline to avoid unnecessary work
@@ -212,8 +212,9 @@ class NaiveMinScoreTuner(Tuner):
                 out_to_dict(fn, getattr(fn, _INTERNAL_WRAP_ATTR_NAME)),
                 algo.strict,
             )["Z"]
+            assert isinstance(cache, strip_generic(MatrixLike))
 
-            algo = algo.update(dimr_fn=lambda k: cache[:, :k])
+            algo = algo.update(dimr_fn=lambda k: cache[:, :k])  # pyright: ignore[reportIndexIssue]
 
         res = dict()
         for k in sorted(k_range, reverse=True):
@@ -271,12 +272,13 @@ class FixPointTuner[T: float](Tuner):
             )["Z"]
 
             cache = run_dimr(self.start_k + self.min_stable)
+            assert isinstance(cache, strip_generic(MatrixLike))
 
             def dimr(k: int) -> FloatMtx:
                 nonlocal cache
-                if k > cache.shape[1]:
+                if k > cache.shape[1]:  # pyright: ignore[reportAttributeAccessIssue]
                     cache = run_dimr(k + self.min_stable)
-                return cache[:, :k]
+                return cache[:, :k]  # pyright: ignore[reportIndexIssue]
 
             algo = algo.update(dimr_fn=dimr)
 

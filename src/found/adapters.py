@@ -4,7 +4,7 @@ from functools import wraps
 from inspect import Parameter, signature
 from inspect import _empty as iempty
 from types import UnionType, resolve_bases
-from typing import Any, Literal, Protocol, Self, Union, get_args, get_origin
+from typing import Literal, Protocol, Self, Union, get_args, get_origin
 
 import anndata as ad
 import numpy as np
@@ -15,7 +15,7 @@ _INTERNAL_WRAP_ATTR_NAME = "__FOUND_WRAPPED_INTERNAL_NAMES"
 
 
 # @TODO: determine if there's a better way to do this
-def strip_generic(tp: Any) -> Any:
+def strip_generic(tp: type | UnionType) -> type | UnionType:
     # recursive case for handling UnionType
     if isinstance(tp, UnionType):
         return Union[*map(strip_generic, get_args(tp))]
@@ -23,7 +23,7 @@ def strip_generic(tp: Any) -> Any:
     return resolve_bases([tp])[0]
 
 
-def check(w: dict[str, Any], p: Parameter, name: str):
+def check(w: dict[str, object], p: Parameter, name: str):
     if p.annotation is not iempty:
         if get_origin(p.annotation) is Literal:
             chk = w[p.name] in get_args(p.annotation)
@@ -38,7 +38,7 @@ def check(w: dict[str, Any], p: Parameter, name: str):
         return chk
 
 
-def wcall[T](w: dict[str, Any], fn: Callable[..., T], strict: bool) -> T:
+def wcall[T](w: dict[str, object], fn: Callable[..., T], strict: bool) -> T:
     kwargs = dict()
     for p in signature(fn).parameters.values():
         if p.name in w:
@@ -49,11 +49,10 @@ def wcall[T](w: dict[str, Any], fn: Callable[..., T], strict: bool) -> T:
     return fn(**kwargs)
 
 
-def out_to_dict[*I, O](func: Callable[[*I], O], out_names: tuple[str, ...]) -> Callable[[*I], dict[str, Any]]:
+def out_to_dict[*I](func: Callable[[*I], tuple], out_names: tuple[str, ...]) -> Callable[[*I], dict[str, object]]:
     @wraps(func)
-    def w(*args: *I, **kwargs) -> dict[str, Any]:
+    def w(*args: *I, **kwargs) -> dict[str, object]:
         o = func(*args, **kwargs)
-        o = o if isinstance(o, tuple) else (o,)
         assert len(o) == len(out_names), (
             f"function {func.__name__} was decorated with named outputs {out_names} "
             f"of length {len(out_names)}, but returned {o}, of length {len(out_names)}"
@@ -63,7 +62,17 @@ def out_to_dict[*I, O](func: Callable[[*I], O], out_names: tuple[str, ...]) -> C
     return w
 
 
-def step_fn[Fn: Callable](*out_names: str) -> Callable[[Fn], Fn]:
+def step_fn[Fn: Callable[..., tuple]](*out_names: str) -> Callable[[Fn], Fn]:
+    """
+    decorator for functions that return tuples, returns a copy which "annotates" individual output values with names for use in :py:class:`~found.adapters.Pipeline`.
+
+    returned function behaves identically to the original un-decorated function, the only modification is the addition of a private attribute to the functionj object.
+
+    :param out_names: desired "names" of return values, in the same order as they are in the returned tuple.
+
+    :returns: named return value annotated function
+    """
+
     def _(func: Fn) -> Fn:
         # lazy way to create a copy of func s.t. setattr doesn't modify func
         @wraps(func)
@@ -79,6 +88,14 @@ def step_fn[Fn: Callable](*out_names: str) -> Callable[[Fn], Fn]:
     return _
 
 
+def wrap_to_ot[T](fn: Callable[..., T]) -> Callable[..., tuple[T]]:
+    @wraps(fn)
+    def w(*args, **kwargs) -> tuple[T]:
+        return (fn(*args, **kwargs),)
+
+    return w
+
+
 @dataclass(frozen=True)
 class Pipeline:
     """
@@ -91,7 +108,9 @@ class Pipeline:
     :param regr_fn: regression function (output accessible to further functions via a parameter named Y unless explicitly wrapped by step_fn)
     :param binr_fn: binarization function (output accessible to further functions via a parameter named W unless explicitly wrapped by step_fn)
 
-    :param cachable_dimr: boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``); caution with setting this without care as it can lead to incorrect results
+    :param cachable_dimr: boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``)
+    caution with setting this without care as it can lead to incorrect results when conducting hyperparameter optimization via :py:class:`~found.tune.Tuner`.
+    as a rule of thumb, this property is generally only true for PCA.
     :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious TypeError failures
     """
 
@@ -101,7 +120,7 @@ class Pipeline:
     cachable_dimr: bool = False
     strict: bool = True
 
-    def check(self, w: dict[str, Any]):
+    def check(self, w: dict[str, object]):
         """
         convenience function, given a set of provided arguments, validates if the pipeline can run
         returns if yes, raises :py:class:`~ValueError` if no
@@ -127,19 +146,19 @@ class Pipeline:
 
     def __post_init__(self):
         if not (hasattr(self.dimr_fn, _INTERNAL_WRAP_ATTR_NAME)):
-            object.__setattr__(self, "dimr_fn", step_fn("Z")(self.dimr_fn))
+            object.__setattr__(self, "dimr_fn", step_fn("Z")(wrap_to_ot(self.dimr_fn)))
 
         if not hasattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME):
-            object.__setattr__(self, "regr_fn", step_fn("Y")(self.regr_fn))
+            object.__setattr__(self, "regr_fn", step_fn("Y")(wrap_to_ot(self.regr_fn)))
         elif "Y" not in (n := getattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME)):
             raise ValueError(f"expected wrapped self.regr_fn to a named output variable named `Y`, but got names {n}")
 
         if not hasattr(self.binr_fn, _INTERNAL_WRAP_ATTR_NAME):
-            object.__setattr__(self, "binr_fn", step_fn("W")(self.binr_fn))
+            object.__setattr__(self, "binr_fn", step_fn("W")(wrap_to_ot(self.binr_fn)))
         elif "W" not in (n := getattr(self.binr_fn, _INTERNAL_WRAP_ATTR_NAME)):
             raise ValueError(f"expected wrapped self.binr_fn to a named output variable named `W`, but got names {n}")
 
-    def __call__(self, **kwargs) -> tuple[NumArr, BoolArr, dict[str, Any]]:
+    def __call__(self, **kwargs) -> tuple[NumArr, BoolArr, dict[str, object]]:
         w = kwargs
 
         self.check(w)

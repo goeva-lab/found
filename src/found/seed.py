@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 
 def mk() -> tuple[Callable[[int | None], None], Callable[[], int | None]]:

@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from typing import Any, Literal, Self
+from typing import Literal, Self
 
 import altair as alt
 import anndata as ad
@@ -45,7 +45,7 @@ class PlotAdata:
         self.__cache[key] = val
         return val
 
-    def get_data(self, key: str) -> Any:
+    def get_data(self, key: str) -> np.ndarray:
         if self.__mtx is None:
             raise ValueError(
                 "using get_data cannot be done when plotting object has not been initialized with an anndata object"
@@ -233,7 +233,7 @@ class PlotHiDDENOutput:
 
     adata: ad.AnnData
     phat: NumArr
-    labs: np.ndarray[tuple[int], Any]
+    labs: np.ndarray[tuple[int], np.dtype]
 
     def __getitem__(self, idx) -> Self:
         if isinstance(idx, Callable):
@@ -276,7 +276,7 @@ class PlotHiDDENOutput:
         )
 
     def labs_pct(
-        self, orig_labs: str | pd.Series, ctrl_val: Any, group_by: str | pd.Series | None = None, vertical: bool = True
+        self, orig_labs: str | pd.Series, ctrl_val: object, group_by: str | pd.Series | None = None, vertical: bool = True
     ) -> alt.LayerChart:
         """
         method used to generate point plots of percentages of case vs control cells in original vs HiDDEN-adjusted labels
@@ -353,7 +353,7 @@ class PlotTunerOutput:
 
     adata: ad.AnnData
     outs: Mapping
-    sel: Any
+    sel: object
 
     def __getitem__(self, k) -> PlotHiDDENOutput:
         if k not in self.outs:

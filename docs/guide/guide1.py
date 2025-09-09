@@ -7,10 +7,9 @@
 # ---
 
 # %% [markdown]
-# # found - overall tour
+# # `found` and `HiDDEN`: a whirlwind tour
 # %% [markdown]
-# we first load the provided gene expression matrix and
-# associated metadata provided in GSE193531 into an anndata object
+# we first import all script dependencies and load the provided data in GSE193531 into an anndata object
 # %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
 from pathlib import Path
@@ -39,7 +38,7 @@ else:
         obs=pd.read_csv(f"{base_url}GSE193531_cell-level-metadata.csv.gz").set_index("index").loc[gex.index],
     )
     # subset to only disease stages of interest
-    adata = adata[adata.obs["disease_stage"].isin(["MM", "NBM", "SMM"])].copy()  # pyright: ignore
+    adata = adata[adata.obs["disease_stage"].isin(["MM", "NBM", "SMM"])].copy()  # pyright: ignore[reportArgumentType]
 
     # use CSR array for counts to improve memory use
     adata.X = sp.csr_array(adata.X)
@@ -81,16 +80,18 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 plt.labs_pct("disease_stage_gt", "NBM", "sample_ID")
 
 # %% [markdown]
-# we can index into the `PlotHiDDENOutput` object to only plot a subset of the data
-# we use this to plot p hat distributions for the three patients where we see the most relabeling
+# we can index into the `PlotHiDDENOutput` object to only plot a subset of the data (similar to `.loc` in `pandas.DataFrame`)
+# we use this to plot p_hat distributions for the three patients where we see the most relabeling:
 # %%
-plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])].phat_vln("disease_stage", "sample_ID").properties(width=80)
+plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])].phat_vln("disease_stage", "sample_ID").properties(
+    width=120
+)
 
 # %% [markdown]
 # as such, it would be interesting to see if we could modify a component of the default pipeline to improve this.
 # to attempt this, we can try to have the binarization step be done in a per-patient fashion.
 #
-# note: this should not be taken as general advice to follow when troubleshooting found-generated labels, instead proper batch correction methods such as batch-adjusted dimensionality reduction methods should most likely be considered instead.
+# note: this should not be taken as general advice to follow when troubleshooting found-generated labels, instead proper batch correction methods such as batch-adjusted dimensionality reduction should most likely be considered instead.
 # however, our interest here is mainly to use this opportunity to demonstrate found's pipeline modification/extension functionality, so we will proceed accordingly.
 # %%
 # note: this new functionality requires patient metadata, which we make available as a function argument
@@ -101,17 +102,17 @@ plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])].phat_vln("d
 #                                                       |
 #                                                       V
 def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> BoolArr:
-    out = np.full_like(V, np.nan)
+    out = V.copy()
 
     for patient in patient_meta.unique():
         mask = patient_meta.eq(patient).to_numpy()
         if not V[mask].any():
             continue
         out[mask] = m.kmeans_bin(
-            Y[mask],  # pyright: ignore
-            V[mask],  # pyright: ignore
+            Y[mask],  # pyright: ignore[reportArgumentType]
+            V[mask],  # pyright: ignore[reportArgumentType]
         )
-    assert not np.isnan(out).any()  # make sure out is properly initialized
+
     return out.astype(bool)
 
 
