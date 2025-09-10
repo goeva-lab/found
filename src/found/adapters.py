@@ -1,52 +1,14 @@
 from collections.abc import Callable, Collection, Mapping
 from dataclasses import dataclass
 from functools import wraps
-from inspect import Parameter, signature
-from inspect import _empty as iempty
-from types import UnionType, resolve_bases
-from typing import Literal, Protocol, Self, Union, get_args, get_origin
+from typing import Protocol, Self
 
 import anndata as ad
 import numpy as np
 
-from .types import BoolArr, FloatMtx, NumArr
+from .types import BoolArr, FloatMtx, NumArr, check_sequence, strip_generic, wcall
 
 _INTERNAL_WRAP_ATTR_NAME = "__FOUND_WRAPPED_INTERNAL_NAMES"
-
-
-# @TODO: determine if there's a better way to do this
-def strip_generic(tp: type | UnionType) -> type | UnionType:
-    # recursive case for handling UnionType
-    if isinstance(tp, UnionType):
-        return Union[*map(strip_generic, get_args(tp))]
-
-    return resolve_bases([tp])[0]
-
-
-def check(w: dict[str, object], p: Parameter, name: str):
-    if p.annotation is not iempty:
-        if get_origin(p.annotation) is Literal:
-            chk = w[p.name] in get_args(p.annotation)
-        else:
-            chk = isinstance(w[p.name], strip_generic(p.annotation))
-        if not chk:
-            raise TypeError(
-                f"function: `{name}` expected value of type "
-                f"`{p.annotation}` to be provided for argument `{p.name}`, but "
-                f"value {w[p.name]} of type {type(w[p.name])} was provided instead"
-            )
-        return chk
-
-
-def wcall[T](w: dict[str, object], fn: Callable[..., T], strict: bool) -> T:
-    kwargs = dict()
-    for p in signature(fn).parameters.values():
-        if p.name in w:
-            if strict:
-                check(w, p, fn.__name__)
-            kwargs[p.name] = w[p.name]
-
-    return fn(**kwargs)
 
 
 def out_to_dict[*I](func: Callable[[*I], tuple], out_names: tuple[str, ...]) -> Callable[[*I], dict[str, object]]:
@@ -108,9 +70,11 @@ class Pipeline:
     :param regr_fn: regression function (output accessible to further functions via a parameter named Y unless explicitly wrapped by step_fn)
     :param binr_fn: binarization function (output accessible to further functions via a parameter named W unless explicitly wrapped by step_fn)
 
-    :param cachable_dimr: boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``)
-    caution with setting this without care as it can lead to incorrect results when conducting hyperparameter optimization via :py:class:`~found.tune.Tuner`.
-    as a rule of thumb, this property is generally only true for PCA.
+    :param cachable_dimr:
+        boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``)
+        caution with setting this without care as it can lead to incorrect results when conducting hyperparameter optimization via :py:class:`~found.tune.Tuner`.
+        as a rule of thumb, this property is generally only true for PCA.
+
     :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious TypeError failures
     """
 
@@ -128,21 +92,15 @@ class Pipeline:
         :param w: dictionary of initial pipeline variables
         """
 
-        added = set()
-
-        for fn, out in [
-            (self.dimr_fn, set(getattr(self.dimr_fn, _INTERNAL_WRAP_ATTR_NAME))),
-            (self.regr_fn, set(getattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME))),
-            (self.binr_fn, set(getattr(self.binr_fn, _INTERNAL_WRAP_ATTR_NAME))),
-        ]:
-            for p in signature(fn).parameters.values():
-                if (p.default is iempty) and (p.name not in (w.keys() | added)):
-                    raise ValueError(
-                        f"pipeline called with missing arguments, provided function {fn.__name__} expects presence of {p.name}, but it was not provided"
-                    )
-                if self.strict and (p.name not in added) and (p.name in w):
-                    check(w, p, fn.__name__)
-            added = added.union(out)
+        check_sequence(
+            [
+                (self.dimr_fn, getattr(self.dimr_fn, _INTERNAL_WRAP_ATTR_NAME)),
+                (self.regr_fn, getattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME)),
+                (self.binr_fn, getattr(self.binr_fn, _INTERNAL_WRAP_ATTR_NAME)),
+            ],
+            self.strict,
+            w,
+        )
 
     def __post_init__(self):
         if not (hasattr(self.dimr_fn, _INTERNAL_WRAP_ATTR_NAME)):

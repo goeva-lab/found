@@ -13,7 +13,6 @@
 # we first import all script dependencies and load the provided data in GSE96583 into an anndata object
 # %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
-
 from gzip import decompress
 from io import BytesIO
 from pathlib import Path
@@ -161,7 +160,7 @@ sel, out = found.HiDDENt(
     lemur_grouping=adata.obs["cell"],
 )
 
-pl.PlotTunerOutput(adata, out, sel).plot_scores()
+pl.PlotTunerOutput(adata, sel, out).plot_scores().show()
 
 # %% [markdown]
 # this `step_fn` wrapping mechanism is actually used internally during Pipeline construction!

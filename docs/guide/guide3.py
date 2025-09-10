@@ -117,9 +117,9 @@ pl.PlotHiDDENOutput(adata, phat, labs)[lambda a: a.obs["stim"] == "stim"].labs_p
 mk_out_only = by_grp("Megakaryocytes")
 pl.PlotTunerOutput(
     adata[adata.obs["cell"] == "Megakaryocytes"],  # we subset our paired anndata value to only megakaryocytes
-    mk_out_only,
     sel["Megakaryocytes"],  # we provided the selected `k` value by indexing the group to choice mapping returned by HiDDENgt
-).plot_scores()
+    mk_out_only,
+).plot_scores().show()
 
 # %% [markdown]
 # finally, it is good to note that `HiDDENg` (and `HiDDENgt`) accept a `grp_specific_args` argument, which provides the ability to inject arguments into the pipeline in a group specific basis.
@@ -142,4 +142,4 @@ pl.PlotHiDDENOutput(
     adata,
     phat,
     labs,
-)[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim", "stim").properties(width=120)
+)[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim", "stim").properties(width=120).show()

@@ -77,7 +77,7 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 # but a lot less for the SMM samples, with the HiDDEN model consistently predicting a higher amount
 # of neoplastic cells as compared to the "ground truth" manual annotations:
 # %%
-plt.labs_pct("disease_stage_gt", "NBM", "sample_ID")
+plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()
 
 # %% [markdown]
 # we can index into the `PlotHiDDENOutput` object to only plot a subset of the data (similar to `.loc` in `pandas.DataFrame`)
@@ -85,7 +85,7 @@ plt.labs_pct("disease_stage_gt", "NBM", "sample_ID")
 # %%
 plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])].phat_vln("disease_stage", "sample_ID").properties(
     width=120
-)
+).show()
 
 # %% [markdown]
 # as such, it would be interesting to see if we could modify a component of the default pipeline to improve this.
@@ -119,7 +119,7 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
 # we use the `.update` method which returns a new version of the pipeline based off an existing with specified components replaced
 algo = algo.update(binr_fn=per_patient_kmeans_bin)
 
-# important! we need to "inject" the patient metadata value into our pipeline
+# ⚠️ important: we need to "inject" the patient metadata value into our pipeline
 p_hat, labs = found.HiDDEN(
     adata,
     "disease_stage",
@@ -127,9 +127,8 @@ p_hat, labs = found.HiDDEN(
     algo,
     k=30,
     X=adata.X,
-    #
-    #  introduction of new variables/data into pipeline
-    #  is done via extra arguments at invocation point
+    #  ⚠️ introduction of new variables/data into pipeline
+    #  ⚠️ is done via extra arguments at invocation point
     #           |
     #           V
     patient_meta=adata.obs["sample_ID"],
@@ -139,4 +138,4 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 # %% [markdown]
 # assessing the new predictions, as expected, we see almost no difference with our initial results, with anything slightly worse performance on SMM-5:
 # %%
-plt.labs_pct("disease_stage_gt", "NBM", "sample_ID")
+plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()

@@ -352,8 +352,8 @@ class PlotTunerOutput:
     """
 
     adata: ad.AnnData
-    outs: Mapping
     sel: object
+    outs: Mapping
 
     def __getitem__(self, k) -> PlotHiDDENOutput:
         if k not in self.outs:

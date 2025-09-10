@@ -216,7 +216,7 @@ def kmeans_bin(Y: NumArr, V: BoolArr) -> BoolArr:
     """
     runs k-means clustering to binarize continuous scores into boolean labels.
 
-    :param Y: 1-d float array of condition scores
+    :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
     :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)
     """

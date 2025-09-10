@@ -26,7 +26,7 @@ import found
 from found import methods as m
 from found import pl
 from found.adapters import Pipeline
-from found.tune import FixPointTuner
+from found.tune import FixPointTuner, NaiveMaxScoreTuner, score_nulldist, score_phatdiff_emd
 
 RANDOM_STATE = 42
 found.set_seed(RANDOM_STATE)
@@ -58,52 +58,71 @@ algo = Pipeline.from_proc_ad("X_pca", m.log_reg, m.kmeans_bin)
 
 # %%
 
-# here we use the provided `FixPointTuner` subclass, which selects for a k s.t. HiDDEN outputs have stabilized relative to smaller ks
-tuner = FixPointTuner(4, 3, 0.02)
+# here we initialize a variety of tuners, and will compare their results
+start_k = 3
+tuner_fix = FixPointTuner(4, start_k, 0.02)
+tuner_nulldist = NaiveMaxScoreTuner(score_nulldist, range(start_k, 31))
+tuner_phatdist = NaiveMaxScoreTuner(score_phatdiff_emd, range(start_k, 31))
 
-sel, outs = found.HiDDENt(
-    adata,
-    "injection",
-    "saline",
-    algo,
-    tuner,
-    # ⚠️  the `from_proc_ad` constructor
-    #     creates a pipeline which expects
-    #     an adata initializing argument
-    #     so we must provide it here
-    #    ________|
-    #    |
-    #    V
-    adata=adata,
-)
+# ⚠️  the `from_proc_ad` constructor creates a pipeline which expects an `adata` argument!
+# ⚠️            |_____________________________________________________________
+# ⚠️                                                                         |
+# ⚠️                                                                         V
+outs_fix = found.HiDDENt(adata, "injection", "saline", algo, tuner_fix, adata=adata)
 
-# initialize a plotting object
-plt = pl.PlotTunerOutput(adata, outs, sel)
+# ⚠️  the `score_nulldist` function _requires_ a `pipeline_algo` argument to be provided, so we must inject that as well
+# ⚠️            |____________________________________________________________________________________________
+# ⚠️                                                                                                        |
+# ⚠️                                                                                                        V
+outs_nulldist = found.HiDDENt(adata, "injection", "saline", algo, tuner_nulldist, adata=adata, pipeline_algo=algo)
+
+# ⚠️  the `score_phatdiff_emd` has an _optional_ `score_weight_vsctl` but we can override it via injection as well
+# ⚠️            |_________________________________________________________________________________________________
+# ⚠️                                                                                                             |
+# ⚠️                                                                                                             V
+outs_phatdist = found.HiDDENt(adata, "injection", "saline", algo, tuner_phatdist, adata=adata, score_weight_vsctl=0.25)
+
+# initialize corresponding plotting objects
+plt_fix = pl.PlotTunerOutput(adata, *outs_fix)
+plt_nulldist = pl.PlotTunerOutput(adata, *outs_nulldist)
+plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 
 # %% [markdown]
 # `PlotTunerOutput` provides a plot_scores function which we can
 # use to assess the changes in scores across tested k values
 # %%
-plt.plot_scores()
+(
+    plt_fix.plot_scores().properties(title="scores for fix point tuning")
+    | plt_nulldist.plot_scores().properties(title="scores for p_hat distance from null")
+    | plt_phatdist.plot_scores().properties(title="scores for p_hat distance between groups")
+).show()
 
 # %% [markdown]
 # we can index into our `PlotTunerOutput` object using
 # tested hyperparameters to get a corresponding `PlotHiDDENOutput` object.
-#
-# here we use this functionality to compare percent relabeling between HiDDEN outputs for k=3 and k=25 (selected value).
 # %%
-plt_at_start = (
-    plt[tuner.start_k][lambda a: a.obs["injection"] == "LPC"]
-    .labs_pct("injection", "saline", "animal_id")
-    .properties(
-        title=f"k = {tuner.start_k}",
-    )
-)
-plt_at_sel = (
-    plt[sel][lambda a: a.obs["injection"] == "LPC"]
-    .labs_pct("injection", "saline", "animal_id")
-    .properties(
-        title=f"k = {sel}",
-    )
-)
-plt_at_start | plt_at_sel  # pyright: ignore[reportUnusedExpression]
+start = plt_fix[start_k]
+fixk = plt_fix[plt_fix.sel]
+nulldistk = plt_nulldist[plt_nulldist.sel]
+phatdistk = plt_phatdist[plt_phatdist.sel]
+case_mask = adata.obs["injection"] == "LPC"
+
+# %% [markdown]
+# here we use this to visualize percent relabeling for the initial tested k, as well as the different ks that were selected for by different tuners
+# %%
+(
+    start[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {start_k}", width=120)
+    | fixk[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {plt_fix.sel}", width=120)
+    | nulldistk[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {plt_nulldist.sel}", width=120)
+    | phatdistk[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {plt_phatdist.sel}", width=120)
+).show()
+
+# %% [markdown]
+# we can also assess phat distributions across different ks
+# %%
+(
+    start.phat_vln("injection", "injection").properties(title=f"k = {start_k}", width=60)
+    | fixk.phat_vln("injection", "injection").properties(title=f"k = {plt_fix.sel}", width=60)
+    | nulldistk.phat_vln("injection", "injection").properties(title=f"k = {plt_nulldist.sel}", width=60)
+    | phatdistk.phat_vln("injection", "injection").properties(title=f"k = {plt_phatdist.sel}", width=60)
+).configure_title(anchor="middle").show()
