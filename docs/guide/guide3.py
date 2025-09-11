@@ -29,7 +29,7 @@ import found
 from found import methods as m
 from found import pl
 from found.adapters import Pipeline
-from found.tune import NaiveMaxScoreTuner, score_phatdiff
+from found.tune import NaiveMaxScoreTuner
 
 RANDOM_STATE = 42
 found.set_seed(RANDOM_STATE)
@@ -92,7 +92,7 @@ sel, by_param, by_grp = found.HiDDENgt(
     "ctrl",
     "cell",
     Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin, cachable_dimr=True),
-    NaiveMaxScoreTuner(score_phatdiff, range(2, 20, 2)),
+    NaiveMaxScoreTuner(m.score_phatdiff, range(2, 20, 2)),
     X=adata.X,
 )
 print(sel)

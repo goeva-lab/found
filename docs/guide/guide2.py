@@ -26,7 +26,7 @@ import found
 from found import methods as m
 from found import pl
 from found.adapters import Pipeline
-from found.tune import FixPointTuner, NaiveMaxScoreTuner, score_nulldist, score_phatdiff_emd
+from found.tune import FixPointTuner, NaiveMaxScoreTuner
 
 RANDOM_STATE = 42
 found.set_seed(RANDOM_STATE)
@@ -61,8 +61,8 @@ algo = Pipeline.from_proc_ad("X_pca", m.logit_reg, m.kmeans_bin)
 # here we initialize a variety of tuners, and will compare their results
 start_k = 3
 tuner_fix = FixPointTuner(4, start_k, 0.02)
-tuner_nulldist = NaiveMaxScoreTuner(score_nulldist, range(start_k, 31))
-tuner_phatdist = NaiveMaxScoreTuner(score_phatdiff_emd, range(start_k, 31))
+tuner_nulldist = NaiveMaxScoreTuner(m.score_nulldist, range(start_k, 31))
+tuner_phatdist = NaiveMaxScoreTuner(m.score_phatdiff_emd, range(start_k, 31))
 
 # ⚠️  the `from_proc_ad` constructor creates a pipeline which expects an `adata` argument!
 # ⚠️            |_____________________________________________________________
