@@ -7,7 +7,7 @@
 # ---
 
 # %% [markdown]
-# # `found` and `HiDDEN`: a whirlwind tour
+# # `found` and {py:func}`~found.find.HiDDEN`: a whirlwind tour
 # %% [markdown]
 # we first import all script dependencies and load the provided data in GSE193531 into an anndata object
 # %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
@@ -64,7 +64,7 @@ print(adata)
 # we run the standard HiDDEN pipeline to classify affected cells on:
 # normal bone marrow, smoldering multiple myeloma, and multiple myeloma patients
 # %%
-algo = Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin, True)
+algo = Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans, True)
 p_hat, labs = found.HiDDEN(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
 
 # %% [markdown]
@@ -80,7 +80,7 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()
 
 # %% [markdown]
-# we can index into the `PlotHiDDENOutput` object to only plot a subset of the data (similar to `.loc` in `pandas.DataFrame`)
+# we can index into the {py:class}`~found.pl.PlotHiDDENOutput` object to only plot a subset of the data (similar to {py:attr}`~pandas.DataFrame.loc` in {py:class}`~pandas.DataFrame`)
 # we use this to plot p_hat distributions for the three patients where we see the most relabeling:
 # %%
 plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])].phat_vln("disease_stage", "sample_ID").properties(
@@ -108,7 +108,7 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
         mask = patient_meta.eq(patient).to_numpy()
         if not V[mask].any():
             continue
-        out[mask] = m.kmeans_bin(
+        out[mask] = m.bin_kmeans(
             Y[mask],  # pyright: ignore[reportArgumentType]
             V[mask],  # pyright: ignore[reportArgumentType]
         )

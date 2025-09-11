@@ -7,10 +7,10 @@
 # ---
 
 # %% [markdown]
-# # `Pipeline.from_proc_ad` and `HiDDENt`: using preprocessed AnnData objects and hyper-parameter tuning
+# # {py:meth}`~found.adapters.Pipeline.from_proc_ad` and {py:func}`~found.find.HiDDENt`: using preprocessed {py:class}`~anndata.AnnData` objects and hyper-parameter tuning
 
 # %% [markdown]
-# we first import all script dependencies and load the provided data in GSE276570 into an anndata object
+# we first import all script dependencies and load the provided data in GSE276570 into an {py:class}`~anndata.AnnData` object
 # %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
 
@@ -45,16 +45,16 @@ print(adata)
 # %% [markdown]
 # in the below example, we will utilize pre-computed PCA embeddings.
 #
-# to do so, we can utilize the `from_proc_ad` static method on `Pipeline`, which will create a pipeline
+# to do so, we can utilize the {py:meth}`~found.adapters.Pipeline.from_proc_ad` static method on {py:class}`~found.adapters.Pipeline`, which will create a pipeline
 # that fetches pre-computed embeddings from an `obsm` slot given a predefined key.
 # %%
 # create a pipeline that uses the above generated dimensionality reduction
-algo = Pipeline.from_proc_ad("X_pca", m.logit_reg, m.kmeans_bin)
+algo = Pipeline.from_proc_ad("X_pca", m.reg_logit, m.bin_kmeans)
 
 # %% [markdown]
 # as we do not know the optimal k for the relabeling task for this dataset, we will
-# use the `HiDDENt` entrypoint, which differs from the classic `HiDDEN` entrypoint by requiring
-# the user to provide a `Tuner` object, which uses some heuristic to select for a `k` automatically.
+# use the {py:func}`~found.find.HiDDENt` entrypoint, which differs from the classic {py:func}`~found.find.HiDDEN` entrypoint by requiring
+# the user to provide a {py:class}`~found.tune.Tuner` object, which attempts to use some heuristic to select for pipeline hyperparameters automatically.
 
 # %%
 
@@ -88,7 +88,7 @@ plt_nulldist = pl.PlotTunerOutput(adata, *outs_nulldist)
 plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 
 # %% [markdown]
-# `PlotTunerOutput` provides a plot_scores function which we can
+# {py:func}`~found.pl.PlotTunerOutput` provides a plot_scores function which we can
 # use to assess the changes in scores across tested k values
 # %%
 (
@@ -98,8 +98,8 @@ plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 ).show()
 
 # %% [markdown]
-# we can index into our `PlotTunerOutput` object using
-# tested hyperparameters to get a corresponding `PlotHiDDENOutput` object.
+# we can index into our {py:func}`~found.pl.PlotTunerOutput` object using
+# tested hyperparameters to get a corresponding {py:func}`~found.pl.PlotTunerOutput` object.
 # %%
 start = plt_fix[start_k]
 fixk = plt_fix[plt_fix.sel]

@@ -194,7 +194,7 @@ def get_case_proba(probs: np.ndarray[tuple[int, int], np.dtype], classes: np.nda
 
 
 @step_fn("Y", "model")
-def logit_reg(
+def reg_logit(
     Z: FloatMtx,
     V: BoolArr,
     logit_args: dict[str, Any] | None = None,
@@ -222,7 +222,7 @@ def logit_reg(
 
 
 @step_fn("Y", "model")
-def svm_reg(
+def reg_svm(
     Z: FloatMtx,
     V: BoolArr,
     svm_args: dict[str, Any] | None = None,
@@ -251,7 +251,7 @@ def svm_reg(
 
 
 @step_fn("Y", "model")
-def gp_reg(
+def reg_gp(
     Z: FloatMtx,
     V: BoolArr,
     gp_args: dict[str, Any] | None = None,
@@ -282,7 +282,7 @@ def gp_reg(
 
 
 @step_fn("Y", "model")
-def rf_reg(
+def reg_rf(
     Z: FloatMtx,
     V: BoolArr,
     rf_args: dict[str, Any] | None = None,
@@ -311,14 +311,12 @@ def rf_reg(
 
 @runtime_checkable
 class HasPredict(Protocol):
-    """
-    :meta hide-value:
-    """
+    """:meta hide-value:"""
 
     def predict(self, Z: FloatMtx) -> BoolArr: ...
 
 
-def mod_bin(
+def bin_model(
     Z: FloatMtx,
     model: HasPredict,
 ) -> BoolArr:
@@ -350,7 +348,7 @@ def from_clusts_to_labs(clusts: BoolArr, V: BoolArr, case_only: NumArr) -> BoolA
     return new_labs
 
 
-def kmeans_bin(
+def bin_kmeans(
     Y: NumArr,
     V: BoolArr,
     kmeans_args: dict[str, Any] | None = None,
@@ -378,7 +376,7 @@ def kmeans_bin(
     )
 
 
-def gmm_bin(Y: NumArr, V: BoolArr, gmm_args: dict[str, Any] | None = None) -> BoolArr:
+def bin_gmm(Y: NumArr, V: BoolArr, gmm_args: dict[str, Any] | None = None) -> BoolArr:
     """
     runs k-means clustering to binarize continuous scores into boolean labels.
 

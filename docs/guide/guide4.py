@@ -90,7 +90,7 @@ phat, labs = found.HiDDEN(
     adata,
     "stim",
     "ctrl",
-    Pipeline(run_lemur, m.logit_reg, m.kmeans_bin),
+    Pipeline(run_lemur, m.reg_logit, m.bin_kmeans),
     adata=adata,
     k=10,
     lemur_design="~ stim",
@@ -105,7 +105,7 @@ phat, labs = found.HiDDEN(
 # however, this object is generated during the dimensionality reduction step, and not returned by `run_lemur`, which returns only the embeddings.
 #
 # luckily, it is actually possible to have step functions return multiple values!
-# this requires the use of the `step_fn` decorator provided in `found.adapters`.
+# this requires the use of the {py:func}`~found.adapters.step_fn` decorator provided in {py:mod}`~found.adapters`.
 
 
 # %%
@@ -153,7 +153,7 @@ sel, out = found.HiDDENt(
     adata,
     "stim",
     "ctrl",
-    Pipeline(run_lemur_w_model_out, m.logit_reg, m.kmeans_bin),
+    Pipeline(run_lemur_w_model_out, m.reg_logit, m.bin_kmeans),
     NaiveMaxScoreTuner(score_lemur_counters, range(8, 17, 4)),
     adata=adata,
     lemur_design="~ stim",
@@ -163,6 +163,10 @@ sel, out = found.HiDDENt(
 pl.PlotTunerOutput(adata, sel, out).plot_scores().show()
 
 # %% [markdown]
-# this `step_fn` wrapping mechanism is actually used internally during Pipeline construction!
-# if a provided step function hasn't already been decorated with `step_fn`, Pipeline will wrap it in `step_fn`,
-# with the return value being named "Z" for `dimr_fn`, "Y" for `regr_fn`, and "W" for `binr_fn`.
+# this {py:func}`~found.adapters.step_fn` wrapping mechanism is actually used internally during Pipeline construction!
+# if a provided step function hasn't already been decorated with {py:func}`~found.adapters.step_fn`, Pipeline will wrap it in {py:func}`~found.adapters.step_fn`,
+# with the return value being named "Z" for {py:class}`~found.adapters.Pipeline```.dimr_fn``, "Y" for {py:class}`~found.adapters.Pipeline```.regr_fn``, and "W" for {py:class}`~found.adapters.Pipeline```.binr_fn``.
+
+# %% [markdown]
+# a final note for developers: if a function inserted into a pipeline needs dynamic access to *all* pipeline values, this can be done by adding a variable keyword argument (i.e. ``**kwargs`` form).
+# for example, this is used by the {py:func}`~found.methods.score_nulldist` function to rerun the existing pipeline.

@@ -7,7 +7,7 @@
 # ---
 
 # %% [markdown]
-# # `HiDDENg` and `HiDDENgt`: grouped entrypoints
+# # {py:func}`~found.find.HiDDENg` and {py:func}`~found.find.HiDDENgt`: grouped entrypoints
 
 # %% [markdown]
 # %% [markdown]
@@ -66,10 +66,10 @@ print(adata)
 # it can be of interest to run HiDDEN in a grouped fashion, splitting a dataset
 # according to some discrete variable and then running HiDDEN on each subset separately.
 #
-# as this is a very common workflow, `found` provides two entrypoints to handle this for the user: `HiDDENg` and `HiDDENgt`, the latter providing hyper-parameter tuning
+# as this is a very common workflow, `found` provides two entrypoints to handle this for the user: {py:func}`~found.find.HiDDENg` and {py:func}`~found.find.HiDDENgt`, the latter providing hyper-parameter tuning
 # %%
 phat, labs = found.HiDDENg(
-    adata, "stim", "ctrl", "cell", Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin), X=adata.X, k=20
+    adata, "stim", "ctrl", "cell", Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans), X=adata.X, k=20
 )
 plt = pl.PlotHiDDENOutput(adata, phat, labs)
 
@@ -83,7 +83,7 @@ plt[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim", "stim").proper
 
 # %% [markdown]
 # the above workflow assumes that a hyperparameter k for the pipeline is a) known and b) fixed for all cell types.
-# however, this is not always the case, and so we can use the `HiDDENgt` entrypoint to perform tuning combined with factor grouping.
+# however, this is not always the case, and so we can use the {py:func}`~found.find.HiDDENgt` entrypoint to perform tuning combined with factor grouping.
 
 # %%
 sel, by_param, by_grp = found.HiDDENgt(
@@ -91,21 +91,21 @@ sel, by_param, by_grp = found.HiDDENgt(
     "stim",
     "ctrl",
     "cell",
-    Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin, cachable_dimr=True),
+    Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans, cachable_dimr=True),
     NaiveMaxScoreTuner(m.score_phatdiff, range(2, 20, 2)),
     X=adata.X,
 )
 print(sel)
 
 # %% [markdown]
-# due to the permutation of outputs by grouping and hyperparameter selection, `HiDDENgt` returns a set of accessor functions, not raw outputs.
+# due to the permutation of outputs by grouping and hyperparameter selection, {py:func}`~found.find.HiDDENgt` returns a set of accessor functions, not raw outputs.
 #
 # specifically:
-#   - the first accessor (here bound to `by_param`), returns `HiDDEN`-style output given a mapping from each group to selected hyperparameters, as well as the score values associated with each group
-#   - the second accessor (here bound to `by_grp`), returns `HiDDENt`-style output given a specific group
+#   - the first accessor (here bound to `by_param`), returns {py:func}`~found.find.HiDDEN`-style output given a mapping from each group to selected hyperparameters, as well as the score values associated with each group
+#   - the second accessor (here bound to `by_grp`), returns {py:func}`~found.find.HiDDENt`-style output given a specific group
 
 # %% [markdown]
-# here we can plot the re-mixed together outputs of HiDDEN given the optimal hyperparameter for each cell type
+# here we can plot the re-mixed together outputs of {py:func}`~found.find.HiDDENgt` given the optimal hyperparameter for each cell type
 
 # %%
 phat, labs, scores = by_param(sel)
@@ -124,9 +124,9 @@ pl.PlotTunerOutput(
 ).plot_scores().show()
 
 # %% [markdown]
-# finally, it is good to note that `HiDDENg` (and `HiDDENgt`) accept a `grp_specific_args` argument, which provides the ability to inject arguments into the pipeline in a group specific basis.
+# finally, it is good to note that {py:func}`~found.find.HiDDENg` (and {py:func}`~found.find.HiDDENgt`) accept a `grp_specific_args` argument, which provides the ability to inject arguments into the pipeline in a group specific basis.
 #
-# we can use this here to run `HiDDENg` with different k values per group (using the values selected by `HiDDENgt`).
+# we can use this here to run {py:func}`~found.find.HiDDENg` with different k values per group (using the values selected by {py:func}`~found.find.HiDDENgt`).
 
 # %%
 phat, labs = found.HiDDENg(
@@ -134,7 +134,7 @@ phat, labs = found.HiDDENg(
     "stim",
     "ctrl",
     "cell",
-    Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin),
+    Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans),
     grp_specific_args={grp: {"k": opt_k} for grp, opt_k in sel.items()},
     X=adata.X,
     k=20,

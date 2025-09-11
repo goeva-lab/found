@@ -194,6 +194,8 @@ class Pipeline:
 
 # create protocol since Callable does not allow specifying keyword only arguments
 class GroupbyOut[T, G](Protocol):
+    """:meta hide-value:"""
+
     def __call__(self, grp: G, /, **kwargs) -> T: ...
 
 
