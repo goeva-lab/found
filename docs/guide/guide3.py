@@ -68,7 +68,9 @@ print(adata)
 #
 # as this is a very common workflow, `found` provides two entrypoints to handle this for the user: `HiDDENg` and `HiDDENgt`, the latter providing hyper-parameter tuning
 # %%
-phat, labs = found.HiDDENg(adata, "stim", "ctrl", "cell", Pipeline(m.run_lognorm_pca, m.log_reg, m.kmeans_bin), X=adata.X, k=20)
+phat, labs = found.HiDDENg(
+    adata, "stim", "ctrl", "cell", Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin), X=adata.X, k=20
+)
 plt = pl.PlotHiDDENOutput(adata, phat, labs)
 
 # %%
@@ -89,7 +91,7 @@ sel, by_param, by_grp = found.HiDDENgt(
     "stim",
     "ctrl",
     "cell",
-    Pipeline(m.run_lognorm_pca, m.log_reg, m.kmeans_bin, cachable_dimr=True),
+    Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin, cachable_dimr=True),
     NaiveMaxScoreTuner(score_phatdiff, range(2, 20, 2)),
     X=adata.X,
 )
@@ -132,7 +134,7 @@ phat, labs = found.HiDDENg(
     "stim",
     "ctrl",
     "cell",
-    Pipeline(m.run_lognorm_pca, m.log_reg, m.kmeans_bin),
+    Pipeline(m.run_lognorm_pca, m.logit_reg, m.kmeans_bin),
     grp_specific_args={grp: {"k": opt_k} for grp, opt_k in sel.items()},
     X=adata.X,
     k=20,

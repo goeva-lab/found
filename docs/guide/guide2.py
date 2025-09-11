@@ -49,7 +49,7 @@ print(adata)
 # that fetches pre-computed embeddings from an `obsm` slot given a predefined key.
 # %%
 # create a pipeline that uses the above generated dimensionality reduction
-algo = Pipeline.from_proc_ad("X_pca", m.log_reg, m.kmeans_bin)
+algo = Pipeline.from_proc_ad("X_pca", m.logit_reg, m.kmeans_bin)
 
 # %% [markdown]
 # as we do not know the optimal k for the relabeling task for this dataset, we will

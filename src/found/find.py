@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .adapters import Pipeline, wrap_gby_fn
-from .methods import kmeans_bin, log_reg, run_lognorm_pca
+from .methods import kmeans_bin, logit_reg, run_lognorm_pca
 from .tune import FixPointTuner, Tuner
 from .types import BoolArr, NumArr
 
@@ -57,7 +57,7 @@ def HiDDEN(
     /,
     cond_col: str,
     control_val: object,
-    algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
+    algo: Pipeline = Pipeline(run_lognorm_pca, logit_reg, kmeans_bin, True),
     **kwargs,
 ) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype]]:
     """
@@ -91,7 +91,7 @@ def HiDDENg(
     cond_col: str,
     control_val: object,
     group_by: str | tuple[str],
-    algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
+    algo: Pipeline = Pipeline(run_lognorm_pca, logit_reg, kmeans_bin, True),
     which_grouped: str | Collection[str] | None = None,
     grp_specific_args: Mapping[object, dict[str, object]] | None = None,
     **kwargs,
@@ -139,7 +139,7 @@ def HiDDENt[P, S](
     /,
     cond_col: str,
     control_val: object,
-    algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
+    algo: Pipeline = Pipeline(run_lognorm_pca, logit_reg, kmeans_bin, True),
     tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
     **kwargs,
 ) -> tuple[P, Mapping[P, tuple[NumArr, np.ndarray[tuple[int], np.dtype], S]]]:
@@ -192,7 +192,7 @@ def HiDDENgt[P, S, G](
     cond_col: str,
     control_val: object,
     group_by: str | tuple[str],
-    algo: Pipeline = Pipeline(run_lognorm_pca, log_reg, kmeans_bin, True),
+    algo: Pipeline = Pipeline(run_lognorm_pca, logit_reg, kmeans_bin, True),
     tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
     which_grouped: str | Collection[str] | None = None,
     grp_specific_args: Mapping[G, dict[str, object]] | None = None,
