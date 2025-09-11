@@ -34,3 +34,6 @@ a documentation site can be built (using [`pkgdown`](https://pkgdown.r-lib.org/#
 ```bash
 R -q -e 'pkgdown::build_site()' && python -m http.server -b localhost -d docs 8000
 ```
+
+note: this will run and execute all guide vignettes, which can be very computationally expensive.
+to avoid doing this, you can pass `examples = FALSE` to the above `pkgdown::build_site` call as an additional argument.
