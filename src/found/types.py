@@ -28,7 +28,7 @@ def strip_generic(tp: type | UnionType | GenericAlias) -> type | UnionType:
     if isinstance(tp, GenericAlias):
         if not isinstance(tp.__origin__, type | UnionType):
             raise ValueError(
-                f"type {tp.__origin} is unsupported for checking, please disable strict type checking or file an issue"
+                f"type {tp.__origin__} is unsupported for checking, please disable strict type checking or file an issue"
             )
         return tp.__origin__
 
@@ -63,6 +63,7 @@ def vtype_check(o: object, annot: type | UnionType | GenericAlias) -> bool:
     if get_origin(annot) is Literal:
         return o in get_args(annot)
 
+    # @TODO: add explicit handling for isinstance-incompatible types (e.g. non-runtime-checkable Protocol)
     return isinstance(o, strip_generic(annot))
 
 
@@ -78,9 +79,9 @@ def ttype_check(t: type | UnionType | GenericAlias, annot: type | UnionType | Ge
     t = strip_generic(t)
     annot = strip_generic(annot)
 
+    # @TODO: add explicit handling for isinstance-incompatible types (e.g. non-runtime-checkable Protocol)
     if isinstance(t, UnionType):
         return all(map(lambda t: issubclass(t, annot), get_args(t)))
-
     return issubclass(t, annot)
 
 
