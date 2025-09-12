@@ -10,7 +10,7 @@
 # # pipeline step function creation: a developer's guide
 
 # %% [markdown]
-# we first import all script dependencies and load the provided data in GSE96583 into an anndata object
+# we first import all script dependencies and load the provided data in GSE96583 into an {py:class}`~anndata.AnnData` object
 # %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
 from gzip import decompress
@@ -71,7 +71,7 @@ print(adata)
 
 # %%
 # subset to 5% of data
-adata = adata[np.random.default_rng(RANDOM_STATE).choice(adata.n_obs, round(adata.n_obs * 0.05), replace=False)].copy()
+adata = adata[np.random.default_rng(RANDOM_STATE).choice(adata.n_obs, round(adata.n_obs * 0.005), replace=False)].copy()
 print(adata)
 
 
@@ -154,19 +154,29 @@ sel, out = found.HiDDENt(
     "stim",
     "ctrl",
     Pipeline(run_lemur_w_model_out, m.reg_logit, m.bin_kmeans),
-    NaiveMaxScoreTuner(score_lemur_counters, range(8, 17, 4)),
+    NaiveMaxScoreTuner(score_lemur_counters, range(2, 17, 4)),
     adata=adata,
     lemur_design="~ stim",
     lemur_grouping=adata.obs["cell"],
 )
 
+# %% [markdown]
+# exploring the HiDDENt outputs, we see that using this metric, we select for a very low number of embedding dimensions!
+# however, given that our data was subset to a very low number of cells for demonstration purposes, these results cannot be interpreted further.
+
+# %%
 pl.PlotTunerOutput(adata, sel, out).plot_scores().show()
 
 # %% [markdown]
-# this {py:func}`~found.adapters.step_fn` wrapping mechanism is actually used internally during Pipeline construction!
-# if a provided step function hasn't already been decorated with {py:func}`~found.adapters.step_fn`, Pipeline will wrap it in {py:func}`~found.adapters.step_fn`,
-# with the return value being named "Z" for {py:class}`~found.adapters.Pipeline```.dimr_fn``, "Y" for {py:class}`~found.adapters.Pipeline```.regr_fn``, and "W" for {py:class}`~found.adapters.Pipeline```.binr_fn``.
+# this {py:func}`~found.adapters.step_fn` wrapping mechanism is actually used internally during {py:class}`~found.adapters.Pipeline` construction!
+# if a provided step function hasn't already been decorated with {py:func}`~found.adapters.step_fn`, {py:class}`~found.adapters.Pipeline` will wrap it in {py:func}`~found.adapters.step_fn`.
+# the return value will be named "Z" for {py:class}`~found.adapters.Pipeline```.dimr_fn``, "Y" for {py:class}`~found.adapters.Pipeline```.regr_fn``, and "W" for {py:class}`~found.adapters.Pipeline```.binr_fn``.
 
 # %% [markdown]
-# a final note for developers: if a function inserted into a pipeline needs dynamic access to *all* pipeline values, this can be done by adding a variable keyword argument (i.e. ``**kwargs`` form).
-# for example, this is used by the {py:func}`~found.methods.score_nulldist` function to rerun the existing pipeline.
+# two final notes for developers:
+#
+# 1) if a function inserted into a pipeline needs dynamic access to *all* pipeline values, this can be done by adding a variable keyword argument (i.e. ``**kwargs`` form).
+# for example, this is used by the {py:func}`~found.methods.score_nulldist` function to rerun a pipeline on randomly permuted case labels to approximate a "null" p_hat distribution.
+#
+# 2) pipeline functions _cannot_ have positional only arguments (either a named positional only argument via the ``arg, /,`` construct or a variable-length positional argument via the ``*args`` construct).
+# calling a {py:class}`~found.adapters.Pipeline` where one of the steps is a function with positional-only arguments will raise a {py:exc}`~TypeError` during the validation step executed prior to computation (see {py:func}`found.types.check_step`).

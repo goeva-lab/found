@@ -11,7 +11,7 @@
 
 # %% [markdown]
 # %% [markdown]
-# we first import all script dependencies and load the provided data in GSE96583 into an anndata object
+# we first import all script dependencies and load the provided data in GSE96583 into an {py:class}`~anndata.AnnData` object
 # %% tags=["hide-input"] mystnb={"code_prompt_show": "show preamble"}
 # import dependencies and load data
 

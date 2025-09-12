@@ -64,18 +64,18 @@ class Pipeline:
     class which when provided with individual pipeline components (see fields),
     creates a pipeline for detecting and re-classifying cells affected/unaffected by the case condition.
 
-    functions are run in the following order: dimr_fn -> regr_fn -> binr_fn
+    functions are run in the following order: ``dimr_fn`` → ``regr_fn`` → ``binr_fn``
 
-    :param dimr_fn: dimensionality reduction function (output accessible to further functions via a parameter named Z unless explicitly wrapped by step_fn)
-    :param regr_fn: regression function (output accessible to further functions via a parameter named Y unless explicitly wrapped by step_fn)
-    :param binr_fn: binarization function (output accessible to further functions via a parameter named W unless explicitly wrapped by step_fn)
+    :param dimr_fn: dimensionality reduction function (output accessible to further functions via a parameter named Z unless explicitly wrapped by :py:func:`~found.adapters.step_fn`)
+    :param regr_fn: regression function (output accessible to further functions via a parameter named Y unless explicitly wrapped by :py:func:`~found.adapters.step_fn`)
+    :param binr_fn: binarization function (output accessible to further functions via a parameter named W unless explicitly wrapped by :py:func:`~found.adapters.step_fn`)
 
     :param cachable_dimr:
         boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``)
         caution with setting this without care as it can lead to incorrect results when conducting hyperparameter optimization via :py:class:`~found.tune.Tuner`.
-        as a rule of thumb, this property is generally only true for PCA.
+        as a rule of thumb, this property is generally only true for truncated PCA.
 
-    :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious TypeError failures
+    :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious {py:exc}`~TypeError` failures
     """
 
     dimr_fn: Callable
@@ -87,7 +87,7 @@ class Pipeline:
     def check(self, w: dict[str, object]):
         """
         convenience function, given a set of provided arguments, validates if the pipeline can run
-        returns if yes, raises :py:class:`~ValueError` if no
+        returns if yes, raises :py:exc:`~ValueError` if no
 
         :param w: dictionary of initial pipeline variables
         """
@@ -109,12 +109,12 @@ class Pipeline:
         if not hasattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME):
             object.__setattr__(self, "regr_fn", step_fn("Y")(wrap_to_ot(self.regr_fn)))
         elif "Y" not in (n := getattr(self.regr_fn, _INTERNAL_WRAP_ATTR_NAME)):
-            raise ValueError(f"expected wrapped self.regr_fn to a named output variable named `Y`, but got names {n}")
+            raise ValueError(f"expected wrapped self.regr_fn output to contain a named output variable `Y`, but got names {n}")
 
         if not hasattr(self.binr_fn, _INTERNAL_WRAP_ATTR_NAME):
             object.__setattr__(self, "binr_fn", step_fn("W")(wrap_to_ot(self.binr_fn)))
         elif "W" not in (n := getattr(self.binr_fn, _INTERNAL_WRAP_ATTR_NAME)):
-            raise ValueError(f"expected wrapped self.binr_fn to a named output variable named `W`, but got names {n}")
+            raise ValueError(f"expected wrapped self.binr_fn output to contain a named output variable `W`, but got names {n}")
 
     def __call__(self, **kwargs) -> tuple[NumArr, BoolArr, dict[str, object]]:
         w = kwargs
@@ -138,12 +138,15 @@ class Pipeline:
         """
         convenience constructor for creating a new :py:class:`~found.adapters.Pipeline` from an existing one (does not mutate original object).
 
-        :param norm_fn: normalization/transformation function (output accessible to further functions via a parameter named N)
-        :param dimr_fn: dimensionality reduction function (output accessible to further functions via a parameter named Z)
-        :param regr_fn: regression function (output accessible to further functions via a parameter named Y)
-        :param binr_fn: binarization function (output accessible to further functions via a parameter named W)
-        :param cachable_dimr: boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``); caution with setting this without care as it can lead to incorrect results
-        :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious TypeError failures
+        :param dimr_fn: dimensionality reduction function (output accessible to further functions via a parameter named ``Z``)
+        :param regr_fn: regression function (output accessible to further functions via a parameter named ``Y``)
+        :param binr_fn: binarization function (output accessible to further functions via a parameter named ``W``)
+        :param cachable_dimr:
+            boolean indicating if the first k dimensions of the output of dimr_fn stable when requesting larger dimensions (e.g. is ``dimr_fn(X, k) = dimr_fn(X, k+n)[:, :k]``)
+            caution with setting this without care as it can lead to incorrect results when conducting hyperparameter optimization via :py:class:`~found.tune.Tuner`.
+            as a rule of thumb, this property is generally only true for truncated PCA.
+
+        :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious :py:exc:`~TypeError` failures
         """
         return type(self)(
             dimr_fn=self.dimr_fn if dimr_fn is None else dimr_fn,
@@ -162,17 +165,16 @@ class Pipeline:
         strict: bool | None = None,
     ) -> Self:
         """
-        convenience constructor for creating :py:class:`~found.adapters.Pipeline`\\ s from processed :py:class:`~anndata.AnnData` objects with already computed count transformation and dimensionality reduction.
+        convenience constructor for creating a :py:class:`~found.adapters.Pipeline`\\ where the `dimr_fn` step fetches data from a specified :py:class:`~anndata.AnnData` :py:attr:`~anndata.AnnData.obsm` slot.
 
-        resulting :py:class:`~found.adapters.Pipeline` must be called with a named argument ``adata`` providing :py:class:`~anndata.AnnData` object.
-        provided ``regr_fn``, ``binr_fn``, ``scor_fn`` methods should receive :py:class:`~anndata.AnnData` object via their ``adata`` argument.
+        resulting :py:class:`~found.adapters.Pipeline` must be called with a named argument ``adata`` providing an :py:class:`~anndata.AnnData` object.
 
         resulting :py:class:`~found.adapters.Pipeline` can optionally be called with a named argument ``k`` specifying the desired dimensionality of the dimensionality reduction space, otherwise the full provided space will be used.
 
-        :param dimr_key: key for ``.obsm`` slot specifying dimensionality reduction matrix
+        :param dimr_key: key for :py:attr:`~anndata.AnnData.obsm` slot specifying dimensionality reduction matrix
         :param regr_fn: regression function (output accessible to further functions via a parameter named Y)
         :param binr_fn: binarization function (output accessible to further functions via a parameter named W)
-        :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious TypeError failures, defaults to Pipeline.strict default
+        :param strict: boolean indicating if the pipeline should conduct strict type checking, disable with caution if getting spurious :py:exc:`~TypeError` failures
         """
 
         def dimr_fn(adata: ad.AnnData, k: int | None = None) -> FloatMtx:

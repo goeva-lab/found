@@ -347,8 +347,8 @@ class PlotTunerOutput:
     can be indexed to return PlotHiDDENOutput objects for diagnostics on specific hyperparameters.
 
     :param adata: anndata object containing input data
+    :param sel: HiDDENt-returned selected hyperparameter configuration
     :param outs: HiDDENt-returned output dictionary
-    :param labs: selected optimal hyperparameter
     """
 
     adata: ad.AnnData
