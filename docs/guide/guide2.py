@@ -62,7 +62,7 @@ algo = Pipeline.from_proc_ad("X_pca", m.reg_logit, m.bin_kmeans)
 start_k = 3
 tuner_fix = FixPointTuner(4, start_k, 0.02)
 tuner_nulldist = NaiveMaxScoreTuner(m.score_nulldist, range(start_k, 31))
-tuner_phatdist = NaiveMaxScoreTuner(m.score_phatdiff_emd, range(start_k, 31))
+tuner_phatdist = NaiveMaxScoreTuner(m.score_phatdiff_dist, range(start_k, 31))
 
 # ⚠️  the `from_proc_ad` constructor creates a pipeline which expects an `adata` argument!
 # ⚠️            |_____________________________________________________________
