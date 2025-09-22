@@ -20,21 +20,25 @@ def remap[T: np.ndarray[tuple[int], np.dtype]](adj_bool: BoolArr, orig_label: T 
 
 
 def prep_grps(
-    obs: pd.DataFrame, grp_by: str | tuple[str], which_grouped: str | Collection[str] | None, kwargs: dict
+    obs: pd.DataFrame, grp_by: str | tuple[str], which_grouped: str | Collection[str] | None, kwargs: dict, cond_col: str
 ) -> tuple[
     Mapping[object, np.ndarray[tuple[int], np.dtype[np.integer]]],
     np.ndarray[tuple[int], np.dtype[np.integer]],
     list[str],
 ]:
-    assert not (  # pyright: ignore[reportGeneralTypeIssues]
-        obs[grp_by]
-        .isna()
-        .any(
-            axis=None,  # pyright: ignore[reportArgumentType]
-        )
-    ), "group by adapters cannot be used on columns containing na values."
+    if obs[grp_by].isna().any(axis=None):  # pyright: ignore[reportArgumentType, reportGeneralTypeIssues]
+        raise ValueError("group by adapters cannot be used on columns containing na values.")
+
     grp_idx = obs.groupby(list(grp_by) if isinstance(grp_by, tuple) else grp_by, sort=True, dropna=False, observed=True).indices
-    out_ord = np.argsort(np.concat(list(grp_idx.values())))
+
+    for g, idx in grp_idx.items():
+        unique_per_grp = obs.iloc[idx][cond_col].unique()
+        if len(unique_per_grp) < 2:
+            raise ValueError(
+                "cannot run grouped HiDDEN pipeline w/ grouping where all "
+                "observations from group exist in only one category, but got "
+                f"only values of {unique_per_grp} for group {g}"
+            )
 
     if which_grouped is None:
         which_grouped = [k for k, v in kwargs.items() if hasattr(v, "__getitem__")]
@@ -47,7 +51,7 @@ def prep_grps(
 
     return (
         grp_idx,
-        out_ord,  # pyright: ignore[reportReturnType]
+        np.argsort(np.concat(list(grp_idx.values()))),  # pyright: ignore[reportReturnType]
         which_grouped,
     )
 
@@ -73,12 +77,12 @@ def HiDDEN(
         - 1-d array of prediction outputs by model
         - binarized labels from prediction values
     """
-    y_hat, new_ann, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
+    p_hat, labs, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
 
     return (
-        y_hat,
+        p_hat,
         remap(
-            new_ann,
+            labs,
             x.obs[cond_col],  # pyright: ignore[reportArgumentType]
             control_val,
         ),
@@ -117,15 +121,15 @@ def HiDDENg(
     if grp_specific_args is None:
         grp_specific_args = defaultdict(dict)
 
-    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs)
+    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs, cond_col)
 
     gfn = wrap_gby_fn(algo, which_grouped, grp_idx)
-    yhat, labs, _ = zip(
+    p_hat, labs, _ = zip(
         *(gfn(grp, **(kwargs | {"V": (x.obs[cond_col] != control_val).to_numpy()} | grp_specific_args[grp])) for grp in grp_idx)
     )
 
     return (
-        np.concat(yhat)[out_ord],  # pyright: ignore[reportReturnType]
+        np.concat(p_hat)[out_ord],  # pyright: ignore[reportReturnType]
         remap(
             np.concat(labs)[out_ord],  # pyright: ignore[reportArgumentType]
             x.obs[cond_col],  # pyright: ignore[reportArgumentType]
@@ -231,7 +235,7 @@ def HiDDENgt[P, S, G](
     if grp_specific_args is None:
         grp_specific_args = defaultdict(dict)
 
-    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs)
+    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs, cond_col)
 
     gfn = wrap_gby_fn(partial(tuner, algo), which_grouped, grp_idx)
     best_params, outs = zip(

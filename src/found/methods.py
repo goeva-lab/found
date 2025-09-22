@@ -205,8 +205,8 @@ def sklearn_wrap[T: HasFitBinClass](Z: FloatMtx, V: BoolArr, model: T) -> tuple[
         # in sorted order, so True should always be the second class
         # however we still perform the `.index` operation as a sanity check
         model.predict_proba(Z)[:, model.classes_.tolist().index(True)],  # pyright: ignore[reportReturnType]
-        # ignore NECESSITY - `mode.predict_proba` will return a 2-d array (since we have two
-        # classes - True and False) so indexing with [:, int] will return yield a 1-d array
+        # ignore NECESSITY - `mode.predict_proba` will return a 2-d array
+        # so indexing with [:, int] will return yield a 1-d array
         model,
     )
 
@@ -333,13 +333,8 @@ def bin_model(
     Z: FloatMtx,
     model: HasPredictBinClass,
 ) -> BoolArr:
-    """
-    uses a previously trained model to get the adjusted labels
+    """:meta hide-value:"""
 
-    :param Z: cell by k matrix (where k is some number of dimensions)
-    :param model: post-fit sklearn model
-    :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)
-    """
     # when possible, check the model is fitted, can't be checked
     # via argument typing since HasEstimator is a Protocol
     if isinstance(model, BaseEstimator):
@@ -412,7 +407,7 @@ def bin_gmm(Y: NumArr, V: BoolArr, gmm_args: dict[str, Any] | None = None) -> Bo
     )
 
 
-def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, deg_cutoff: float) -> Integral:
+def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.ndarray[tuple[int], np.dtype[np.floating]]:
     assert lhs.shape[1] == rhs.shape[1], (  # pyright: ignore[reportOptionalSubscript]
         # ignore NECESSITY - spmatrix.shape is not annotated
         "lhs/rhs number of features must be equal"
@@ -423,17 +418,16 @@ def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, deg_cutoff: float) -> Integ
 
     if isinstance(lhs, np.ndarray):
         lhs_mean, rhs_mean = np.mean(lhs, axis=0), np.mean(rhs, axis=0)  # pyright: ignore[reportCallIssue, reportArgumentType]
-
     else:
         lhs_mean, rhs_mean = lhs.mean(axis=0), rhs.mean(axis=0)
 
     # remove genes for which log2fc is not sensical
     # (i.e. mean of zero in either condition)
-    gtz = np.logical_and(lhs_mean > 0, rhs_mean > 0)
+    mask = np.logical_and(lhs_mean > 0, rhs_mean > 0)
     # remove genes where log2FC is less than 1.5
-    lfc = np.abs(np.log2(rhs_mean[gtz] / lhs_mean[gtz])) > deg_cutoff
+    mask[mask] = np.abs(np.log2(rhs_mean[mask] / lhs_mean[mask])) > lfc_cutoff
 
-    lhs, rhs = lhs[:, gtz][:, lfc], rhs[:, gtz][:, lfc]  # pyright: ignore[reportAssignmentType]
+    lhs, rhs = lhs[:, mask], rhs[:, mask]  # pyright: ignore[reportAssignmentType]
     # ignore NECESSITY - pyright can't tell that lhs/rhs are of type MatrixLike
     # due to type hints on indexing not sufficiently preserving type info
 
@@ -442,7 +436,13 @@ def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, deg_cutoff: float) -> Integ
         lhs, rhs = lhs.todense(), rhs.todense()  # pyright: ignore[reportAssignmentType, reportAttributeAccessIssue]
         # ignore NECESSITY - pyright can't tell that lhs/rhs are of type sparray
 
-    return np.sum((mannwhitneyu(lhs, rhs, axis=0).pvalue * ngenes) < 0.05)
+    pvals = np.full((ngenes,), np.nan)
+    pvals[mask] = mannwhitneyu(lhs, rhs, axis=0).pvalue * ngenes
+    return pvals
+
+
+def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float, signif_cutoff: float = 0.05) -> Integral:
+    return np.sum((mannwhitneyu_pvals(lhs, rhs, lfc_cutoff)) < signif_cutoff)  # pyright: ignore[reportReturnType]
 
 
 def score_deg(
