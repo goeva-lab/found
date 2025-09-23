@@ -61,8 +61,8 @@ adata.obs["sample_ID"] = pd.Categorical(
 print(adata)
 
 # %% [markdown]
-# we run the standard HiDDEN pipeline to classify affected cells on:
-# normal bone marrow, smoldering multiple myeloma, and multiple myeloma patients
+# we run the standard HiDDEN pipeline to classify affected cells on patients from the following groups:
+# normal bone marrow, smoldering multiple myeloma, and multiple myeloma
 # %%
 algo = Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans, True)
 p_hat, labs = found.HiDDEN(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
@@ -80,15 +80,17 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()
 
 # %% [markdown]
-# we can index into the {py:class}`~found.pl.PlotHiDDENOutput` object to only plot a subset of the data (similar to {py:attr}`~pandas.DataFrame.loc` in {py:class}`~pandas.DataFrame`)
-# we use this to plot p_hat distributions for the three patients where we see the most relabeling:
+# we can index into the {py:class}`~found.pl.PlotHiDDENOutput` object to only plot a subset of the data (similar to {py:attr}`~pandas.DataFrame.loc` in {py:class}`~pandas.DataFrame`).
+# here, we use this to plot p_hat distributions for the three patients where we see the most relabeling, first without splitting by the refined labels, then with splitting:
 # %%
-plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])].phat_vln("disease_stage", "sample_ID").properties(
-    width=120
+subset_plt = plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])]
+(
+    subset_plt.phat_vln("sample_ID", split_mode=False).properties(width=120)
+    | subset_plt.phat_vln("sample_ID").properties(width=120)
 ).show()
 
 # %% [markdown]
-# as such, it would be interesting to see if we could modify a component of the default pipeline to improve this.
+# it might be of interest to ask if per-patient batch effects have serious effects on HiDDEN outputs, and if accounting for them could increase the accuracy/sensitivity of our outputs.
 # to attempt this, we can try to have the binarization step be done in a per-patient fashion.
 #
 # note: this should not be taken as general advice to follow when troubleshooting found-generated labels, instead proper batch correction methods such as batch-adjusted dimensionality reduction should most likely be considered instead.

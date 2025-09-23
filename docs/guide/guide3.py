@@ -79,7 +79,7 @@ plt[lambda a: a.obs["stim"] == "stim"].labs_pct("stim", "ctrl", "cell")
 # %% [markdown]
 # we see that megakaryocytes show the most relabeling, so we plot the p_hat values for that cell type specifically
 # %%
-plt[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim", "stim").properties(width=120)
+plt[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim").properties(width=120)
 
 # %% [markdown]
 # the above workflow assumes that a hyperparameter k for the pipeline is a) known and b) fixed for all cell types.
@@ -137,11 +137,10 @@ phat, labs = found.HiDDENg(
     Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans),
     grp_specific_args={grp: {"k": opt_k} for grp, opt_k in sel.items()},
     X=adata.X,
-    k=20,
 )
 
 pl.PlotHiDDENOutput(
     adata,
     phat,
     labs,
-)[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim", "stim").properties(width=120).show()
+)[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim").properties(width=120).show()

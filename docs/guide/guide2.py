@@ -101,11 +101,12 @@ plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 # we can index into our {py:func}`~found.pl.PlotTunerOutput` object using
 # tested hyperparameters to get a corresponding {py:func}`~found.pl.PlotTunerOutput` object.
 # %%
+
+case_mask = adata.obs["injection"] == "LPC"
 start = plt_fix[start_k]
 fixk = plt_fix[plt_fix.sel]
 nulldistk = plt_nulldist[plt_nulldist.sel]
 phatdistk = plt_phatdist[plt_phatdist.sel]
-case_mask = adata.obs["injection"] == "LPC"
 
 # %% [markdown]
 # here we use this to visualize percent relabeling for the initial tested k, as well as the different ks that were selected for by different tuners
@@ -121,8 +122,8 @@ case_mask = adata.obs["injection"] == "LPC"
 # we can also assess phat distributions across different ks
 # %%
 (
-    start.phat_vln("injection", "injection").properties(title=f"k = {start_k}", width=60)
-    | fixk.phat_vln("injection", "injection").properties(title=f"k = {plt_fix.sel}", width=60)
-    | nulldistk.phat_vln("injection", "injection").properties(title=f"k = {plt_nulldist.sel}", width=60)
-    | phatdistk.phat_vln("injection", "injection").properties(title=f"k = {plt_phatdist.sel}", width=60)
+    start.phat_vln("injection").properties(title=f"k = {start_k}", width=60)
+    | fixk.phat_vln("injection").properties(title=f"k = {plt_fix.sel}", width=60)
+    | nulldistk.phat_vln("injection").properties(title=f"k = {plt_nulldist.sel}", width=60)
+    | phatdistk.phat_vln("injection").properties(title=f"k = {plt_phatdist.sel}", width=60)
 ).configure_title(anchor="middle").show()

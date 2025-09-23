@@ -114,7 +114,7 @@ class PlotAdata:
         continuous: str | pd.Series,
         discrete: str | pd.Series | None = None,
         split: str | pd.Series | None = None,
-        rescale_by: Literal[None, "width", "n"] = "n",
+        rescale_by: Literal["area", "width", "n"] = "n",
         vertical: bool = True,
         n: int = 100,
     ) -> alt.Chart:
@@ -247,32 +247,39 @@ class PlotHiDDENOutput:
 
     def phat_vln(
         self,
-        orig_labs: str | pd.Series | None = None,
         group_by: str | pd.Series | None = None,
-        rescale_by: Literal[None, "width", "n"] = "n",
+        split_mode: Literal[False, "area", "width", "n"] = "n",
         vertical: bool = True,
         n: int = 100,
     ) -> alt.Chart:
         """
         method used to generate violin plots of p hat values
 
-        :param orig_labs: key in self.adata for original condition labels (will be used to split violin plot on if HiDDEN changed the label)
         :param group_by: key in self.adata to group violin plot by
-        :param rescale_by_n: if the violin plot is split, how should the two sides be scaled?
-            (options: None - meaning they have equivalent area, "n" - scaled by proportion of observations, "width" - min/max scaling so that they have the same width)
+        :param split_mode: if the violin plot should be split by the refined HiDDEN labels, and if yes, how should the splits be scaled
+            (options: ``"area"`` - meaning they have equivalent area, ``"n"`` - scaled by proportion of observations, ``"width"`` - min/max scaling so that they have the same width, ``False`` - no splitting)
         :param vertical: should the plot be vertical (like a violin plot) or horizontal (e.g. like a density plot)
         :param n: number of bins for density estimation
         """
         pl = PlotAdata(self.adata)
-        if isinstance(orig_labs, str):
-            orig_labs = pd.Series(pl.get_data(orig_labs), name=orig_labs)
-        return pl.vln(
-            pd.Series(self.phat, name="HiDDEN_phat"),
-            group_by,
-            pd.Series(self.labs != orig_labs, name="HiDDEN_changed") if orig_labs is not None else None,
-            rescale_by=rescale_by,
-            vertical=vertical,
-            n=n,
+
+        return (
+            pl.vln(
+                pd.Series(self.phat, name="HiDDEN_phat"),
+                group_by,
+                pd.Series(self.labs, name="HiDDEN_labs"),
+                rescale_by=split_mode,
+                vertical=vertical,
+                n=n,
+            )
+            if split_mode is not False
+            else pl.vln(
+                pd.Series(self.phat, name="HiDDEN_phat"),
+                group_by,
+                None,
+                vertical=vertical,
+                n=n,
+            )
         )
 
     def labs_pct(

@@ -154,14 +154,14 @@ sel, out = found.HiDDENt(
     "stim",
     "ctrl",
     Pipeline(run_lemur_w_model_out, m.reg_logit, m.bin_kmeans),
-    NaiveMaxScoreTuner(score_lemur_counters, range(2, 17, 4)),
+    NaiveMaxScoreTuner(score_lemur_counters, range(4, 17, 2)),
     adata=adata,
     lemur_design="~ stim",
     lemur_grouping=adata.obs["cell"],
 )
 
 # %% [markdown]
-# exploring the HiDDENt outputs, we see that using this metric, we select for a very low number of embedding dimensions!
+# exploring the HiDDENt outputs, we see that using this metric, we select for `k=10`, with a drop off in score for `k>10`.
 # however, given that our data was subset to a very low number of cells for demonstration purposes, these results cannot be interpreted further.
 
 # %%
