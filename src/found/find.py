@@ -50,7 +50,7 @@ def prep_grps(
     which_grouped.append("V")
 
     return (
-        grp_idx,
+        grp_idx,  # pyright: ignore[reportReturnType]
         np.argsort(np.concat(list(grp_idx.values()))),  # pyright: ignore[reportReturnType]
         which_grouped,
     )
