@@ -27,7 +27,7 @@ jobs:
         shell: Rscript {0}
       - run: |
           pak::pak("lintr")
-          errors <- lintr::lint_package()
+          errors <- lintr::lint_package("./R")
           print(errors)
           quit(save = "no", status = length(errors) != 0)
         shell: Rscript {0}
