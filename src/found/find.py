@@ -1,5 +1,5 @@
 from collections import defaultdict
-from collections.abc import Callable, Collection, Mapping
+from collections.abc import Callable, Mapping
 from functools import partial
 from typing import Protocol
 
@@ -20,11 +20,18 @@ def remap[T: np.ndarray[tuple[int], np.dtype]](adj_bool: BoolArr, orig_label: T 
 
 
 def prep_grps(
-    obs: pd.DataFrame, grp_by: str | tuple[str], which_grouped: str | Collection[str] | None, kwargs: dict, cond_col: str
+    obs: pd.DataFrame,
+    grp_by: str | tuple[str],
+    which_grouped: str
+    | tuple[str]
+    | list[str]
+    | dict[str, Callable[[object, np.ndarray[tuple[int], np.dtype[np.integer]]], object]]
+    | None,
+    kwargs: dict,
 ) -> tuple[
     Mapping[object, np.ndarray[tuple[int], np.dtype[np.integer]]],
     np.ndarray[tuple[int], np.dtype[np.integer]],
-    list[str],
+    dict[str, Callable[[object, np.ndarray[tuple[int], np.dtype[np.integer]]], object]],
 ]:
     if obs[grp_by].isna().any(axis=None):  # pyright: ignore[reportArgumentType, reportGeneralTypeIssues]
         raise ValueError("group by adapters cannot be used on columns containing na values.")
@@ -32,7 +39,7 @@ def prep_grps(
     grp_idx = obs.groupby(list(grp_by) if isinstance(grp_by, tuple) else grp_by, sort=True, dropna=False, observed=True).indices
 
     for g, idx in grp_idx.items():
-        unique_per_grp = obs.iloc[idx][cond_col].unique()
+        unique_per_grp = np.unique(kwargs["V"][idx])
         if len(unique_per_grp) < 2:
             raise ValueError(
                 "cannot run grouped HiDDEN pipeline w/ grouping where all "
@@ -40,14 +47,15 @@ def prep_grps(
                 f"only values of {unique_per_grp} for group {g}"
             )
 
+    fidx = lambda v, i: v[i]  # noqa: E731
     if which_grouped is None:
-        which_grouped = [k for k, v in kwargs.items() if hasattr(v, "__getitem__")]
+        which_grouped = {k: fidx for k, v in kwargs.items() if hasattr(v, "__getitem__")}
     elif isinstance(which_grouped, str):
-        which_grouped = [which_grouped]
+        which_grouped = {which_grouped: fidx}
+    elif isinstance(which_grouped, list | tuple):
+        which_grouped = {k: fidx for k in which_grouped}
     else:
-        which_grouped = list(which_grouped)
-
-    which_grouped.append("V")
+        which_grouped["V"] = fidx
 
     return (
         grp_idx,  # pyright: ignore[reportReturnType]
@@ -96,7 +104,11 @@ def HiDDENg(
     control_val: object,
     group_by: str | tuple[str],
     algo: Pipeline = Pipeline(run_lognorm_pca, reg_logit, bin_kmeans, True),
-    which_grouped: str | Collection[str] | None = None,
+    which_grouped: str
+    | tuple[str]
+    | list[str]
+    | dict[str, Callable[[object, np.ndarray[tuple[int], np.dtype[np.integer]]], object]]
+    | None = None,
     grp_specific_args: Mapping[object, dict[str, object]] | None = None,
     **kwargs,
 ) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype]]:
@@ -106,7 +118,7 @@ def HiDDENg(
     :param x: input :py:class:`~anndata.AnnData` object
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
-    :param group_by: set of column names in ``x.obs`` specifiying grouping
+    :param group_by: set of column names in ``x.obs`` specifying grouping
     :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
     :param which_grouped: set of pipeline arguments which should be indexed by grouping (set to None to group all pipeline arguments which support indexing)
     :param grp_specific_args: any additional arguments that are to be provided on a group-specific basis
@@ -121,12 +133,11 @@ def HiDDENg(
     if grp_specific_args is None:
         grp_specific_args = defaultdict(dict)
 
-    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs, cond_col)
+    kwargs = kwargs | {"V": (x.obs[cond_col] != control_val).to_numpy()}
+    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs)
 
     gfn = wrap_gby_fn(algo, which_grouped, grp_idx)
-    p_hat, labs, _ = zip(
-        *(gfn(grp, **(kwargs | {"V": (x.obs[cond_col] != control_val).to_numpy()} | grp_specific_args[grp])) for grp in grp_idx)
-    )
+    p_hat, labs, _ = zip(*(gfn(grp, **(kwargs | grp_specific_args[grp])) for grp in grp_idx))
 
     return (
         np.concat(p_hat)[out_ord],  # pyright: ignore[reportReturnType]
@@ -159,7 +170,7 @@ def HiDDENt[P, S](
     :return: 2-tuple consisting of:
 
         - selected optimal pipeline hyperparameters
-        - dictionary with keys being attempted pipeline hyperparameters and values being a 3-tuple of:
+        - dictionary with keys being pipeline hyperparameters and values being a 3-tuple of:
 
             - 1-d array of prediction outputs by model
             - model adjusted labels
@@ -199,7 +210,11 @@ def HiDDENgt[P, S, G](
     group_by: str | tuple[str],
     algo: Pipeline = Pipeline(run_lognorm_pca, reg_logit, bin_kmeans, True),
     tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
-    which_grouped: str | Collection[str] | None = None,
+    which_grouped: str
+    | tuple[str]
+    | list[str]
+    | dict[str, Callable[[object, np.ndarray[tuple[int], np.dtype[np.integer]]], object]]
+    | None = None,
     grp_specific_args: Mapping[G, dict[str, object]] | None = None,
     **kwargs,
 ) -> tuple[
@@ -213,10 +228,10 @@ def HiDDENgt[P, S, G](
     :param x: input :py:class:`~anndata.AnnData` object
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
-    :param group_by: set of column names in ``x.obs`` specifiying grouping
+    :param group_by: set of column names in ``x.obs`` specifying grouping
     :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
     :param tuner: provided tuner which attempts to optimize pipeline for a specific hyperparameter
-    :param which_grouped: set of pipeline arguments which should be indexed by grouping (set to None to group all pipeline argumnents which support indexing)
+    :param which_grouped: set of pipeline arguments which should be indexed by grouping (set to None to group all pipeline arguments which support indexing)
     :param grp_specific_args: any additional arguments that are to be provided on a group-specific basis
     :param kwargs: additional variables to pass into pipeline across every group
     :return: 3-tuple consisting of:
@@ -235,7 +250,8 @@ def HiDDENgt[P, S, G](
     if grp_specific_args is None:
         grp_specific_args = defaultdict(dict)
 
-    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs, cond_col)
+    kwargs = kwargs | {"V": (x.obs[cond_col] != control_val).to_numpy()}
+    grp_idx, out_ord, which_grouped = prep_grps(x.obs, group_by, which_grouped, kwargs)
 
     gfn = wrap_gby_fn(partial(tuner, algo), which_grouped, grp_idx)
     best_params, outs = zip(
@@ -244,7 +260,6 @@ def HiDDENgt[P, S, G](
                 grp,
                 **(
                     kwargs  # fmt: skip
-                    | {"V": (x.obs[cond_col] != control_val).to_numpy()}
                     | grp_specific_args[grp]  # pyright: ignore[reportArgumentType]
                 ),
             )

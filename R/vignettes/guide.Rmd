@@ -60,7 +60,7 @@ we can then utilize existing `found` pipelines to run label refinement:
 ```{r}
 out <- HiDDEN(
   so, "stim", "CTRL",
-  adapters$Pipeline(methods$run_lognorm_pca, methods$log_reg, methods$kmeans_bin),
+  adapters$Pipeline(methods$run_lognorm_pca, methods$reg_logit, methods$bin_kmeans),
   # ⚠️: X must be observation by feature format, so we transpose the output of LayerData!
   X = t(LayerData(so, "counts")), k = 15L
 )
@@ -80,7 +80,7 @@ sct_pca <- function(so, k) {
 }
 out <- HiDDEN(
   so, "stim", "CTRL",
-  adapters$Pipeline(to_step(sct_pca), methods$log_reg, methods$kmeans_bin),
+  adapters$Pipeline(to_step(sct_pca), methods$reg_logit, methods$bin_kmeans),
   so = so, k = 15L
 )
 ```
@@ -90,7 +90,7 @@ we can also try utilizing the automatic hyperparameter tuning implemented in `fo
 ```{r}
 outs <- HiDDENt(
   so, "stim", "CTRL",
-  adapters$Pipeline(to_step(sct_pca), methods$log_reg, methods$kmeans_bin),
+  adapters$Pipeline(to_step(sct_pca), methods$reg_logit, methods$bin_kmeans),
   tune$FixPointTuner(3, 8, 0.02),
   so = so
 )

@@ -1,4 +1,4 @@
-from collections.abc import Callable, Collection, Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from functools import wraps
 from typing import Protocol, Self
@@ -202,15 +202,18 @@ class GroupbyOut[T, G](Protocol):
 
 
 def wrap_gby_fn[T, G](
-    fn: Callable[..., T], which_args: Collection[str], grps: Mapping[G, np.ndarray[tuple[int], np.dtype[np.integer]]]
+    fn: Callable[..., T],
+    which_args: dict[str, Callable[[object, np.ndarray[tuple[int], np.dtype[np.integer]]], object]],
+    grps: Mapping[G, np.ndarray[tuple[int], np.dtype[np.integer]]],
 ) -> GroupbyOut[T, G]:
     def f(grp: G, /, **kwargs) -> T:
-        new_args = {k: kwargs[k][grps[grp]] for k in which_args}
+        new_args = {k: v(kwargs[k], grps[grp]) for k, v in which_args.items()}
 
         for k in new_args:
             # materialize anndata view before it is repeatedly accessed downstream
             if isinstance(new_args[k], ad.AnnData):
-                new_args[k] = new_args[k].copy()
+                new_args[k] = new_args[k].copy()  # pyright: ignore[reportAttributeAccessIssue]
+                # ignore NECESSITY: new_args[k] check above ensures type is AnnData
 
             # more specializations here
 
