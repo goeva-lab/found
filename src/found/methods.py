@@ -112,7 +112,7 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
 
 def run_pca(N: MatrixLike, k: int, scale: bool = True) -> FloatMtx:
     """
-    runs PCA to provide PC-space coordinates for input matrix, first applying a centering and scaling transformn.
+    runs PCA to provide PC-space coordinates for input matrix, first applying a centering and scaling transform.
 
     :param N: cell by gene matrix
     :param k: dimensionality of the PCA to run
@@ -273,7 +273,7 @@ def reg_gp(
     gp_args: dict[str, Any] | None = None,
 ) -> tuple[NumArr, GaussianProcessClassifier]:
     """
-    runs a gaussian process classifier -based regression to score cells as affected/unaffected by the condition.
+    runs a Gaussian process classifier -based regression to score cells as affected/unaffected by the condition.
 
     :param Z: cell by k matrix (where k is some number of dimensions)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
@@ -481,8 +481,8 @@ def score_deg2(
     implements a heuristic to score label adjustment based on number of DEGs produced by new labels using two comparisons.
     specifically two comparisons are run, and the return value is a weighted difference of:
 
-    1) case cells labelled affected vs case cells labelled unaffected (difference should be as large as possible)
-    2) control cells vs case cells labelled unaffected (difference should be as small as possible)
+    1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)
+    2) control cells vs case cells labeled unaffected (difference should be as small as possible)
 
     :param X: input cell by gene matrix
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
@@ -575,7 +575,7 @@ def score_phatdiff(
 def symm_kl_div(lhs: NumArr, rhs: NumArr) -> NumericScalar:
     """
     implements a symmetrized version of Kullback-Leibler (KL) divergence, by returning the sum of the KL divergence from ``lhs`` to ``rhs`` and from ``rhs`` to ``lhs``.
-    this symmetrized statistic is also known as the jeffreys divergence.
+    this symmetrized statistic is also known as the Jeffreys divergence.
 
     :param lhs: 1-d N-length vector of probability values
     :param rhs: 1-d N-length vector of probability values
@@ -596,8 +596,8 @@ def score_phatdiff_dist(
     implements a heuristic to score label adjustment based on the distribution difference between p_hat values.
     specifically two comparisons are run, and the return value is a weighted difference of:
 
-    1) case cells labelled affected vs case cells labelled unaffected (difference should be as large as possible)
-    2) control cells vs case cells labelled unaffected (difference should be as small as possible)
+    1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)
+    2) control cells vs case cells labeled unaffected (difference should be as small as possible)
 
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
