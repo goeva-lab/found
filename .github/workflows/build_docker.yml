@@ -1,0 +1,16 @@
+on: push
+
+jobs:
+  build_docker:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'docker/setup-qemu-action@v3'
+      - uses: 'docker/setup-buildx-action@v3'
+      - uses: 'docker/build-push-action@v6'
+        with:
+          outputs: 'type=oci,dest=/tmp/image.tar'
+          push: false
+      - uses: 'actions/upload-artifact@v4'
+        with:
+          name: 'docker_image'
+          path: '/tmp/image.tar'
