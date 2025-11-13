@@ -13,6 +13,6 @@ jobs:
           activate-environment: true
       - run: |
           uv pip install '.[dev]' 'pyright'
-      - uses: astral-sh/ruff-action@v3
+      - uses: 'astral-sh/ruff-action@v3'
       - run: |
           pyright --warnings

@@ -24,14 +24,14 @@ jobs:
           devtools::document()
           devtools::install(dependencies = FALSE)
         working-directory: './R'
-        shell: Rscript {0}
+        shell: 'Rscript {0}'
       - run: |
           pak::pak("lintr")
           errors <- lintr::lint_package("./R")
           print(errors)
           quit(save = "no", status = length(errors) != 0)
-        shell: Rscript {0}
+        shell: 'Rscript {0}'
       - run: |
           devtools::check(error_on = "error", args = c("--no-examples", "--no-tests", "--no-vignettes"))
         working-directory: './R'
-        shell: Rscript {0}
+        shell: 'Rscript {0}'
