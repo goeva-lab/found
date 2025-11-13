@@ -31,8 +31,7 @@ from base as R
 run ["mkdir", "-p", "/workdir/found"]
 workdir /workdir/found
 
-run ["apt", "install", "-y", "r-base-dev"]
-run ["apt", "install", "-y", "libcurl4-openssl-dev"]
+run ["apt", "install", "-y", "r-base-dev", "libcurl4-openssl-dev"]
 run ["Rscript", "-e", "install.packages('pak', repos = 'https://cloud.r-project.org/')"]
 
 copy ./R/DESCRIPTION .
