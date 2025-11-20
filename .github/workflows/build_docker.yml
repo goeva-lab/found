@@ -19,5 +19,4 @@ jobs:
         with:
           push: true
           tags: '${{ github.repository }}:latest'
-          labels:
-            - 'org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}'
+          labels: 'org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}'
