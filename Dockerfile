@@ -6,7 +6,7 @@ run ["mkdir", "-p", "/workdir/found"]
 workdir /workdir/found
 
 copy --from=ghcr.io/astral-sh/uv:latest /uv /bin
-run ["uv", "venv", ".venv"]
+run ["uv", "venv", ".venv", "--managed-python", "-p", "3.14"]
 
 run ["apt", "install", "-y", "rustup"]
 run ["rustup", "install", "stable"]
