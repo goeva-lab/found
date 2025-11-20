@@ -221,7 +221,7 @@ class PlotAdata:
 @dataclass(frozen=True)
 class PlotHiDDENOutput:
     """
-    class which when provided with pipelien outputs (see fields),
+    class which when provided with pipeline outputs (see fields),
     can be used to create various diagnostic plots.
 
     can be indexed to plot only a subset of the data.

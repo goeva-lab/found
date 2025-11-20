@@ -455,8 +455,8 @@ def score_deg(
 
     :param X: input cell by gene matrix
     :param V: 1-d boolean array of condition labels (True corresponds to case, False to control)
-    :param W: 1-d boolean array of adjusted condition labels (True correspons to case, False to control)
-    :return: number of DEGs between conditions (as determined by a bonferroni-corrected mann-whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
+    :param W: 1-d boolean array of adjusted condition labels (True corresponds to case, False to control)
+    :return: number of DEGs between conditions (as determined by a Bonferroni-corrected Mann-Whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
     """
 
     lhs, rhs = X[~W, :], X[W, :]
@@ -529,8 +529,8 @@ def score_phatdiff(
     implements a heuristic to score label adjustment based on the distribution difference (using the Kolmogorov-Smirnov statistic) between p_hat values.
     specifically two comparisons are run, and the return value is a weighted difference of:
 
-    1) case cells labelled affected vs case cells labelled unaffected (difference should be as large as possible)
-    2) control cells vs case cells labelled unaffected (difference should be as small as possible)
+    1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)
+    2) control cells vs case cells labeled unaffected (difference should be as small as possible)
 
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
