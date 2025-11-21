@@ -7,7 +7,6 @@ dependencies = [
     "scipy",
     "numpy",
     "altair[all]",
-    "crc32c",        # not direct dependency, but needed for zarr (dependency of anndata), seemingly undeclared by zarr
 ]
 requires-python = ">=3.12"
 
