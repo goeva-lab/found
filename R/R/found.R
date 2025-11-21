@@ -67,8 +67,8 @@ to_step <- function(fn) {
   py_str$w(z)
 }
 
-sce_s4_class <- methods::getClass("SingleCellExperiment")
-seurat_s4_class <- methods::getClass("Seurat")
+sce_s4_class <- methods::getClass("SingleCellExperiment", where = "SingleCellExperiment")
+seurat_s4_class <- methods::getClass("Seurat", where = "SeuratObject")
 
 conv_HiDDEN <- function(HiDDEN_out) {
   list("p_hat" = reticulate::py_to_r(HiDDEN_out[0]), "labs" = reticulate::py_to_r(HiDDEN_out[1]))
@@ -135,7 +135,6 @@ HiDDEN <- S7::new_generic("HiDDEN", "x")
 #' @name HiDDEN
 #' @method HiDDEN SingleCellExperiment
 #'
-#' @importFrom  SingleCellExperiment colData
 #'
 S7::method(HiDDEN, sce_s4_class) <- function(
   x,
@@ -149,7 +148,6 @@ S7::method(HiDDEN, sce_s4_class) <- function(
 #' @name HiDDEN
 #' @method HiDDEN Seurat
 #'
-#' @importClassesFrom SeuratObject Seurat
 #'
 S7::method(HiDDEN, seurat_s4_class) <- function(
   x,
@@ -212,7 +210,6 @@ HiDDENt <- S7::new_generic("HiDDENt", "x")
 #' @name HiDDENt
 #' @method HiDDENt SingleCellExperiment
 #'
-#' @importFrom  SingleCellExperiment colData
 #'
 S7::method(HiDDENt, sce_s4_class) <- function(
   x,
@@ -226,7 +223,6 @@ S7::method(HiDDENt, sce_s4_class) <- function(
 #' @name HiDDENt
 #' @method HiDDENt Seurat
 #'
-#' @importClassesFrom SeuratObject Seurat
 #'
 S7::method(HiDDENt, seurat_s4_class) <- function(
   x,
@@ -292,7 +288,6 @@ HiDDENg <- S7::new_generic("HiDDENg", "x")
 #' @name HiDDENg
 #' @method HiDDENg SingleCellExperiment
 #'
-#' @importFrom  SingleCellExperiment colData
 #'
 S7::method(HiDDENg, sce_s4_class) <- function(
   x,
@@ -306,7 +301,6 @@ S7::method(HiDDENg, sce_s4_class) <- function(
 #' @name HiDDENg
 #' @method HiDDENg Seurat
 #'
-#' @importClassesFrom SeuratObject Seurat
 #'
 S7::method(HiDDENg, seurat_s4_class) <- function(
   x,
@@ -381,7 +375,6 @@ HiDDENgt <- S7::new_generic("HiDDENgt", "x")
 #' @name HiDDENgt
 #' @method HiDDENgt SingleCellExperiment
 #'
-#' @importFrom  SingleCellExperiment colData
 #'
 S7::method(HiDDENgt, sce_s4_class) <- function(
   x,
@@ -396,7 +389,6 @@ S7::method(HiDDENgt, sce_s4_class) <- function(
 #' @name HiDDENgt
 #' @method HiDDENgt Seurat
 #'
-#' @importClassesFrom SeuratObject Seurat
 #'
 S7::method(HiDDENgt, seurat_s4_class) <- function(
   x,
