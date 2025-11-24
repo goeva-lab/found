@@ -63,12 +63,22 @@ jobs:
       - uses: 'actions/checkout@v3'
       - run: |
           apt update && apt install -y --no-install-recommends r-base-dev 
+      - uses: 'actions/cache/restore@v4'
+        with:
+          path: |
+            /usr/local/lib/R/site-library/
+          key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
-          pak::local_install_dev_deps()
+          pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
           devtools::document()
         working-directory: './R'
         shell: 'Rscript {0}'
+      - uses: 'actions/cache/save@v4'
+        with:
+          path: |
+            /usr/local/lib/R/site-library/
+          key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           errors <- lintr::lint_package("./R")
           print(errors)
@@ -110,10 +120,15 @@ jobs:
       # `examples` set to FALSE because runner does not have enough computational resources to render examples
       # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
-          apt update && apt install -y --no-install-recommends r-base-dev 
+          apt update && apt install -y --no-install-recommends r-base-dev
+      - uses: 'actions/cache/restore@v4'
+        with:
+          path: |
+            /usr/local/lib/R/site-library/
+          key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
-          pak::local_install_dev_deps()
+          pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
           devtools::document()
           devtools::build_manual(path = ".")
           pkgdown::build_site(
