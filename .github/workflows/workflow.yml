@@ -44,6 +44,7 @@ jobs:
         password: '${{ secrets.GITHUB_TOKEN }}'
     steps:
       - uses: 'actions/checkout@v3'
+      - uses: 'astral-sh/setup-uv@v6'
       - run: |
           uv pip install -p '/workdir/found/.venv/bin/python' 'pyright'
       - uses: 'astral-sh/ruff-action@v3'
@@ -60,6 +61,8 @@ jobs:
         password: '${{ secrets.GITHUB_TOKEN }}'
     steps:
       - uses: 'actions/checkout@v3'
+      - run: |
+          apt install -y --no-install-recommends r-base-dev 
       - run: |
           install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
           pak::local_install_dev_deps()
@@ -106,6 +109,8 @@ jobs:
           python -m ipykernel install --user --name found && sphinx-build -D nb_execution_mode=off -b dirhtml -n docs docs/_build/html && mv docs/_build/html dist/py
       # `examples` set to FALSE because runner does not have enough computational resources to render examples
       # @TODO: look into using self-hosted runners depending on future hardware access
+      - run: |
+          apt install -y --no-install-recommends r-base-dev 
       - run: |
           install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
           pak::local_install_dev_deps()
