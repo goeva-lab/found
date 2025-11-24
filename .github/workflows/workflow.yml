@@ -69,8 +69,14 @@ jobs:
             /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
+          install.packages("pak", lib = '/usr/local/lib/R/site-library/', repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
+        working-directory: './R'
+        shell: 'Rscript {0}'
+      - run: |
           pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
+        working-directory: './R'
+        shell: 'Rscript {0}'
+      - run: |
           devtools::document()
         working-directory: './R'
         shell: 'Rscript {0}'
@@ -127,8 +133,14 @@ jobs:
             /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
+          install.packages("pak", lib = '/usr/local/lib/R/site-library/', repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
+        working-directory: './R'
+        shell: 'Rscript {0}'
+      - run: |
           pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
+        working-directory: './R'
+        shell: 'Rscript {0}'
+      - run: |
           devtools::document()
           devtools::build_manual(path = ".")
           pkgdown::build_site(
