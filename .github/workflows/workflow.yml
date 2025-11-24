@@ -67,12 +67,11 @@ jobs:
             /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          install.packages("pak", lib = '/usr/local/lib/R/site-library/', repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
-          pak::pak("R6")
+          install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
         working-directory: './R'
         shell: 'Rscript {0}'
       - run: |
-          pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
+          pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
         working-directory: './R'
         shell: 'Rscript {0}'
       - uses: 'actions/cache/save@v4'
@@ -129,12 +128,11 @@ jobs:
             /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          install.packages("pak", lib = '/usr/local/lib/R/site-library/', repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
-          pak::pak("R6")
+          install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
         working-directory: './R'
         shell: 'Rscript {0}'
       - run: |
-          pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
+          pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
         working-directory: './R'
         shell: 'Rscript {0}'
       - run: |
