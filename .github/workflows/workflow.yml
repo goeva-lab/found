@@ -76,16 +76,13 @@ jobs:
           pak::local_install_dev_deps(lib = '/usr/local/lib/R/site-library/')
         working-directory: './R'
         shell: 'Rscript {0}'
-      - run: |
-          devtools::document()
-        working-directory: './R'
-        shell: 'Rscript {0}'
       - uses: 'actions/cache/save@v4'
         with:
           path: |
             /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
+          devtools::document("./R")
           errors <- lintr::lint_package("./R")
           print(errors)
           quit(save = "no", status = length(errors) != 0)
@@ -162,12 +159,13 @@ jobs:
           git commit -m 'publish: ${{ github.sha }}'
           git push -f 'https://git:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git' gh-pages
         working-directory: './dist'
-      - run: |
-          echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> '${{ github.env }}'
+      - id: 'r-package-ver'
+        run: |
+          echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> "${GITHUB_OUTPUT}"
       - uses: 'actions/upload-artifact@v4'
         with:
           name: 'R manual'
-          path: 'R/found_${{ env.FOUND_R_PACKAGE_VERSION }}.pdf'
+          path: 'R/found_${{ steps.r-package-ver.outputs.FOUND_R_PACKAGE_VERSION }}.pdf'
       - uses: 'actions/upload-artifact@v4'
         with:
           name: 'docs site'
