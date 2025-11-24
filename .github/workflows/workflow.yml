@@ -63,8 +63,7 @@ jobs:
           apt update && apt install -y --no-install-recommends r-base-dev 
       - uses: 'actions/cache/restore@v4'
         with:
-          path: |
-            /usr/local/lib/R/site-library/
+          path: '/usr/local/lib/R/site-library/'
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
@@ -76,8 +75,7 @@ jobs:
         shell: 'Rscript {0}'
       - uses: 'actions/cache/save@v4'
         with:
-          path: |
-            /usr/local/lib/R/site-library/
+          path: '/usr/local/lib/R/site-library/'
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           devtools::document("./R")
@@ -121,11 +119,10 @@ jobs:
       # `examples` set to FALSE because runner does not have enough computational resources to render examples
       # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
-          apt update && apt install -y --no-install-recommends r-base-dev
+          apt update && apt install -y --no-install-recommends 'r-base-dev'
       - uses: 'actions/cache/restore@v4'
         with:
-          path: |
-            /usr/local/lib/R/site-library/
+          path: '/usr/local/lib/R/site-library/'
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
