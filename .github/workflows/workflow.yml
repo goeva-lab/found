@@ -73,9 +73,6 @@ jobs:
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
-        working-directory: './R'
-        shell: 'Rscript {0}'
-      - run: |
           pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
         working-directory: './R'
         shell: 'Rscript {0}'
@@ -85,6 +82,7 @@ jobs:
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           devtools::document("./R")
+
           errors <- lintr::lint_package("./R")
           print(errors)
           quit(save = "no", status = length(errors) != 0)
@@ -109,37 +107,35 @@ jobs:
       packages: 'read'
     steps:
       - uses: 'actions/checkout@v3'
-      - run: |
-          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'nodejs'      
-      - uses: 'r-lib/actions/setup-tinytex@v2'
-      - uses: 'r-lib/actions/setup-pandoc@v2'
       - uses: 'astral-sh/setup-uv@v6'
       - run: |
           uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]'
       - run: |
           mkdir dist && touch dist/.nojekyll
-      # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
-      # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
+          # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
+          # @TODO: look into using self-hosted runners depending on future hardware access
           python -m ipykernel install --user --name 'found' && sphinx-build -D 'nb_execution_mode=off' -b 'dirhtml' -n 'docs' 'docs/_build/html' && mv 'docs/_build/html' 'dist/py'
+      - run: |
+          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
       - uses: 'actions/cache/restore@v4'
         with:
           path: '/usr/local/lib/R/site-library/'
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
-        working-directory: './R'
-        shell: 'Rscript {0}'
-      - run: |
           pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
-        working-directory: './R'
-        shell: 'Rscript {0}'
-      # `examples` set to FALSE because runner does not have enough computational resources to render examples
-      # @TODO: look into using self-hosted runners depending on future hardware access
-      - run: |
+
+          pak::pak("tinytex")
+          tinytex::install_tinytex()
+
           devtools::document()
+
           devtools::build_manual(path = ".")
+
           pkgdown::build_site(
+            # `examples` set to FALSE because runner does not have enough computational resources to render examples
+            # @TODO: look into using self-hosted runners depending on future hardware access
             examples = FALSE,
             override = list(
               destination = "../dist/R",
