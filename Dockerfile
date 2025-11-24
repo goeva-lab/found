@@ -35,10 +35,11 @@ run apt -y update &&  \
     apt install -y \
     r-base-dev libcurl4-openssl-dev libxml2-dev && \
     rm -rf /var/lib/apt/lists/*
-run ["Rscript", "-e", "install.packages(c('pak', 'xml2', 'roxygen2'), repos = 'https://cloud.r-project.org/')"]
+run ["Rscript", "-e", "install.packages('pak', repos = sprintf('https://r-lib.github.io/p/pak/stable/%s/%s/%s', .Platform[['pkgType']], R.Version()[['os']], R.Version()[['arch']]))"]
+run ["Rscript", "-e", "pak::pak('roxygen2')"]
 
 copy ./R/DESCRIPTION .
-run ["Rscript", "-e", "pak::local_install_deps()"]
+run ["Rscript", "-e", "pak::local_install_deps(lib = '/workdir/.pak/found-lib')"]
 
 copy --from=py /root/.local/share/uv /root/.local/share/uv
 copy --from=py /workdir/found/.venv /workdir/found/.venv
@@ -46,10 +47,8 @@ env PATH="/workdir/found/.venv/bin:${PATH}"
 env RETICULATE_PYTHON="/workdir/found/.venv/bin/python"
 
 copy ./R/R ./R
-run ["Rscript", "-e", "roxygen2::roxygenize()"]
-run ["Rscript", "-e", "pak::local_install()"]
-
-run ["Rscript", "-e", "remove.packages(c('pak', 'roxygen2'))"]
+run ["Rscript", "-e", ".libPaths('/workdir/.pak/found-lib'); roxygen2::roxygenize()"]
+run ["Rscript", "-e", "pak::local_install(lib = '/workdir/.pak/found-lib')"]
 
 from base as R
 
@@ -63,8 +62,7 @@ copy --from=py_build /workdir/found/.venv /workdir/found/.venv
 env PATH="/workdir/found/.venv/bin:${PATH}"
 env RETICULATE_PYTHON="/workdir/found/.venv/bin/python"
 
-copy --from=R_build /usr/local/lib/R/site-library /usr/local/lib/R/site-library
-copy --from=R_build /usr/lib/R/site-library /usr/lib/R/site-library
-copy --from=R_build /usr/lib/R/library /usr/lib/R/library
+copy --from=R_build /usr/lib/R/library/ /usr/lib/R/library/
+copy --from=R_build /workdir/.pak/found-lib /usr/lib/R/site-library/
 
 run ["Rscript", "-e", "library(found)"]
