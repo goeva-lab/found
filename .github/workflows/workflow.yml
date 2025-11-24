@@ -109,24 +109,19 @@ jobs:
       packages: 'read'
     steps:
       - uses: 'actions/checkout@v3'
+      - run: |
+          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'nodejs'      
+      - uses: 'r-lib/actions/setup-tinytex@v2'
+      - uses: 'r-lib/actions/setup-pandoc@v2'
       - uses: 'astral-sh/setup-uv@v6'
       - run: |
           uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]'
-      - uses: 'r-lib/actions/setup-tinytex@v2'
-      - uses: 'r-lib/actions/setup-pandoc@v2'
-        with:
-          working-directory: './R'
-          cache: 'always'
       - run: |
           mkdir dist && touch dist/.nojekyll
       # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
       # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
-          python -m ipykernel install --user --name found && sphinx-build -D nb_execution_mode=off -b dirhtml -n docs docs/_build/html && mv docs/_build/html dist/py
-      # `examples` set to FALSE because runner does not have enough computational resources to render examples
-      # @TODO: look into using self-hosted runners depending on future hardware access
-      - run: |
-          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev'
+          python -m ipykernel install --user --name 'found' && sphinx-build -D 'nb_execution_mode=off' -b 'dirhtml' -n 'docs' 'docs/_build/html' && mv 'docs/_build/html' 'dist/py'
       - uses: 'actions/cache/restore@v4'
         with:
           path: '/usr/local/lib/R/site-library/'
@@ -139,6 +134,8 @@ jobs:
           pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
         working-directory: './R'
         shell: 'Rscript {0}'
+      # `examples` set to FALSE because runner does not have enough computational resources to render examples
+      # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
           devtools::document()
           devtools::build_manual(path = ".")
@@ -151,7 +148,7 @@ jobs:
           )
         working-directory: './R'
         shell: 'Rscript {0}'
-      - if: ${{ format('refs/heads/{0}', github.event.repository.default_branch) == github.ref }}
+      - if: ${{ success() && format('refs/heads/{0}', github.event.repository.default_branch) == github.ref }}
         run: |
           set -euxo pipefail
           
