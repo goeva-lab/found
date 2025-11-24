@@ -45,20 +45,10 @@ jobs:
     steps:
       - uses: 'actions/checkout@v3'
       - run: |
-          install.packages("pak")
-          pak::local_install_dev_deps()
-          devtools::document()
-        working-directory: './R'
-        shell: 'Rscript {0}'
+          uv pip install -p '/workdir/found/.venv/bin/python' 'pyright'
+      - uses: 'astral-sh/ruff-action@v3'
       - run: |
-          errors <- lintr::lint_package("./R")
-          print(errors)
-          quit(save = "no", status = length(errors) != 0)
-        shell: 'Rscript {0}'
-      - run: |
-          devtools::check(error_on = "error", args = c("--no-examples", "--no-tests", "--no-vignettes"))
-        working-directory: './R'
-        shell: 'Rscript {0}'
+          pyright --warnings
   lint_R:
     needs: 
       - 'build_docker'
@@ -71,7 +61,7 @@ jobs:
     steps:
       - uses: 'actions/checkout@v3'
       - run: |
-          install.packages("pak")
+          install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
           pak::local_install_dev_deps()
           devtools::document()
         working-directory: './R'
@@ -117,7 +107,7 @@ jobs:
       # `examples` set to FALSE because runner does not have enough computational resources to render examples
       # @TODO: look into using self-hosted runners depending on future hardware access
       - run: |
-          install.packages("pak")
+          install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform[["pkgType"]], R.Version()[["os"]], R.Version()[["arch"]]))
           pak::local_install_dev_deps()
           devtools::document()
           devtools::build_manual(path = ".")
