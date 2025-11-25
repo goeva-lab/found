@@ -118,6 +118,8 @@ jobs:
           python -m ipykernel install --user --name 'found' && sphinx-build -D 'nb_execution_mode=off' -b 'dirhtml' -n 'docs' 'docs/_build/html' && mv 'docs/_build/html' 'dist/py'
       - run: |
           apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
+      - run: |
+          echo '/root/bin' >> "${GITHUB_PATH}"
       - uses: 'actions/cache/restore@v4'
         with:
           path: '/usr/local/lib/R/site-library/'
@@ -139,7 +141,7 @@ jobs:
             examples = FALSE,
             override = list(
               destination = "../dist/R",
-              repo = list(url = list(source = sprintf("https://github.com/goeva-lab/found/tree/%s/R", system("git rev-parse main", intern = TRUE))))
+              repo = list(url = list(source = "https://github.com/goeva-lab/found/tree/${{ github.sha }}/R"))
             )
           )
         working-directory: './R'
