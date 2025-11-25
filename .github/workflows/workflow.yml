@@ -1,0 +1,182 @@
+on:
+  push:
+
+jobs:
+  build_docker:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'read'
+      packages: 'write'
+    steps:
+      - uses: 'docker/login-action@v3'
+        with:
+          registry: 'ghcr.io'
+          username: '${{ github.actor }}'
+          password: '${{ secrets.GITHUB_TOKEN }}'
+      - uses: 'docker/setup-qemu-action@v3'
+      - uses: 'docker/setup-buildx-action@v3'
+      - uses: 'docker/metadata-action@v5'
+        id: 'meta'
+        with:
+          images: 'ghcr.io/${{ github.repository }}'
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - uses: 'docker/build-push-action@v6'
+        with:
+          push: true
+          tags: '${{ steps.meta.outputs.tags }}'
+          labels: '${{ steps.meta.outputs.labels }}'
+          cache-from: 'type=gha'
+          cache-to: 'type=gha,mode=max'
+  lint_py:
+    needs: 
+      - 'build_docker'
+    runs-on: 'ubuntu-latest'
+    container:
+      image: 'ghcr.io/${{ github.repository }}:sha-${{ github.sha }}'
+      credentials:
+        username: '${{ github.actor }}'
+        password: '${{ secrets.GITHUB_TOKEN }}'
+    permissions:
+      contents: 'read'
+      packages: 'read'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'astral-sh/setup-uv@v6'
+      - run: |
+          uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]' 'pyright'
+      - uses: 'astral-sh/ruff-action@v3'
+      - run: |
+          pyright --warnings
+  lint_R:
+    needs: 
+      - 'build_docker'
+    runs-on: 'ubuntu-latest'
+    container:
+      image: 'ghcr.io/${{ github.repository }}:sha-${{ github.sha }}'
+      credentials:
+        username: '${{ github.actor }}'
+        password: '${{ secrets.GITHUB_TOKEN }}'
+    permissions:
+      contents: 'read'
+      packages: 'read'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - run: |
+          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev'
+      - uses: 'actions/cache/restore@v4'
+        with:
+          path: |
+            /usr/lib/R/library
+            /usr/lib/R/site-library/
+            /usr/local/lib/R/site-library/
+          key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
+      - run: |
+          if (!requireNamespace("pak", quietly = TRUE)) {
+            install.packages("pak", lib = "/usr/lib/R/site-library/", repos = "https://cloud.r-project.org/")
+          } 
+          pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
+        working-directory: './R'
+        shell: 'Rscript {0}'
+      - uses: 'actions/cache/save@v4'
+        with:
+          path: |
+            /usr/lib/R/library
+            /usr/lib/R/site-library/
+            /usr/local/lib/R/site-library/
+          key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
+      - run: |
+          devtools::document("./R")
+
+          errors <- lintr::lint_package("./R")
+          print(errors)
+          quit(save = "no", status = length(errors) != 0)
+        shell: 'Rscript {0}'
+      - run: |
+          devtools::check(error_on = "error", args = c("--no-examples", "--no-tests", "--no-vignettes"))
+        working-directory: './R'
+        shell: 'Rscript {0}'
+  build_docs:
+    needs: 
+      - 'build_docker'
+      - 'lint_R'
+      - 'lint_py'
+    runs-on: 'ubuntu-latest'
+    container:
+      image: 'ghcr.io/${{ github.repository }}:sha-${{ github.sha }}'
+      credentials:
+        username: '${{ github.actor }}'
+        password: '${{ secrets.GITHUB_TOKEN }}'
+    permissions:
+      contents: 'write'
+      packages: 'read'
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: 'astral-sh/setup-uv@v6'
+      - run: |
+          uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]'
+      - run: |
+          mkdir dist && touch dist/.nojekyll
+      - run: |
+          # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
+          # @TODO: look into using self-hosted runners depending on future hardware access
+          python -m ipykernel install --user --name 'found' && sphinx-build -D 'nb_execution_mode=off' -b 'dirhtml' -n 'docs' 'docs/_build/html' && mv 'docs/_build/html' 'dist/py'
+      - run: |
+          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
+      - run: |
+          echo "${HOME}/bin" >> "${GITHUB_PATH}"
+      - uses: 'actions/cache/restore@v4'
+        with:
+          path: |
+            /usr/lib/R/library
+            /usr/lib/R/site-library/
+            /usr/local/lib/R/site-library/
+          key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
+      - run: |
+          if (!requireNamespace("pak", quietly = TRUE)) {
+            install.packages("pak", lib = "/usr/lib/R/site-library/", repos = "https://cloud.r-project.org/")
+          } 
+          pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
+
+          pak::pak("tinytex", lib = "/usr/lib/R/site-library/")
+          tinytex::install_tinytex()
+
+          devtools::document()
+
+          devtools::build_manual(path = ".")
+
+          pkgdown::build_site(
+            # `examples` set to FALSE because runner does not have enough computational resources to render examples
+            # @TODO: look into using self-hosted runners depending on future hardware access
+            examples = FALSE,
+            override = list(
+              destination = "../dist/R",
+              repo = list(url = list(source = "https://github.com/goeva-lab/found/tree/${{ github.sha }}/R"))
+            )
+          )
+        working-directory: './R'
+        shell: 'Rscript {0}'
+      - if: ${{ success() && format('refs/heads/{0}', github.event.repository.default_branch) == github.ref }}
+        run: |
+          set -euxo pipefail
+          
+          git init -b gh-pages
+          git add .
+          git config user.name 'github-actions[bot]' && git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m 'publish: ${{ github.sha }}'
+          git push -f 'https://git:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git' gh-pages
+        working-directory: './dist'
+      - id: 'r-package-ver'
+        run: |
+          echo "FOUND_R_PACKAGE_VERSION=$(Rscript -e 'cat(unname(read.dcf("R/DESCRIPTION")[, "Version"]))')" >> "${GITHUB_OUTPUT}"
+      - uses: 'actions/upload-artifact@v4'
+        with:
+          name: 'R manual'
+          path: 'R/found_${{ steps.r-package-ver.outputs.FOUND_R_PACKAGE_VERSION }}.pdf'
+      - uses: 'actions/upload-artifact@v4'
+        with:
+          name: 'docs site'
+          path: 'dist/'
