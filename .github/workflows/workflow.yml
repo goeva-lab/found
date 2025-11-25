@@ -69,16 +69,24 @@ jobs:
           apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev'
       - uses: 'actions/cache/restore@v4'
         with:
-          path: '/usr/local/lib/R/site-library/'
+          path: |
+            /usr/lib/R/library
+            /usr/lib/R/site-library/
+            /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
-          pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
+          if (!requireNamespace("pak", quietly = TRUE)) {
+            install.packages("pak", lib = "/usr/lib/R/site-library/", repos = "https://cloud.r-project.org/")
+          } 
+          pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
         working-directory: './R'
         shell: 'Rscript {0}'
       - uses: 'actions/cache/save@v4'
         with:
-          path: '/usr/local/lib/R/site-library/'
+          path: |
+            /usr/lib/R/library
+            /usr/lib/R/site-library/
+            /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
           devtools::document("./R")
@@ -119,16 +127,21 @@ jobs:
       - run: |
           apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
       - run: |
-          echo '/root/bin' >> "${GITHUB_PATH}"
+          echo "${HOME}/bin" >> "${GITHUB_PATH}"
       - uses: 'actions/cache/restore@v4'
         with:
-          path: '/usr/local/lib/R/site-library/'
+          path: |
+            /usr/lib/R/library
+            /usr/lib/R/site-library/
+            /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          install.packages("pak", lib = "/usr/local/lib/R/site-library/", repos = "https://cloud.r-project.org/")
-          pak::local_install_dev_deps(lib = "/usr/local/lib/R/site-library/")
+          if (!requireNamespace("pak", quietly = TRUE)) {
+            install.packages("pak", lib = "/usr/lib/R/site-library/", repos = "https://cloud.r-project.org/")
+          } 
+          pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
 
-          pak::pak("tinytex")
+          pak::pak("tinytex", lib = "/usr/lib/R/site-library/")
           tinytex::install_tinytex()
 
           devtools::document()
