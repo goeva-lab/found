@@ -9,7 +9,7 @@ run ["uv", "venv", ".venv", "--managed-python", "-p", "3.13"]
 
 run apt -y update &&  \ 
     apt install -y \
-    rustup build-essential && \
+    'rustup' 'build-essential' && \
     rm -rf /var/lib/apt/lists/*
 
 run ["rustup", "install", "stable"]
@@ -33,7 +33,7 @@ workdir /workdir/found
 
 run apt -y update &&  \ 
     apt install -y \
-    r-base-dev libcurl4-openssl-dev libxml2-dev && \
+    'r-base-dev' 'libcurl4-openssl-dev' 'libxml2-dev' && \
     rm -rf /var/lib/apt/lists/*
 run ["Rscript", "-e", "install.packages('pak', repos = sprintf('https://r-lib.github.io/p/pak/stable/%s/%s/%s', .Platform[['pkgType']], R.Version()[['os']], R.Version()[['arch']]))"]
 run ["Rscript", "-e", "pak::pak('roxygen2')"]
@@ -54,7 +54,7 @@ from base as R
 
 run apt -y update &&  \ 
     apt install --no-install-recommends -y \
-    r-base-core && \
+    'r-base-core' && \
     rm -rf /var/lib/apt/lists/*
 
 copy --from=py_build /root/.local/share/uv /root/.local/share/uv
