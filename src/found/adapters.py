@@ -28,7 +28,7 @@ def step_fn[Fn: Callable[..., tuple]](*out_names: str) -> Callable[[Fn], Fn]:
     """
     decorator for functions that return tuples, returns a copy which "annotates" individual output values with names for use in :py:class:`~found.adapters.Pipeline`.
 
-    returned function behaves identically to the original un-decorated function, the only modification is the addition of a private attribute to the function object.
+    returned function behaves identically to the original un-decorated function, the only modification is the addition of a private attribute to the functionj object.
 
     :param out_names: desired "names" of return values, in the same order as they are in the returned tuple.
 

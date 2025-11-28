@@ -7,7 +7,7 @@ def mk() -> tuple[Callable[[int | None], None], Callable[[], int | None]]:
 
     def set_seed(seed: int | None):
         """
-        convenience function used to set a singular random seed for all methods utilized in this module, with the aim of guaranteeing reproducibility.
+        conveninence function used to set a singular random seed for all methods utilized in this module, with the aim of guaranteeing reproducibility.
         see :py:func:`~found.seed.get_seed` for seed access.
 
         :param seed: integer seed, must be within [0, 4294967295], set to None to remove fixed seeding
@@ -19,7 +19,7 @@ def mk() -> tuple[Callable[[int | None], None], Callable[[], int | None]]:
 
     def get_seed() -> int | None:
         """
-        convenience function used to access a singular random seed for all methods utilized in this module, with the aim of guaranteeing reproducibility.
+        conveninence function used to access a singular random seed for all methods utilized in this module, with the aim of guaranteeing reproducibility.
         see :py:func:`~found.seed.set_seed` for seed setting.
 
         :return: integer seed, within [0, 4294967295], or None if no seed has been fixed
