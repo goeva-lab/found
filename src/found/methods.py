@@ -529,9 +529,9 @@ def score_phatdiff(
     implements a heuristic to score label adjustment based on the distribution difference (using the Kolmogorov-Smirnov statistic) between p_hat values.
     specifically two comparisons are run, and the return value is a weighted difference of:
 
-    1) case cells labelled affected vs case cells labelled unaffected (difference should be as large as possible)
-    2) control cells vs case cells labelled unaffected (difference should be as small as possible)
-
+        1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)
+        2) control cells vs case cells labeled unaffected (difference should be as small as possible)
+        
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
     :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)
