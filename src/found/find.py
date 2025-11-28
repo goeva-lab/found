@@ -70,6 +70,7 @@ def HiDDEN(
     cond_col: str,
     control_val: object,
     algo: Pipeline = Pipeline(run_lognorm_pca, reg_logit, bin_kmeans, True),
+    multiclass: bool = False,
     **kwargs,
 ) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype]]:
     """
@@ -79,13 +80,17 @@ def HiDDEN(
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
     :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
+    :param multiclass: whether to treat the problem as multiclass classification
     :param kwargs: additional variables to pass into pipeline
     :return: 2-tuple consisting of:
 
         - 1-d array of prediction outputs by model
         - binarized labels from prediction values
     """
-    p_hat, labs, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
+    if not multiclass:
+        p_hat, labs, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
+    else:
+        p_hat, labs, _ = algo(V=x.obs[cond_col].to_numpy(), **kwargs)
 
     return (
         p_hat,
