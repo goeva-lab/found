@@ -455,8 +455,8 @@ def score_deg(
 
     :param X: input cell by gene matrix
     :param V: 1-d boolean array of condition labels (True corresponds to case, False to control)
-    :param W: 1-d boolean array of adjusted condition labels (True correspons to case, False to control)
-    :return: number of DEGs between conditions (as determined by a bonferroni-corrected mann-whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
+    :param W: 1-d boolean array of adjusted condition labels (True corresponds to case, False to control)
+    :return: number of DEGs between conditions (as determined by a Bonferroni-corrected Mann-Whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
     """
 
     lhs, rhs = X[~W, :], X[W, :]
