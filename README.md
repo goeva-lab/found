@@ -45,3 +45,9 @@ uv run sphinx-autobuild docs docs/_build/html -b dirhtml -n --watch ./src
 
 note: this will run and execute all guide vignettes, which can be very computationally expensive.
 to avoid doing this, you can pass `-D nb_execution_mode=off` to the above `sphinx-autobuild` command as an additional argument.
+
+## development/contributing
+
+this project uses [`ruff`](https://docs.astral.sh/ruff/installation/) for formatting and [`pyright`](https://microsoft.github.io/pyright/#/installation) for linting.
+
+please ensure that any contributions pass formatting/linting checks accordingly, as determined by `ruff check` and `pyright --warnings`.
