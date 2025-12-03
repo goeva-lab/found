@@ -68,9 +68,8 @@ def HiDDEN(
     x: ad.AnnData,
     /,
     cond_col: str,
-    control_val: object,
+    control_val: object = None,
     algo: Pipeline = Pipeline(run_lognorm_pca, reg_logit, bin_kmeans, True),
-    multiclass: bool = False,
     **kwargs,
 ) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype]]:
     """
@@ -87,7 +86,7 @@ def HiDDEN(
         - 1-d array of prediction outputs by model
         - binarized labels from prediction values
     """
-    if not multiclass:
+    if control_val is not None:
         p_hat, labs, _ = algo(V=(x.obs[cond_col] != control_val).to_numpy(), **kwargs)
     else:
         p_hat, labs, _ = algo(V=x.obs[cond_col].to_numpy(), **kwargs)
