@@ -198,7 +198,7 @@ class HasFitBinClass(Protocol):
     predict_proba: Callable[[FloatMtx], np.ndarray[tuple[int, int], np.dtype[np.floating]]] | Any
 
 
-def sklearn_wrap[T: HasFitBinClass](Z: FloatMtx, V: np.ndarray, model: T) -> tuple[NumArr, T]:
+def sklearn_wrap[T: HasFitBinClass](Z: FloatMtx, V: np.ndarray, model: T) -> tuple[NumArr | FloatMtx, T]:
     is_binary = set(np.unique(V)) == {False, True}
     
     model = model.fit(Z, V)
@@ -221,7 +221,7 @@ def reg_logit(
     Z: FloatMtx,
     V: BoolArr,
     logit_args: dict[str, Any] | None = None,
-) -> tuple[NumArr, LogisticRegression]:
+) -> tuple[NumArr | FloatMtx, LogisticRegression]:
     """
     runs a logistic regression to score cells as affected/unaffected by the condition.
 
@@ -248,7 +248,7 @@ def reg_svm(
     Z: FloatMtx,
     V: BoolArr,
     svm_args: dict[str, Any] | None = None,
-) -> tuple[NumArr, SVC]:
+) -> tuple[NumArr | FloatMtx, SVC]:
     """
     runs a support vector machine classifier -based regression to score cells as affected/unaffected by the condition.
 
@@ -276,7 +276,7 @@ def reg_gp(
     Z: FloatMtx,
     V: BoolArr,
     gp_args: dict[str, Any] | None = None,
-) -> tuple[NumArr, GaussianProcessClassifier]:
+) -> tuple[NumArr | FloatMtx, GaussianProcessClassifier]:
     """
     runs a Gaussian process classifier -based regression to score cells as affected/unaffected by the condition.
 
@@ -304,7 +304,7 @@ def reg_rf(
     Z: FloatMtx,
     V: BoolArr,
     rf_args: dict[str, Any] | None = None,
-) -> tuple[NumArr, RandomForestClassifier]:
+) -> tuple[NumArr | FloatMtx, RandomForestClassifier]:
     """
     runs a random forest classifier -based regression to score cells as affected/unaffected by the condition.
 
@@ -331,7 +331,7 @@ def reg_nc(
     Z: FloatMtx,
     V: np.ndarray,
     nc_args: dict[str, Any] | None = None,
-) -> tuple[NumArr, NearestCentroid]:
+) -> tuple[NumArr | FloatMtx, NearestCentroid]:
     """
     runs a Nearest Centroid classifier -based regression to score cells as affected/unaffected by the condition.
 
@@ -356,7 +356,7 @@ def reg_rn(
     Z: FloatMtx,
     V: np.ndarray,
     nc_args: dict[str, Any] | None = None,
-) -> tuple[NumArr, RadiusNeighborsClassifier]:
+) -> tuple[NumArr | FloatMtx, RadiusNeighborsClassifier]:
     """
     runs a Radius Neighbors Classifier to score cells as affected/unaffected by the condition.
 
