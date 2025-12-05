@@ -77,9 +77,8 @@ def HiDDEN(
 
     :param x: input :py:class:`~anndata.AnnData` object
     :param cond_col: string indicating obs column in adata representing condition value
-    :param control_val: value representing the control condition in the provided condition column
+    :param control_val: value representing the control condition in the provided condition column. If None, labels are treated as multiclass rather than binary.
     :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
-    :param multiclass: whether to treat the problem as multiclass classification
     :param kwargs: additional variables to pass into pipeline
     :return: 2-tuple consisting of:
 

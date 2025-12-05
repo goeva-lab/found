@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from numbers import Integral
-from typing import Any, Protocol, Self, runtime_checkable, Literal
+from typing import Any, Protocol, Self, runtime_checkable
 from warnings import catch_warnings
 
 import numpy as np
@@ -478,8 +478,7 @@ def bin_argmax_multiclass(
 
 def bin_kmeans_multiclass(
     Y: FloatMtx,
-    n_clusters: int | None = None,
-    method: Literal["mean", "centroid"] = "centroid",
+    n_clusters: int | None = None
 ) -> FloatMtx:
     """
     A k-means based binarization function for multiclass classification.
@@ -487,7 +486,6 @@ def bin_kmeans_multiclass(
 
     :param Y: n-d float array of probability scores
     :param n_clusters: number of clusters to use for k-means. If None, inferred from the number of columns in Y.
-    :param method: method to use for assigning clusters to classes. "centroid" uses the centroid of k-means clusters, "mean" uses the mean of points in the cluster.
     :return: 1-d float array of binarized scores
     """
 
@@ -508,19 +506,11 @@ def bin_kmeans_multiclass(
             # Handle empty clusters: just map to a dummy class (e.g., argmax of centroid)
             class_id = np.argmax(kmeans.cluster_centers_[cluster_id])
         else:
-            if method == "centroid":
-                # Get the cluster's centroid (the k-means computed center)
-                centroid = kmeans.cluster_centers_[cluster_id]
-                # Find the class with the highest probability in the centroid
-                class_id = np.argmax(centroid)
-            elif method == "mean":
-                # Compute mean class-score vector for the cluster
-                mean_vec = Y[idx].mean(axis=0)
-                # Assign cluster to the class with highest mean score
-                class_id = np.argmax(mean_vec)
-
+            # Get the cluster's centroid (the k-means computed center)
+            centroid = kmeans.cluster_centers_[cluster_id]
+            # Find the class with the highest probability in the centroid
+            class_id = np.argmax(centroid)
         cluster_to_class[cluster_id] = class_id
-    # print(cluster_to_class)
     # Map every sample's cluster → class
     final_labels = np.take(cluster_to_class, cluster_labels)
 
