@@ -78,19 +78,13 @@ def scale_sd[T: MatrixLike](X: T) -> T:
     # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
 
 
-def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
+def norm_log1p(X: MatrixLike) -> MatrixLike:
     """
     implements a size factor scaled log1p transform as recommended in `Ahlmann-Eltze et al. <https://doi.org/10.1038/s41592-023-01814-1>`_.
 
     :param X: input cell by gene matrix
     :return: ``log((X / s) + 1)`` where ``s`` is the per-cell size factors of ``X``
     """
-
-    # if dealing with spmatrix types, convert to sparray equivalents
-    if isinstance(X, sp.csr_matrix):
-        X = sp.csr_array(X)
-    if isinstance(X, sp.csc_matrix):
-        X = sp.csc_array(X)
 
     X = scale_rs(X)
 
@@ -110,42 +104,59 @@ def norm_log1p(X: MatrixLike | sp.csc_matrix | sp.csr_matrix) -> MatrixLike:
     return X
 
 
-def run_pca(N: MatrixLike, k: int, scale: bool = True) -> FloatMtx:
+def run_pca(N: MatrixLike, k: int, scale: bool = True, pca_args: dict[str, Any] | None = None) -> FloatMtx:
     """
-    runs PCA to provide PC-space coordinates for input matrix, first applying a centering and scaling transform.
+    runs PCA as implemented in :py:class:`~sklearn.decomposition.PCA` using the ARPACK solver to provide PC-space embeddings for the input matrix.
 
     :param N: cell by gene matrix
     :param k: dimensionality of the PCA to run
+    :param scale: whether input matrix should be scaled column-wise to unit variance
+    :param pca_args: additional arguments to pass to :py:class:`~sklearn.decomposition.PCA`
     :return: cell by k matrix representing cells in PC-space
     """
 
     # return PCA output
     # centering is not needed since arpack solver centers pre-PCA
-    return PCA(k, svd_solver="arpack", random_state=get_seed()).fit_transform(
+    return PCA(
+        k,
+        random_state=get_seed(),
+        svd_solver="arpack",
+        **(pca_args or {}),
+    ).fit_transform(
         scale_sd(N) if scale else N  # pyright: ignore[reportArgumentType]
     )
     # ignore NECESSITY - sparray also works for PCA, but is not documented
 
 
-def run_lognorm_pca(X: MatrixLike | sp.csc_matrix | sp.csr_matrix, k: int, scale: bool = True) -> FloatMtx:
+def run_lognorm_pca(
+    X: MatrixLike | sp.csc_matrix | sp.csr_matrix, k: int, scale: bool = True, pca_args: dict[str, Any] | None = None
+) -> FloatMtx:
     """
-    runs PCA to provide PC-space coordinates for each cell, first applying a log1p w/ scaling transform, then centering and scaling.
+    runs PCA as implemented in :py:class:`~sklearn.decomposition.PCA` using the ARPACK solver to provide PC-space embeddings for the input matrix.
+    prior to PCA, a log1p-based variance stabilizing transform is applied (see :py:func:`~found.methods.norm_log1p`).
 
     :param X: cell by gene matrix
     :param k: dimensionality of the PCA to run
+    :param scale: whether input matrix should be scaled column-wise to unit variance
+    :param pca_args: additional arguments to pass to :py:class:`~sklearn.decomposition.PCA`
     :return: cell by k matrix representing cells in PC-space
     """
-    return run_pca(norm_log1p(X), k, scale)
+    # if dealing with spmatrix types, convert to sparray equivalents
+    if isinstance(X, sp.csr_matrix):
+        X = sp.csr_array(X)
+    if isinstance(X, sp.csc_matrix):
+        X = sp.csc_array(X)
+
+    return run_pca(norm_log1p(X), k, scale, pca_args)
 
 
 @step_fn("Z", "NMF_p")
 def run_nmf(
-    X: MatrixLike,
+    X: MatrixLike | sp.csc_matrix | sp.csr_matrix,
     k: int,
     sf_obs_scale: bool = True,
     sd_var_scale: bool = True,
-    nmf_lreg: tuple[float, float] = (0.0, 0.0),
-    nmf_l1l2ratio: float = 0.0,
+    nmf_args: dict[str, Any] | None = None,
 ) -> tuple[FloatMtx, FloatMtx]:
     """
     runs NMF (decomposition of ``X`` into ``w @ h``) as implemented in :py:class:`~sklearn.decomposition.NMF` to provide NMF-cell-by-k-space coordinates for each cell.
@@ -161,13 +172,17 @@ def run_nmf(
     :param k: k, specifying number of NMF components/programs
     :param sf_obs_scale: should row-wise size factor scaling be applied
     :param sd_var_scale: should column-wise standard deviation scaling be applied
-    :param nmf_lreg: tuple of penalty terms for w and h matrices, respectively (0 meaning no regularization is applied)
-    :param nmf_l1l2ratio: regularization mixing parameter, indicating weight of l1 vs l2 penalty (0 means only l2 penalty, 1 means only l1 penalty)
+    :param nmf_args: additional arguments to pass to :py:class:`~sklearn.decomposition.NMF`
     :return: 2-tuple of:
 
         - cell by k matrix representing cells in NMF-cell-by-k-space (e.g. ``w``)
         - gene by k matrix representing NMF-computed gene programs (e.g. ``h^T``)
     """
+
+    if isinstance(X, sp.csr_matrix):
+        X = sp.csr_array(X)
+    if isinstance(X, sp.csc_matrix):
+        X = sp.csc_array(X)
 
     if sf_obs_scale:
         X = scale_rs(X)
@@ -177,9 +192,7 @@ def run_nmf(
     m = NMF(
         k,  # pyright: ignore[reportArgumentType]
         random_state=get_seed(),
-        alpha_W=nmf_lreg[0],
-        alpha_H=nmf_lreg[1],  # pyright: ignore[reportArgumentType]
-        l1_ratio=nmf_l1l2ratio,
+        **(nmf_args or {}),
     )
     z = m.fit_transform(X)  # pyright: ignore[reportArgumentType]
 
@@ -348,7 +361,10 @@ def from_clusts_to_labs(clusts: BoolArr, V: BoolArr, case_only: NumArr) -> BoolA
 
     # cluster 0/1 doesn't necessarily match True/False label so
     # check we check correspondence by using the mean of p_hat in each
-    clust_0_has_lower_mean = case_only[~clusts].mean() < case_only[clusts].mean()
+    if len(cl := np.unique(clusts)) == 1:
+        clust_0_has_lower_mean = bool(cl[0]) == (case_only[clusts == cl[0]].mean() > 0.5)
+    else:
+        clust_0_has_lower_mean = case_only[~clusts].mean() < case_only[clusts].mean()
 
     # we only reassign cells in the case condition
     new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts
@@ -607,8 +623,11 @@ def score_phatdiff_dist(
     :param score_weight_vsctl: weight given to difference of the second comparison
     :return: ``score_weight_relab`` * statistic from first comparison - ``score_weight_vsctl`` * statistic from second comparison
     """
-    case_only_pred = Y[V]
     case_only_vhat = W[V]
+    if len(np.unique(case_only_vhat)) == 1:
+        return 0  # @TODO: figure out better strategy to deal with no/total relabeling
+
+    case_only_pred = Y[V]
     ctl_only_pred = Y[~V]
 
     return (
