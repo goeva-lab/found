@@ -49,7 +49,13 @@ def prep_grps(
 
     fidx = lambda v, i: v[i]  # noqa: E731
     if which_grouped is None:
-        which_grouped = {k: fidx for k, v in kwargs.items() if hasattr(v, "__getitem__")}
+        which_grouped = {
+            k: fidx
+            for k, v in kwargs.items()
+            if hasattr(v, "__getitem__")
+            # short circuit check if shape attribute is present to avoid error on sparse matrices
+            and ((hasattr(v, "shape") and v.shape[0] == len(obs)) or (hasattr(v, "__len__") and len(v) == len(obs)))
+        }
     elif isinstance(which_grouped, str):
         which_grouped = {which_grouped: fidx}
     elif isinstance(which_grouped, list | tuple):
