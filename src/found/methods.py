@@ -106,7 +106,7 @@ def scale_sd[T: MatrixLike](X: T) -> T:
 
 def vst_shiftlog[T: MatrixLike](X: T, overdispersion: float = 0.05) -> T:
     """
-    implements a variance stabilizing transform accounting for overdispersion, with size factor scaled to have a geometric mean of 1,
+    implements a variance stabilizing transform accounting for overdispersion, with size factors scaled to have a geometric mean of 1,
     as recommended in `Ahlmann-Eltze et al. <https://doi.org/10.1038/s41592-023-01814-1>`_.
 
     :param X: input matrix
@@ -144,7 +144,7 @@ def run_pca(
 
     :param X: cell by gene matrix
     :param k: dimensionality of the PCA to run
-    :param pre_pca_tf: optional callback to transform data matrix prior to PCA embedding
+    :param pre_pca_tf: optional callback to transform data matrix prior to PCA embedding, defaults to :py:func:`~found.methods.vst_shiftlog` followed by :py:func:`~found.methods.scale_sd`
     :param pca_args: additional arguments to pass to :py:class:`~sklearn.decomposition.PCA`
     :return: cell by k matrix representing cells in PC-space
     """
@@ -184,7 +184,7 @@ def run_nmf(
 
     :param X: cell by gene matrix
     :param k: k, specifying number of NMF components/programs
-    :param pre_nmf_tf: optional callback to transform data matrix prior to NMF embedding
+    :param pre_nmf_tf: optional callback to transform data matrix prior to NMF embedding, defaults to :py:func:`~found.methods.scale_rs` followed by :py:func:`~found.methods.scale_sd`
     :param nmf_args: additional arguments to pass to :py:class:`~sklearn.decomposition.NMF`
     :return: 2-tuple of:
 

@@ -138,6 +138,6 @@ p_hat, labs = found.HiDDEN(
 plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 
 # %% [markdown]
-# assessing the new predictions, as expected, we see almost no difference with our initial results, with anything slightly worse performance on SMM-5:
+# assessing the new outputs, as expected, we see almost no difference with our initial results:
 # %%
 plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()
