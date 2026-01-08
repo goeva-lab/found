@@ -64,7 +64,7 @@ print(adata)
 # we run the standard HiDDEN pipeline to classify affected cells on patients from the following groups:
 # normal bone marrow, smoldering multiple myeloma, and multiple myeloma
 # %%
-algo = Pipeline(m.run_lognorm_pca, m.reg_logit, m.bin_kmeans, True)
+algo = Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans, True)
 p_hat, labs = found.HiDDEN(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
 
 # %% [markdown]

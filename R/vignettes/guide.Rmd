@@ -60,7 +60,7 @@ we can then utilize existing `found` pipelines to run label refinement:
 ```{r}
 out <- HiDDEN(
   so, "stim", "CTRL",
-  adapters$Pipeline(methods$run_lognorm_pca, methods$reg_logit, methods$bin_kmeans),
+  adapters$Pipeline(methods$run_pca, methods$reg_logit, methods$bin_kmeans),
   # ⚠️: X must be observation by feature format, so we transpose the output of LayerData!
   X = t(LayerData(so, "counts")), k = 15L
 )
