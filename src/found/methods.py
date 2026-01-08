@@ -33,6 +33,32 @@ def mult_preserve_type[T: MatrixLike](lhs: T, rhs: np.ndarray) -> T:
     return o  # pyright: ignore[reportReturnType]
 
 
+def log1p[T: MatrixLike](X: T) -> T:
+    """
+    matrix format aware log1p
+
+    :param X: input matrix
+    :return: ``log(X + 1)``
+    """
+
+    if isinstance(X, sp.csr_array):
+        X = X.tocsr().log1p()  # pyright: ignore[reportAttributeAccessIssue]
+        assert isinstance(X, sp.csr_array)
+    elif isinstance(X, sp.csc_array):
+        X = X.tocsc().log1p()  # pyright: ignore[reportAttributeAccessIssue]
+        assert isinstance(X, sp.csc_array)
+    # ignore NECESSITY - pyright can't detect log1p method on sparse matrix types
+    # because method is added dynamically, as observed here:
+    # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
+    # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52
+    else:
+        X = np.log1p(X)  # pyright: ignore[reportAssignmentType]
+        # ignore NECESSITY - log1p method type hint does not preserve shape type hint
+
+    return X  # pyright: ignore[reportReturnType]
+    # ignore NECESSITY - ???
+
+
 def scale_rs[T: MatrixLike](X: T) -> T:
     """
     returns scaled version of input matrix with row-wise sums of 1
@@ -78,66 +104,47 @@ def scale_sd[T: MatrixLike](X: T) -> T:
     # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
 
 
-def norm_log1p(X: MatrixLike) -> MatrixLike:
+def vst_shiftlog[T: MatrixLike](X: T, overdispersion: float = 0.05) -> T:
     """
-    implements a size factor scaled log1p transform as recommended in `Ahlmann-Eltze et al. <https://doi.org/10.1038/s41592-023-01814-1>`_.
+    implements a variance stabilizing transform accounting for overdispersion, with size factor scaled to have a geometric mean of 1,
+    as recommended in `Ahlmann-Eltze et al. <https://doi.org/10.1038/s41592-023-01814-1>`_.
 
-    :param X: input cell by gene matrix
-    :return: ``log((X / s) + 1)`` where ``s`` is the per-cell size factors of ``X``
+    :param X: input matrix
+    :param overdispersion: overdispersion factor
+    :return: variance stabilized matrix
     """
+    per_cell_sum = X.sum(axis=1)
+    size_fact = per_cell_sum / np.exp(np.mean(np.log(per_cell_sum)))
 
-    X = scale_rs(X)
+    # silence warnings about reciprocal for zero, filled with zeros elsewhere
+    with catch_warnings(action="ignore", category=RuntimeWarning):
+        recip = np.reciprocal(size_fact)
+    recip = np.where(size_fact > 0, recip, 0.0) * 4 * overdispersion
 
-    if isinstance(X, np.ndarray):
-        X = np.log1p(X)  # pyright: ignore[reportAssignmentType]
-        # ignore NECESSITY - log1p method type hint does not preserve shape type hint
-    else:
-        X = X.tocsr().log1p()  # pyright: ignore[reportAttributeAccessIssue]
-        # ignore NECESSITY - pyright can't detect log1p method on sparse matrix types
-        # because method is added dynamically, as observed here:
-        # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
-        # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52
+    X = mult_preserve_type(X, recip[:, np.newaxis])
 
-    # make sure we're not introducing sp.spmatrix type further into the pipeline
-    assert not isinstance(X, sp.spmatrix)
+    X = log1p(X)
+
+    X = X * np.reciprocal(np.sqrt(overdispersion))
 
     return X
 
 
-def run_pca(N: MatrixLike, k: int, scale: bool = True, pca_args: dict[str, Any] | None = None) -> FloatMtx:
-    """
-    runs PCA as implemented in :py:class:`~sklearn.decomposition.PCA` using the ARPACK solver to provide PC-space embeddings for the input matrix.
-
-    :param N: cell by gene matrix
-    :param k: dimensionality of the PCA to run
-    :param scale: whether input matrix should be scaled column-wise to unit variance
-    :param pca_args: additional arguments to pass to :py:class:`~sklearn.decomposition.PCA`
-    :return: cell by k matrix representing cells in PC-space
-    """
-
-    # return PCA output
-    # centering is not needed since arpack solver centers pre-PCA
-    return PCA(
-        k,
-        random_state=get_seed(),
-        svd_solver="arpack",
-        **(pca_args or {}),
-    ).fit_transform(
-        scale_sd(N) if scale else N  # pyright: ignore[reportArgumentType]
-    )
-    # ignore NECESSITY - sparray also works for PCA, but is not documented
-
-
-def run_lognorm_pca(
-    X: MatrixLike | sp.csc_matrix | sp.csr_matrix, k: int, scale: bool = True, pca_args: dict[str, Any] | None = None
+def run_pca(
+    X: MatrixLike | sp.csc_matrix | sp.csr_matrix,
+    k: int,
+    pre_pca_tf: Callable[[MatrixLike], MatrixLike] | None = lambda X: scale_sd(vst_shiftlog(X)),
+    pca_args: dict[str, Any] | None = None,
 ) -> FloatMtx:
     """
     runs PCA as implemented in :py:class:`~sklearn.decomposition.PCA` using the ARPACK solver to provide PC-space embeddings for the input matrix.
-    prior to PCA, a log1p-based variance stabilizing transform is applied (see :py:func:`~found.methods.norm_log1p`).
+    an optional callback can be provided to transform data prior to PCA (e.g. variance stabilizing transform, scaling, etc.).
+
+    note: :py:class:`~sklearn.decomposition.PCA` w/ ARPACK handles center-ing internally, so the provided transform _should not_ center provided data.
 
     :param X: cell by gene matrix
     :param k: dimensionality of the PCA to run
-    :param scale: whether input matrix should be scaled column-wise to unit variance
+    :param pre_pca_tf: optional callback to transform data matrix prior to PCA embedding
     :param pca_args: additional arguments to pass to :py:class:`~sklearn.decomposition.PCA`
     :return: cell by k matrix representing cells in PC-space
     """
@@ -147,15 +154,22 @@ def run_lognorm_pca(
     if isinstance(X, sp.csc_matrix):
         X = sp.csc_array(X)
 
-    return run_pca(norm_log1p(X), k, scale, pca_args)
+    if pre_pca_tf is not None:
+        X = pre_pca_tf(X)
+
+    return PCA(
+        k,
+        random_state=get_seed(),
+        svd_solver="arpack",
+        **(pca_args or {}),
+    ).fit_transform(X)
 
 
 @step_fn("Z", "NMF_p")
 def run_nmf(
     X: MatrixLike | sp.csc_matrix | sp.csr_matrix,
     k: int,
-    sf_obs_scale: bool = True,
-    sd_var_scale: bool = True,
+    pre_nmf_tf: Callable[[MatrixLike], MatrixLike] | None = lambda X: scale_sd(scale_rs(X)),
     nmf_args: dict[str, Any] | None = None,
 ) -> tuple[FloatMtx, FloatMtx]:
     """
@@ -170,24 +184,21 @@ def run_nmf(
 
     :param X: cell by gene matrix
     :param k: k, specifying number of NMF components/programs
-    :param sf_obs_scale: should row-wise size factor scaling be applied
-    :param sd_var_scale: should column-wise standard deviation scaling be applied
+    :param pre_nmf_tf: optional callback to transform data matrix prior to NMF embedding
     :param nmf_args: additional arguments to pass to :py:class:`~sklearn.decomposition.NMF`
     :return: 2-tuple of:
 
         - cell by k matrix representing cells in NMF-cell-by-k-space (e.g. ``w``)
         - gene by k matrix representing NMF-computed gene programs (e.g. ``h^T``)
     """
-
+    # if dealing with spmatrix types, convert to sparray equivalents
     if isinstance(X, sp.csr_matrix):
         X = sp.csr_array(X)
     if isinstance(X, sp.csc_matrix):
         X = sp.csc_array(X)
 
-    if sf_obs_scale:
-        X = scale_rs(X)
-    if sd_var_scale:
-        X = scale_sd(X)
+    if pre_nmf_tf is not None:
+        X = pre_nmf_tf(X)
 
     m = NMF(
         k,  # pyright: ignore[reportArgumentType]
@@ -235,7 +246,7 @@ def reg_logit(
 
     :param Z: cell by k matrix (where k is some number of dimensions)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
-    :param logit_args: additional arguments to pass to :py:class:`~sklearn.linear_model.LogisticRegression` (defaults: ``max_iter``: ``100``, ``solver``: ``"newton-cg"``, ``penalty``: ``None``)
+    :param logit_args: additional arguments to pass to :py:class:`~sklearn.linear_model.LogisticRegression` (defaults: ``solver``: ``"newton-cg"``, ``C``: :py:const:`~numpy.inf`)
     :return: 2-tuple of:
 
         - 1-d float array of probability scores generated by the fitted model
@@ -246,7 +257,7 @@ def reg_logit(
         V,
         LogisticRegression(
             random_state=get_seed(),
-            **({"solver": "newton-cg", "max_iter": 100, "penalty": None} | (logit_args or {})),
+            **({"solver": "newton-cg", "C": np.inf} | (logit_args or {})),
         ),
     )
 
