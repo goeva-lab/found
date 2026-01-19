@@ -48,6 +48,6 @@ to avoid doing this, you can pass `-D nb_execution_mode=off` to the above `sphin
 
 ## development/contributing
 
-this project uses [`ruff`](https://docs.astral.sh/ruff/installation/) for formatting and [`pyright`](https://microsoft.github.io/pyright/#/installation) for linting.
+this project uses [`ruff`](https://docs.astral.sh/ruff/installation/) for formatting and [`basedpyright`](https://docs.basedpyright.com/latest/installation/command-line-and-language-server/) for linting.
 
-please ensure that any contributions pass formatting/linting checks accordingly, as determined by `ruff check` and `pyright --warnings`.
+please ensure that any contributions pass formatting/linting checks accordingly, as determined by `ruff check` and `basedpyright --warnings`.

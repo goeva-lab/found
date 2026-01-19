@@ -22,7 +22,6 @@ dev = [
     "ipykernel",
     "ipywidgets",
     "scanpy[leiden]",
-    "scikit-misc",
     "pandas",
     "pyLemur",
 ]
@@ -30,3 +29,6 @@ dev = [
 [build-system]
 requires = ["uv_build"]
 build-backend = "uv_build"
+
+[tool.pyright]
+typeCheckingMode = "standard"

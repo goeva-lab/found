@@ -180,11 +180,13 @@ class PlotAdata:
 
         if vertical:
             dens_ax, refl_ax, val_ax, facet_ax = alt.X, alt.X2, alt.Y, alt.Column
-            mdict: dict = {"orient": "horizontal"}
+            mdict: dict = {  # type annotation to avoid narrowing, which would lead to error in mark_area call
+                "orient": "horizontal"
+            }
             hdict = {"orient": "bottom", "labelAnchor": "middle", "labelPadding": 2}
         else:
             dens_ax, refl_ax, val_ax, facet_ax = alt.Y, alt.Y2, alt.X, alt.Row
-            mdict: dict = {"orient": "vertical"}
+            mdict = {"orient": "vertical"}
             hdict = {"labelPadding": 2, "labelAngle": 0, "labelAlign": "left"}
 
         chart = (
