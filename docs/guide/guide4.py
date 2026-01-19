@@ -173,10 +173,12 @@ pl.PlotTunerOutput(adata, sel, out).plot_scores().show()
 # the return value will be named "Z" for {py:class}`~found.adapters.Pipeline```.dimr_fn``, "Y" for {py:class}`~found.adapters.Pipeline```.regr_fn``, and "W" for {py:class}`~found.adapters.Pipeline```.binr_fn``.
 
 # %% [markdown]
-# two final notes for developers:
+# some final notes for developers:
 #
 # 1) if a function inserted into a pipeline needs dynamic access to *all* pipeline values, this can be done by adding a variable keyword argument (i.e. ``**kwargs`` form).
 # for example, this is used by the {py:func}`~found.methods.score_nulldist` function to rerun a pipeline on randomly permuted case labels to approximate a "null" p_hat distribution.
 #
 # 2) pipeline functions _cannot_ have positional only arguments (either a named positional only argument via the ``arg, /,`` construct or a variable-length positional argument via the ``*args`` construct).
 # calling a {py:class}`~found.adapters.Pipeline` where one of the steps is a function with positional-only arguments will raise a {py:exc}`~TypeError` during the validation step executed prior to computation (see {py:func}`found.types.check_step`).
+#
+# 3) pipeline functions should _always_ use the value of {py:func}`~found.seed.get_seed()` whenever a random seed is necessary, to allow for downstream users to generate fully reproducible results via {py:func}`~found.seed.set_seed()`
