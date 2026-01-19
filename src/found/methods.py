@@ -230,7 +230,7 @@ def sklearn_wrap[T: HasFitBinClass](Z: FloatMtx, V: BoolArr, model: T) -> tuple[
         # however we still perform the `.index` operation as a sanity check
         model.predict_proba(Z)[:, model.classes_.tolist().index(True)],  # pyright: ignore[reportReturnType]
         # ignore NECESSITY - `mode.predict_proba` will return a 2-d array
-        # so indexing with [:, int] will return yield a 1-d array
+        # so indexing with [:, int] will return a 1-d array
         model,
     )
 
@@ -348,6 +348,15 @@ def reg_rf(
 
 
 @runtime_checkable
+class HasFitPredictClass(Protocol):
+    """:meta hide-value:"""
+
+    def fit_predict(
+        self, X: np.ndarray[tuple[int, int], np.dtype[np.number]]
+    ) -> np.ndarray[tuple[int], np.dtype[np.integer]]: ...
+
+
+@runtime_checkable
 class HasPredictBinClass(Protocol):
     """:meta hide-value:"""
 
@@ -368,15 +377,16 @@ def bin_model(
     return model.predict(Z)
 
 
-def from_clusts_to_labs(clusts: BoolArr, V: BoolArr, case_only: NumArr) -> BoolArr:
+def from_clusts_to_labs(model: HasFitPredictClass, V: BoolArr, case_only_Y_hat: NumArr) -> BoolArr:
+    clusts = model.fit_predict(case_only_Y_hat[:, np.newaxis]).astype(bool)
     new_labs = V.copy()
 
     # cluster 0/1 doesn't necessarily match True/False label so
     # check we check correspondence by using the mean of p_hat in each
     if len(cl := np.unique(clusts)) == 1:
-        clust_0_has_lower_mean = bool(cl[0]) == (case_only[clusts == cl[0]].mean() > 0.5)
+        clust_0_has_lower_mean = bool(cl[0]) == (case_only_Y_hat[clusts == cl[0]].mean() > 0.5)
     else:
-        clust_0_has_lower_mean = case_only[~clusts].mean() < case_only[clusts].mean()
+        clust_0_has_lower_mean = case_only_Y_hat[~clusts].mean() < case_only_Y_hat[clusts].mean()
 
     # we only reassign cells in the case condition
     new_labs[V] = clusts if clust_0_has_lower_mean else ~clusts
@@ -397,18 +407,15 @@ def bin_kmeans(
     :param kmeans_args: additional arguments to pass to :py:class:`~sklearn.linear_model.LogisticRegression` (defaults: ``n_init``: ``"auto"``)
     :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)
     """
-    case_only = Y[V]
 
     return from_clusts_to_labs(
         KMeans(
             n_clusters=2,
             random_state=get_seed(),
             **({"n_init": "auto"} | (kmeans_args or {})),  # pyright: ignore[reportArgumentType]
-        )
-        .fit_predict(case_only.reshape(-1, 1))
-        .astype(bool),
+        ),
         V,
-        case_only,  # pyright: ignore[reportArgumentType]
+        Y[V],
     )
 
 
@@ -420,18 +427,15 @@ def bin_gmm(Y: NumArr, V: BoolArr, gmm_args: dict[str, Any] | None = None) -> Bo
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
     :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)
     """
-    case_only = Y[V]
 
     return from_clusts_to_labs(
         GaussianMixture(
             n_components=2,
             random_state=get_seed(),
             **(gmm_args or {}),
-        )
-        .fit_predict(case_only.reshape(-1, 1))
-        .astype(bool),
+        ),
         V,
-        case_only,  # pyright: ignore[reportArgumentType]
+        Y[V],
     )
 
 
