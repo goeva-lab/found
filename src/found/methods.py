@@ -75,8 +75,7 @@ def scale_rs[T: MatrixLike](X: T) -> T:
         recip = np.reciprocal(size_fact)
     recip = np.where(size_fact > 0, recip, 0.0)
 
-    return mult_preserve_type(X, recip[:, np.newaxis])  # pyright: ignore[reportReturnType]
-    # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
+    return mult_preserve_type(X, recip[:, np.newaxis])
 
 
 def scale_sd[T: MatrixLike](X: T) -> T:
@@ -100,8 +99,7 @@ def scale_sd[T: MatrixLike](X: T) -> T:
         recip = np.reciprocal(stdev)
     recip = np.where(stdev > 0, recip, 0.0)
 
-    return mult_preserve_type(X, recip[np.newaxis, :])  # pyright: ignore[reportReturnType]
-    # ignore NECESSITY - np.where broadcasting does not maintain array size in type information
+    return mult_preserve_type(X, recip[np.newaxis, :])
 
 
 def vst_shiftlog[T: MatrixLike](X: T, overdispersion: float = 0.05) -> T:
@@ -213,10 +211,11 @@ def run_nmf(
 class HasFitBinClass(Protocol):
     # @TODO: remove `| Any` escape hatches
 
-    # Any required since `GaussianProcessClassifier.classes_` attribute is set to be ArrayLike/Buffer, not just ndarray
+    # Any required since `RandomForestClassifier.classes_` attribute is set to be list[Unknown], not just ndarray
     classes_: np.ndarray[tuple[int], np.dtype[np.bool]] | Any
-    # Any required since optional arguments on fit method are not properly interpreted
-    fit: Callable[[FloatMtx, BoolArr], Self] | Any
+
+    fit: Callable[[FloatMtx, BoolArr], Self]
+
     # Any required due to SVC predict_proba type hint being unspecific
     predict_proba: Callable[[FloatMtx], np.ndarray[tuple[int, int], np.dtype[np.floating]]] | Any
 
