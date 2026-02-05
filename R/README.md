@@ -20,7 +20,7 @@ to build documentation a local copy of the repo must first be downloaded, then t
 
 ```bash
 git clone 'git@github.com:goeva-lab/found' && cd found/R
-R -q -e 'devtools::document(); devtools::install()'
+R -q -e 'pak::local_install_dev_deps(); devtools::document(); pak::local_install()'
 ```
 
 the manual can then be built using the following command (again using [`devtools`](https://devtools.r-lib.org/#installation))
