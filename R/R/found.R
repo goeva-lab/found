@@ -89,6 +89,15 @@ conv_HiDDENt <- function(HiDDENt_outs) {
   list("chosen" = chosen, "outs" = out_l)
 }
 
+from_sce <- function(sce, cols) {
+  ad.AnnData(
+    obs = as.data.frame(SingleCellExperiment::colData(sce)[c(cols)])
+  )
+}
+from_so <- function(so, cols) {
+  ad.AnnData(obs = so[[c(cols)]])
+}
+
 #' HiDDEN
 #'
 #' HiDDEN entrypoint
@@ -142,7 +151,7 @@ S7::method(HiDDEN, sce_s4_class) <- function(
   control_val,
   ...
 ) {
-  HiDDEN(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col)]]), cond_col, control_val, ...)
+  HiDDEN(from_sce(x, cond_col), cond_col, control_val, ...)
 }
 
 #' @name HiDDEN
@@ -155,7 +164,7 @@ S7::method(HiDDEN, seurat_s4_class) <- function(
   control_val,
   ...
 ) {
-  HiDDEN(ad.AnnData(obs = x[[c(cond_col)]]), cond_col, control_val, ...)
+  HiDDEN(from_so(x, cond_col), cond_col, control_val, ...)
 }
 
 #' HiDDENt
@@ -217,7 +226,7 @@ S7::method(HiDDENt, sce_s4_class) <- function(
   control_val,
   ...
 ) {
-  HiDDENt(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col)]]), cond_col, control_val, ...)
+  HiDDENt(from_sce(x, cond_col), cond_col, control_val, ...)
 }
 
 #' @name HiDDENt
@@ -230,7 +239,7 @@ S7::method(HiDDENt, seurat_s4_class) <- function(
   control_val,
   ...
 ) {
-  HiDDENt(ad.AnnData(obs = x[[c(cond_col)]]), cond_col, control_val, ...)
+  HiDDENt(from_so(x, cond_col), cond_col, control_val, ...)
 }
 
 #' HiDDENg
@@ -296,7 +305,7 @@ S7::method(HiDDENg, sce_s4_class) <- function(
   group_by,
   ...
 ) {
-  HiDDENg(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+  HiDDENg(from_sce(x, c(cond_col, group_by)), cond_col, control_val, group_by, ...)
 }
 #' @name HiDDENg
 #' @method HiDDENg Seurat
@@ -309,7 +318,7 @@ S7::method(HiDDENg, seurat_s4_class) <- function(
   group_by,
   ...
 ) {
-  HiDDENg(ad.AnnData(obs = x[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+  HiDDENg(from_so(x, c(cond_col, group_by)), cond_col, control_val, group_by, ...)
 }
 
 #' HiDDENgt
@@ -383,7 +392,7 @@ S7::method(HiDDENgt, sce_s4_class) <- function(
   group_by,
   ...
 ) {
-  HiDDENgt(ad.AnnData(obs = SingleCellExperiment::colData(x)[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+  HiDDENgt(from_sce(x, c(cond_col, group_by)), cond_col, control_val, group_by, ...)
 }
 
 #' @name HiDDENgt
@@ -397,7 +406,7 @@ S7::method(HiDDENgt, seurat_s4_class) <- function(
   group_by,
   ...
 ) {
-  HiDDENgt(ad.AnnData(obs = x[[c(cond_col, group_by)]]), cond_col, control_val, group_by, ...)
+  HiDDENgt(from_so(x, c(cond_col, group_by)), cond_col, control_val, group_by, ...)
 }
 
 .onLoad <- function(libname, pkgname) {
