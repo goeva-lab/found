@@ -36,7 +36,7 @@ intersphinx_mapping = {
     "scipy": ("https://docs.scipy.org/doc/scipy/", None),
     "sklearn": ("http://scikit-learn.org/stable/", None),
     "altair": ("https://altair-viz.github.io/", None),
-    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/version/2.3/", None),
 }
 
 typehints_use_rtype = False
