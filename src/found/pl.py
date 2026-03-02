@@ -1,5 +1,5 @@
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, Self
 
 import altair as alt
@@ -228,14 +228,16 @@ class PlotHiDDENOutput:
 
     can be indexed to plot only a subset of the data.
 
-    :param adata: anndata object containing input data
+    :param adata: object containing input data
     :param phat: HiDDEN-generated p hat values
     :param labs: HiDDEN-adjusted condition labels
+    :param layer: name of layer to use when accessing layer-specific data from ``self.adata``, ``X`` slot is used if set to ``None``
     """
 
     adata: ad.AnnData
     phat: NumArr
     labs: np.ndarray[tuple[int], np.dtype]
+    layer: str | None = field(kw_only=True, default=None)
 
     def __getitem__(self, idx) -> Self:
         if isinstance(idx, Callable):
@@ -245,6 +247,7 @@ class PlotHiDDENOutput:
             self.adata[idx],
             self.phat[idx],  # pyright: ignore[reportArgumentType]
             self.labs[idx],  # pyright: ignore[reportArgumentType]
+            layer=self.layer,
         )
 
     def phat_vln(
@@ -263,7 +266,7 @@ class PlotHiDDENOutput:
         :param vertical: should the plot be vertical (like a violin plot) or horizontal (e.g. like a density plot)
         :param n: number of bins for density estimation
         """
-        pl = PlotAdata(self.adata)
+        pl = PlotAdata(self.adata, layer="counts" if ((self.adata.X is None) and (self.layer is None)) else self.layer)
 
         return (
             pl.vln(
@@ -295,7 +298,7 @@ class PlotHiDDENOutput:
         :param group_by: key in self.adata to group calculation by
         :param vertical: should the plot be vertical (i.e. metric on Y axis, groups on X axis) or horizontal (i.e. metric on X axis, groups on Y axis)
         """
-        pl = PlotAdata(self.adata)
+        pl = PlotAdata(self.adata, layer="counts" if ((self.adata.X is None) and (self.layer is None)) else self.layer)
 
         if isinstance(orig_labs, str):
             orig_labs = pd.Series(pl.get_data(orig_labs), name=orig_labs)
@@ -355,14 +358,16 @@ class PlotTunerOutput:
 
     can be indexed to return PlotHiDDENOutput objects for diagnostics on specific hyperparameters.
 
-    :param adata: anndata object containing input data
+    :param adata: object containing input data
     :param sel: HiDDENt-returned selected hyperparameter configuration
     :param outs: HiDDENt-returned output dictionary
+    :param layer: name of layer to use when accessing layer-specific data from ``self.adata``, ``X`` slot is used if set to ``None``
     """
 
     adata: ad.AnnData
     sel: object
     outs: Mapping
+    layer: str | None = field(kw_only=True, default=None)
 
     def __getitem__(self, k) -> PlotHiDDENOutput:
         if k not in self.outs:
