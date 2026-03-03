@@ -90,8 +90,8 @@ we can also try utilizing the automatic hyperparameter tuning implemented in `fo
 ```{r}
 outs <- HiDDENt(
   so, "stim", "CTRL",
-  adapters$Pipeline(to_step(sct_pca), methods$reg_logit, methods$bin_kmeans),
   tune$FixPointTuner(3, 8, 0.02),
+  adapters$Pipeline(to_step(sct_pca), methods$reg_logit, methods$bin_kmeans),
   so = so
 )
 # we can see what the automatically selected hyperparameter `k` is:

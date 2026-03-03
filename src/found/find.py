@@ -9,7 +9,7 @@ import pandas as pd
 
 from .adapters import Pipeline, wrap_gby_fn
 from .methods import bin_kmeans, reg_logit, run_pca
-from .tune import FixPointTuner, Tuner
+from .tune import Tuner
 from .types import BoolArr, NumArr
 
 
@@ -160,8 +160,8 @@ def HiDDENt[P, S](
     /,
     cond_col: str,
     control_val: object,
+    tuner: Tuner[P, S],
     algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
-    tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
     **kwargs,
 ) -> tuple[P, Mapping[P, tuple[NumArr, np.ndarray[tuple[int], np.dtype], S]]]:
     """
@@ -170,8 +170,8 @@ def HiDDENt[P, S](
     :param x: input :py:class:`~anndata.AnnData` object
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
-    :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
     :param tuner: provided tuner which attempts to optimize pipeline for a specific hyperparameter
+    :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
     :param kwargs: additional variables to pass into pipeline
     :return: 2-tuple consisting of:
 
@@ -214,8 +214,8 @@ def HiDDENgt[P, S, G](
     cond_col: str,
     control_val: object,
     group_by: str | tuple[str],
+    tuner: Tuner[P, S],
     algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
-    tuner: Tuner[P, S] = FixPointTuner(5, 8, 0.04),
     which_grouped: str
     | tuple[str]
     | list[str]
@@ -235,8 +235,8 @@ def HiDDENgt[P, S, G](
     :param cond_col: string indicating obs column in adata representing condition value
     :param control_val: value representing the control condition in the provided condition column
     :param group_by: set of column names in ``x.obs`` specifying grouping
-    :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
     :param tuner: provided tuner which attempts to optimize pipeline for a specific hyperparameter
+    :param algo: algorithm pipeline (expected to use parameter ``V`` as original condition annotation)
     :param which_grouped: set of pipeline arguments which should be indexed by grouping (set to None to group all pipeline arguments which support indexing)
     :param grp_specific_args: any additional arguments that are to be provided on a group-specific basis
     :param kwargs: additional variables to pass into pipeline across every group

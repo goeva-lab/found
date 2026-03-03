@@ -68,19 +68,19 @@ tuner_phatdist = NaiveMaxScoreTuner(m.score_phatdiff_dist, range(start_k, 31))
 # ⚠️            |_____________________________________________________________
 # ⚠️                                                                         |
 # ⚠️                                                                         V
-outs_fix = found.HiDDENt(adata, "injection", "saline", algo, tuner_fix, adata=adata)
+outs_fix = found.HiDDENt(adata, "injection", "saline", tuner_fix, algo, adata=adata)
 
 # ⚠️  the `score_nulldist` function _requires_ a `pipeline_algo` argument to be provided, so we must inject that as well
 # ⚠️            |____________________________________________________________________________________________
 # ⚠️                                                                                                        |
 # ⚠️                                                                                                        V
-outs_nulldist = found.HiDDENt(adata, "injection", "saline", algo, tuner_nulldist, adata=adata, pipeline_algo=algo)
+outs_nulldist = found.HiDDENt(adata, "injection", "saline", tuner_nulldist, algo, adata=adata, pipeline_algo=algo)
 
 # ⚠️  the `score_phatdiff_emd` has an _optional_ `score_weight_vsctl` but we can override it via injection as well
 # ⚠️            |_________________________________________________________________________________________________
 # ⚠️                                                                                                             |
 # ⚠️                                                                                                             V
-outs_phatdist = found.HiDDENt(adata, "injection", "saline", algo, tuner_phatdist, adata=adata, score_weight_vsctl=0.25)
+outs_phatdist = found.HiDDENt(adata, "injection", "saline", tuner_phatdist, algo, adata=adata, score_weight_vsctl=0.25)
 
 # initialize corresponding plotting objects
 plt_fix = pl.PlotTunerOutput(adata, *outs_fix)

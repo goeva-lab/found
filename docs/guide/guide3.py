@@ -89,8 +89,8 @@ sel, by_param, by_grp = found.HiDDENgt(
     "stim",
     "ctrl",
     "cell",
-    Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans, cachable_dimr=True),
     NaiveMaxScoreTuner(m.score_phatdiff, range(2, 20, 2)),
+    Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans, cachable_dimr=True),
     X=adata.X,
 )
 print(sel)

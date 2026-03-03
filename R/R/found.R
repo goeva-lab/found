@@ -173,7 +173,7 @@ S7::method(HiDDEN, seurat_s4_class) <- function(
 #'
 #' @usage
 #' # method for SingleCellExperiment
-#' HiDDENt(sce, cond_col, control_val, algo, tuner, ...)
+#' HiDDENt(sce, cond_col, control_val, tuner, algo, ...)
 #'
 #' @examplesIf requireNamespace("irlba", quietly = TRUE) && requireNamespace("Seurat", quietly = TRUE) && requireNamespace("SeuratObject", quietly = TRUE) && requireNamespace("SeuratData", quietly = TRUE) && ("ifnb" %in% SeuratData::InstalledData()[["Dataset"]])
 #' so <- SeuratData::LoadData("ifnb") |>
@@ -188,21 +188,21 @@ S7::method(HiDDEN, seurat_s4_class) <- function(
 #' }
 #' algo <- adapters$Pipeline(to_step(sct_pca), methods$reg_logit, methods$bin_kmeans)
 #' tuner <- tune$FixPointTuner(5, 8, 0.04)
-#' out <- HiDDENt(so, "stim", "CTRL", algo, tuner, so = so)
+#' out <- HiDDENt(so, "stim", "CTRL", tuner, algo, so = so)
 #' names(out)
 #' names(out[["outs"]][[as.character(out[["chosen"]])]])
 #'
 #' @usage
 #' # method for Seurat
-#' HiDDENt(so, cond_col, control_val, algo, tuner, ...)
+#' HiDDENt(so, cond_col, control_val, tuner, algo, ...)
 #'
 #' @param x input object
 #' @param cond_col character
 #' character indicating per-cell metadata column for condition labels
 #' @param control_val
 #' value in per-cell condition labels representing control condition
-#' @param algo Pipeline
 #' @param tuner Tuner
+#' @param algo Pipeline
 #' @param ... extra arguments passed into pipeline
 #'
 #' @returns HiDDENt output - list of two (2) elements, w/ names:
@@ -327,11 +327,11 @@ S7::method(HiDDENg, seurat_s4_class) <- function(
 #'
 #' @usage
 #' # method for SingleCellExperiment
-#' HiDDENgt(sce, cond_col, control_val, group_by, algo, tuner, which_grouped, grp_specific_args, ...)
+#' HiDDENgt(sce, cond_col, control_val, group_by, tuner, algo, which_grouped, grp_specific_args, ...)
 #'
 #' @usage
 #' # method for Seurat
-#' HiDDENgt(so, cond_col, control_val, group_by, algo, tuner, which_grouped, grp_specific_args, ...)
+#' HiDDENgt(so, cond_col, control_val, group_by, tuner, algo, which_grouped, grp_specific_args, ...)
 #'
 #' @param x input object
 #' @param cond_col character
@@ -340,8 +340,8 @@ S7::method(HiDDENg, seurat_s4_class) <- function(
 #' value in per-cell condition labels representing control condition
 #' @param group_by character
 #' character indicating per-cell metadata column for grouping labels
-#' @param algo Pipeline
 #' @param tuner Tuner
+#' @param algo Pipeline
 #' @param which_grouped character
 #' vector of argument names from the pipeline need to be grouped
 #' (by default will be determined automatically by checking which ones support indexing)
@@ -364,7 +364,7 @@ S7::method(HiDDENg, seurat_s4_class) <- function(
 #' }
 #' algo <- adapters$Pipeline(to_step(sct_pca), methods$reg_logit, methods$bin_kmeans)
 #' tuner <- tune$FixPointTuner(5, 8, 0.04)
-#' out <- HiDDENgt(so, "stim", "CTRL", "seurat_annotations", algo, tuner, so = so)
+#' out <- HiDDENgt(so, "stim", "CTRL", "seurat_annotations", tuner, algo, so = so)
 #' names(out)
 #' names(out[["by_param"]](out[["chosen"]]))
 #' names(out[["by_grp"]](names(out[["chosen"]])[[1]]))

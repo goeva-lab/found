@@ -153,8 +153,8 @@ sel, out = found.HiDDENt(
     adata,
     "stim",
     "ctrl",
-    Pipeline(run_lemur_w_model_out, m.reg_logit, m.bin_kmeans),
     NaiveMaxScoreTuner(score_lemur_counters, range(4, 17, 2)),
+    Pipeline(run_lemur_w_model_out, m.reg_logit, m.bin_kmeans),
     adata=adata,
     lemur_design="~ stim",
     lemur_grouping=adata.obs["cell"],
@@ -176,7 +176,7 @@ pl.PlotTunerOutput(adata, sel, out).plot_scores().show()
 # some final notes for developers:
 #
 # 1) if a function inserted into a pipeline needs dynamic access to *all* pipeline values, this can be done by adding a variable keyword argument (i.e. ``**kwargs`` form).
-# for example, this is used by the {py:func}`~found.methods.score_nulldist` function to rerun a pipeline on randomly permuted case labels to approximate a "null" p_hat distribution.
+# for example, this is used by the {py:func}`~found.methods.score_nulldist` function to rerun the pipeline regression step on randomly permuted case labels to approximate a "null" p_hat distribution.
 #
 # 2) pipeline functions _cannot_ have positional only arguments (either a named positional only argument via the ``arg, /,`` construct or a variable-length positional argument via the ``*args`` construct).
 # calling a {py:class}`~found.adapters.Pipeline` where one of the steps is a function with positional-only arguments will raise a {py:exc}`~TypeError` during the validation step executed prior to computation (see {py:func}`found.types.check_step`).
