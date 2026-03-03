@@ -126,7 +126,7 @@ jobs:
       - run: |
           # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
           # @TODO: look into using self-hosted runners depending on future hardware access
-          python -m ipykernel install --user --name 'found' && sphinx-build -D 'nb_execution_mode=off' -b 'dirhtml' -n 'docs' 'docs/_build/html' && mv 'docs/_build/html' 'dist/py'
+          python -m ipykernel install --user --name 'found' && sphinx-build 'docs' 'docs/_build/html'  -D 'nb_execution_mode=off' -b 'dirhtml' -n && mv 'docs/_build/html' 'dist/py'
       - run: |
           apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
       - run: |

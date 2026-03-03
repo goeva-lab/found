@@ -1,6 +1,6 @@
 # found: HiDDEN implementation
 
-this repository provides an implementation of a method for refining case-control labels in sc-RNAseq data, as decribed in [Goeva et al, 2024](https://doi.org/10.1038/s41467-024-53666-8)
+this repository provides an implementation of a method for refining case-control labels in single-cell -omics data, as decribed in [Goeva et al, 2024](https://doi.org/10.1038/s41467-024-53666-8)
 
 ## R bridge
 
@@ -9,13 +9,12 @@ documentation below is all regarding the python package.
 
 ## disclaimer
 
-very unfinished, more testing is needed before general use can be advised, API is subject to breaking changes under 0ver
+API is subject to breaking changes under 0ver, no releases cut so far, breaking changes are pushed to main
 
-## TODO
+## planned future features / TODO
 
-- add more documentation
-- add more methods
-- support for more underlying data types (e.g. zarr arrays, HDF5 arrays, etc.)
+- support for more underlying data types within methods (e.g. zarr arrays, HDF5 arrays, etc.)
+- native support for multinomial/ordinal condition labels (both in entrypoints and method implementations)
 
 ## installation
 
@@ -40,7 +39,7 @@ uv run -m ipykernel install --user --name found
 [`sphinx`](https://www.sphinx-doc.org/en/master/) is used to build a documentation website, which can be built and previewed locally at [localhost:8000](http://localhost:8000) via the following command (assuming current directory is a clone of this repository):
 
 ```bash
-uv run sphinx-autobuild docs docs/_build/html -b dirhtml -n --watch ./src
+uv run sphinx-autobuild './docs' './docs/_build/html' -b 'dirhtml' -n --watch './src'
 ```
 
 note: this will run and execute all guide vignettes, which can be very computationally expensive.
