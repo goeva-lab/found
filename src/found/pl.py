@@ -6,6 +6,7 @@ import altair as alt
 import anndata as ad
 import numpy as np
 import pandas as pd
+from pandas.api.extensions import ExtensionArray
 from scipy import sparse as sp
 from scipy.stats import gaussian_kde
 
@@ -40,12 +41,12 @@ class PlotAdata:
             self.__meta_p = adata.obsp
             self.__cache = {}
 
-    def __ret_cache(self, key: str, val) -> np.ndarray:
-        val = np.asarray(val)
+    def __ret_cache(self, key: str, val) -> ExtensionArray:
+        val = pd.Series(val).array
         self.__cache[key] = val
         return val
 
-    def get_data(self, key: str) -> np.ndarray:
+    def get_data(self, key: str) -> ExtensionArray:
         if self.__mtx is None:
             raise ValueError(
                 "using get_data cannot be done when plotting object has not been initialized with an anndata object"
@@ -58,11 +59,11 @@ class PlotAdata:
             o = self.__mtx[:, self.__idx.get_loc(key)]
             if isinstance(o, sp.sparray | sp.spmatrix):
                 o = o.todense()  # pyright: ignore[reportAttributeAccessIssue]
-                o = np.array(o).reshape(-1)
+                o = np.asarray(o).reshape(-1)
             return self.__ret_cache(key, o)
 
         if key in self.__meta.columns:
-            o = self.__meta[key].values
+            o = self.__meta[key]
             return self.__ret_cache(key, o)
 
         split = key.split(".", maxsplit=1)
@@ -119,13 +120,13 @@ class PlotAdata:
         n: int = 100,
     ) -> alt.Chart:
         data = pd.DataFrame(
-            {"continuous": self.get_data(continuous) if isinstance(continuous, str) else continuous.values}
+            {"continuous": self.get_data(continuous) if isinstance(continuous, str) else continuous.array}
             | (
                 {}
                 if discrete is None
-                else {"discrete": self.get_data(discrete) if isinstance(discrete, str) else discrete.values}
+                else {"discrete": self.get_data(discrete) if isinstance(discrete, str) else discrete.array}
             )
-            | ({} if split is None else {"split": self.get_data(split) if isinstance(split, str) else split.values})
+            | ({} if split is None else {"split": self.get_data(split) if isinstance(split, str) else split.array})
         )
 
         if split is not None:
