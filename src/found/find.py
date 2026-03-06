@@ -14,7 +14,7 @@ from .types import BoolArr, NumArr
 
 
 def remap[T: np.ndarray[tuple[int], np.dtype]](adj_bool: BoolArr, orig_label: T | pd.Series, control_val: object) -> T:
-    return np.where(adj_bool, orig_label, control_val)  # pyright: ignore[reportReturnType, reportArgumentType]
+    return np.where(adj_bool, orig_label, control_val)  # pyright: ignore[reportReturnType, reportArgumentType, reportCallIssue]
     # ignore NECESSITY - np.where broadcasting does
     # not maintain array size in type information
 
