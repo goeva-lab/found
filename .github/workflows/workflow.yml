@@ -80,8 +80,12 @@ jobs:
       - run: |
           if (!requireNamespace("pak", quietly = TRUE)) {
             install.packages("pak", lib = "/usr/lib/R/site-library/", repos = "https://cloud.r-project.org/")
-          } 
-          pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
+            requireNamespace("pak")
+          }
+          tryCatch(
+            pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/"),
+            error = function(e) { print(.Last.error.trace); stop(e) }
+          )
         working-directory: './R'
         shell: 'Rscript {0}'
       - uses: 'actions/cache/save@v4'
@@ -141,8 +145,12 @@ jobs:
       - run: |
           if (!requireNamespace("pak", quietly = TRUE)) {
             install.packages("pak", lib = "/usr/lib/R/site-library/", repos = "https://cloud.r-project.org/")
-          } 
-          pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
+            requireNamespace("pak")
+          }
+          tryCatch(
+            pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/"),
+            error = function(e) { print(.Last.error.trace); stop(e) }
+          )
 
           pak::pak("tinytex", lib = "/usr/lib/R/site-library/")
           tinytex::install_tinytex()
