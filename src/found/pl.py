@@ -322,12 +322,12 @@ class PlotHiDDENOutput:
                 pd.concat(
                     [
                         pd.Series(orig_labs != ctrl_val)
-                        .groupby(group_by)
+                        .groupby(group_by, observed=True)
                         .agg("mean")
                         .to_frame(name="pct_case")
                         .assign(source="original"),
                         pd.Series(self.labs != ctrl_val)
-                        .groupby(group_by)
+                        .groupby(group_by, observed=True)
                         .agg("mean")
                         .to_frame(name="pct_case")
                         .assign(source="HiDDEN"),
