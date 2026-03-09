@@ -85,7 +85,7 @@ jobs:
           tryCatch(
             # pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/"),
             pak::pak(c("devtools", "lintr"), lib = "/usr/lib/R/site-library/"),
-            error = function(e) { if (exists(".Last.error.trace")) { print(.Last.error.trace) } ; stop(e) }
+            error = function(e) { if (exists(".Last.error.trace")) { print(.Last.error.trace) }; stop(e) }
           )
           devtools::document()
         working-directory: './R'
@@ -138,8 +138,11 @@ jobs:
       - run: |
           set -euxo pipefail
           apt update
-          apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo' 
-          # apt install -y --no-install-recommends 'libxml2-dev' 'libfontconfig1-dev' 'libharfbuzz-dev' 'libfribidi-dev' 'libfreetype6-dev' 'libpng-dev' 'libtiff5-dev' 'libjpeg-dev' 'libwebp-dev'
+
+          # general R dependencies
+          apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
+          # package dependencies, needed due to `pkg.sysreqs` disable
+          apt install -y --no-install-recommends 'libxml2-dev' 'libfontconfig1-dev' 'libharfbuzz-dev' 'libfribidi-dev' 'libfreetype6-dev' 'libpng-dev' 'libtiff5-dev' 'libjpeg-dev' 'libwebp-dev' 'pandoc'
       - run: |
           echo "${HOME}/bin" >> "${GITHUB_PATH}"
       - uses: 'actions/cache/restore@v4'
@@ -164,7 +167,7 @@ jobs:
               pak::pak(c("devtools", "pkgdown"), lib = "/usr/lib/R/site-library/")
               pak::pak(c("tinytex"), lib = "/usr/lib/R/site-library/")
             },
-            error = function(e) { if (exists(".Last.error.trace")) { print(.Last.error.trace) } ; stop(e) }
+            error = function(e) { if (exists(".Last.error.trace")) { print(.Last.error.trace) }; stop(e) }
           )
 
           tinytex::install_tinytex()
