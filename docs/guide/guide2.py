@@ -112,10 +112,10 @@ phatdistk = plt_phatdist[plt_phatdist.sel]
 # here we use this to visualize percent relabeling for the initial tested k, as well as the different ks that were selected for by different tuners
 # %%
 (
-    start[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {start_k}", width=120)
-    | fixk[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {plt_fix.sel}", width=120)
-    | nulldistk[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {plt_nulldist.sel}", width=120)
-    | phatdistk[case_mask].labs_pct("injection", "saline", "animal_id").properties(title=f"k = {plt_phatdist.sel}", width=120)
+    start[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {start_k}", width=120)
+    | fixk[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_fix.sel}", width=120)
+    | nulldistk[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_nulldist.sel}", width=120)
+    | phatdistk[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_phatdist.sel}", width=120)
 ).show()
 
 # %% [markdown]

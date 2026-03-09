@@ -240,6 +240,16 @@ class PlotHiDDENOutput:
     labs: np.ndarray[tuple[int], np.dtype]
     layer: str | None = field(kw_only=True, default=None)
 
+    __pl: PlotAdata = field(init=False)
+
+    def __post_init__(self):
+        object.__setattr__(
+            self,
+            # make sure to mangle private __pl field, see scheme defined here: https://peps.python.org/pep-0008/#method-names-and-instance-variables
+            f"_{type(self).__name__}__pl",
+            PlotAdata(self.adata, layer="counts" if ((self.adata.X is None) and (self.layer is None)) else self.layer),
+        )
+
     def __getitem__(self, idx) -> Self:
         if isinstance(idx, Callable):
             idx = idx(self.adata)
@@ -267,10 +277,8 @@ class PlotHiDDENOutput:
         :param vertical: should the plot be vertical (like a violin plot) or horizontal (e.g. like a density plot)
         :param n: number of bins for density estimation
         """
-        pl = PlotAdata(self.adata, layer="counts" if ((self.adata.X is None) and (self.layer is None)) else self.layer)
-
         return (
-            pl.vln(
+            self.__pl.vln(
                 pd.Series(self.phat, name="HiDDEN_phat"),
                 group_by,
                 pd.Series(self.labs, name="HiDDEN_labs"),
@@ -279,7 +287,7 @@ class PlotHiDDENOutput:
                 n=n,
             )
             if split_mode is not False
-            else pl.vln(
+            else self.__pl.vln(
                 pd.Series(self.phat, name="HiDDEN_phat"),
                 group_by,
                 None,
@@ -288,67 +296,60 @@ class PlotHiDDENOutput:
             )
         )
 
-    def labs_pct(
-        self, orig_labs: str | pd.Series, ctrl_val: object, group_by: str | pd.Series | None = None, vertical: bool = True
-    ) -> alt.LayerChart:
+    def labs_bar(
+        self,
+        orig_labs: str | pd.Series,
+        ctrl_val: object,
+        group_by: str | pd.Series | None = None,
+        vertical: bool = True,
+        scale: bool = True,
+    ) -> alt.Chart:
         """
-        method used to generate point plots of percentages of case vs control cells in original vs HiDDEN-adjusted labels
+        method used to generate stacked bar plots showing levels of case, control, and HiDDEN-adjusted labels
 
-        :param orig_labs: key in self.adata for original condition labels
+        :param orig_labs: key in ``self.adata`` for original condition labels
         :param ctrl_val: value corresponding to control in condition labels
-        :param group_by: key in self.adata to group calculation by
+        :param group_by: optional key in ``self.adata`` to group calculation by
         :param vertical: should the plot be vertical (i.e. metric on Y axis, groups on X axis) or horizontal (i.e. metric on X axis, groups on Y axis)
+        :param scale: should columns height be scaled by group size (i.e. turns into representation of group fractions instead raw numbers)
         """
-        pl = PlotAdata(self.adata, layer="counts" if ((self.adata.X is None) and (self.layer is None)) else self.layer)
-
         if isinstance(orig_labs, str):
-            orig_labs = pd.Series(pl.get_data(orig_labs), name=orig_labs)
+            orig_labs = pd.Series(self.__pl.get_data(orig_labs), name=orig_labs)
 
-        if group_by is None:
-            c = alt.Chart(
-                pd.DataFrame(
-                    {
-                        "pct_case": [pd.Series(orig_labs != ctrl_val).mean(), pd.Series(self.labs != ctrl_val).mean()],
-                        "source": ["original", "HiDDEN"],
-                    }
-                )
-            )
-        else:
-            if isinstance(group_by, str):
-                group_by = pd.Series(pl.get_data(group_by), name=group_by)
-            assert isinstance(group_by.name, str)
-
-            c = alt.Chart(
-                pd.concat(
-                    [
-                        pd.Series(orig_labs != ctrl_val)
-                        .groupby(group_by, observed=True)
-                        .agg("mean")
-                        .to_frame(name="pct_case")
-                        .assign(source="original"),
-                        pd.Series(self.labs != ctrl_val)
-                        .groupby(group_by, observed=True)
-                        .agg("mean")
-                        .to_frame(name="pct_case")
-                        .assign(source="HiDDEN"),
-                    ]
-                ).reset_index(names=group_by.name)
-            ).encode(
-                (alt.X if vertical else alt.Y)(group_by.name),
-                alt.Detail(group_by.name),
-            )
-
-        c = c.encode((alt.Y if vertical else alt.X)("pct_case").scale(domain=[0, 1]))
-
-        return c.mark_line(
-            strokeDash=(4, 4),
-        ) + c.mark_point(
-            filled=True,
-            opacity=0.8,
-        ).encode(
-            alt.Color("source"),
-            alt.Shape("source"),
+        ctrl_str, unaff_str, aff_str = "control", "case: HiDDEN - unaffected", "case: HiDDEN - affected"
+        df = pd.DataFrame(
+            {"label": pd.Series(np.where(self.labs == ctrl_val, unaff_str, aff_str)).mask(orig_labs == ctrl_val, ctrl_str)}
         )
+
+        if group_by is not None:
+            if isinstance(group_by, str):
+                group_by = pd.Series(self.__pl.get_data(group_by), name=group_by)
+            assert isinstance(group_by.name, str)
+            df[group_by.name] = group_by
+
+            df = df.groupby([group_by.name, "label"], observed=True)
+        else:
+            df = df.groupby("label", observed=True)
+
+        col = "fraction" if scale else "count"
+
+        df = df.agg("size").rename(col)  # pyright: ignore[reportCallIssue, reportArgumentType]
+
+        if scale:
+            if group_by is not None:
+                df = df.groupby(group_by.name, observed=True)
+            df = df.transform(lambda x: x / x.sum())
+
+        c = alt.Chart(df.to_frame().reset_index()).encode(
+            (alt.Y if vertical else alt.X)(col),
+            alt.Color("label", sort=[ctrl_str, unaff_str, aff_str]),
+            alt.Order("color_label_sort_index:Q", sort="descending" if vertical else "ascending"),
+        )
+
+        if group_by is not None:
+            c = c.encode((alt.X if vertical else alt.Y)(group_by.name))  # pyright: ignore[reportArgumentType]
+
+        return c.mark_bar()
 
 
 @dataclass(frozen=True)

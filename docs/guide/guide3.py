@@ -72,7 +72,7 @@ phat, labs = found.HiDDENg(adata, "stim", "ctrl", "cell", Pipeline(m.run_pca, m.
 plt = pl.PlotHiDDENOutput(adata, phat, labs)
 
 # %%
-plt[lambda a: a.obs["stim"] == "stim"].labs_pct("stim", "ctrl", "cell")
+plt[lambda a: a.obs["stim"] == "stim"].labs_bar("stim", "ctrl", "cell")
 
 # %% [markdown]
 # we see that megakaryocytes show the most relabeling, so we plot the p_hat values for that cell type specifically
@@ -108,7 +108,7 @@ print(sel)
 # %%
 phat, labs, scores = by_param(sel)
 
-pl.PlotHiDDENOutput(adata, phat, labs)[lambda a: a.obs["stim"] == "stim"].labs_pct("stim", "ctrl", "cell")
+pl.PlotHiDDENOutput(adata, phat, labs)[lambda a: a.obs["stim"] == "stim"].labs_bar("stim", "ctrl", "cell")
 
 # %% [markdown]
 # we can also explore the evolution of score values for specifically megakaryocytes, and see that setting k to 6 seems to yield optimal results

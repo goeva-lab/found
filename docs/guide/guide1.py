@@ -77,7 +77,7 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 # but a lot less for the SMM samples, with the HiDDEN model consistently predicting a higher amount
 # of neoplastic cells as compared to the "ground truth" manual annotations:
 # %%
-plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()
+plt.labs_bar("disease_stage_gt", "NBM", "sample_ID").show()
 
 # %% [markdown]
 # we can index into the {py:class}`~found.pl.PlotHiDDENOutput` object to only plot a subset of the data (similar to {py:attr}`~pandas.DataFrame.loc` in {py:class}`~pandas.DataFrame`).
@@ -140,4 +140,4 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 # %% [markdown]
 # assessing the new outputs, as expected, we see almost no difference with our initial results:
 # %%
-plt.labs_pct("disease_stage_gt", "NBM", "sample_ID").show()
+plt.labs_bar("disease_stage_gt", "NBM", "sample_ID").show()
