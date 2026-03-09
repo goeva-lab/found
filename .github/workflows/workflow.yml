@@ -102,7 +102,6 @@ jobs:
             exclusions = list("vignettes/guide.Rmd" = list(object_usage_linter = Inf))
           ))) != 0)
         shell: 'Rscript {0}'
-        working-directory: './R'
       - run: |
           devtools::check(error_on = "error", args = c("--no-examples", "--no-tests", "--no-vignettes"))
         working-directory: './R'
