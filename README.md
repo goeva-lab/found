@@ -26,6 +26,14 @@ found can be installed via the following command:
 uv pip install 'git+ssh://git@github.com/goeva-lab/found'
 ```
 
+alternatively, a docker/OCI image is provided at [ghcr.io/goeva-lab/found](https://github.com/goeva-lab/found/pkgs/container/found) (built according to instructions [here](./Dockerfile) and via the workflow defined [here](.github/workflows/workflow.yml#L5-L33)), which provides a debian-based environment with both R and python `found` packages pre-installed.
+
+this image can be downloaded via the following command (replace `docker` w/ `podman`/etc. as needed):
+
+```bash
+docker pull 'ghcr.io/goeva-lab/found'
+```
+
 ## documentation
 
 to build documentation (and run associated notebooks), a local copy of the repo must be downloaded, dev dependencies must be installed, and a kernel based on the configured venv must be installed:
