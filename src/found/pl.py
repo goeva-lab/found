@@ -1,6 +1,6 @@
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 import altair as alt
 import anndata as ad
@@ -9,8 +9,6 @@ import pandas as pd
 from pandas.api.extensions import ExtensionArray
 from scipy import sparse as sp
 from scipy.stats import gaussian_kde
-
-from .types import NumArr
 
 alt.data_transformers.enable("vegafusion")
 
@@ -193,17 +191,17 @@ class PlotAdata:
         chart = (
             alt.Chart(dens_data.sort_values("val"), view=alt.ViewConfig(stroke=None))
             .encode(
-                dens_ax("density")
+                dens_ax("density:Q")
                 .impute(None)
                 .title(None)
                 .axis(labels=False, grid=False, values=[] if discrete is None else [0])
                 .scale(domain=[-1.1, 1.1]),
-                val_ax("val").title(
+                val_ax("val:Q").title(
                     continuous
                     if isinstance(continuous, str)
                     else (str(continuous.name) if continuous.name is not None else None)
                 ),
-                refl_ax("density_refl"),
+                refl_ax("density_refl:Q"),
             )
             .mark_area(**mdict)
         )
@@ -215,11 +213,12 @@ class PlotAdata:
             chart = chart.encode(facet_enc)
 
         if split is not None:
-            chart = chart.encode(
-                alt.Color("split").title(
-                    split if isinstance(split, str) else (str(split.name) if split.name is not None else None)
-                )
+            col_enc = alt.Color("split:N").title(
+                split if isinstance(split, str) else (str(split.name) if split.name is not None else None)
             )
+            if hasattr(dens_data["split"], "cat"):
+                col_enc = col_enc.sort(dens_data["split"].cat.categories)
+            chart = chart.encode(col_enc)
 
         return chart
 
@@ -239,8 +238,8 @@ class PlotHiDDENOutput:
     """
 
     adata: ad.AnnData
-    phat: NumArr
-    labs: np.ndarray[tuple[int], np.dtype]
+    phat: pd.Series
+    labs: pd.Series
     layer: str | None = field(kw_only=True, default=None)
 
     __pl: PlotAdata = field(init=False)
@@ -321,7 +320,11 @@ class PlotHiDDENOutput:
 
         ctrl_str, unaff_str, aff_str = "control", "case: HiDDEN - unaffected", "case: HiDDEN - affected"
         df = pd.DataFrame(
-            {"label": pd.Series(np.where(self.labs == ctrl_val, unaff_str, aff_str)).mask(orig_labs == ctrl_val, ctrl_str)}
+            {
+                "label": pd.Series(np.where(np.asarray(self.labs == ctrl_val), unaff_str, aff_str)).mask(
+                    orig_labs == ctrl_val, ctrl_str
+                )
+            }
         )
 
         if group_by is not None:
@@ -371,17 +374,17 @@ class PlotTunerOutput:
 
     adata: ad.AnnData
     sel: object
-    outs: Mapping
+    outs: Mapping[Any, tuple[pd.Series, pd.Series, Any]]
     layer: str | None = field(kw_only=True, default=None)
 
-    def __getitem__(self, k) -> PlotHiDDENOutput:
+    def __getitem__(self, k: Any) -> PlotHiDDENOutput:
         if k not in self.outs:
             raise ValueError(
                 f"provided key must be one of evaluated hyperparameters, but {k} is not in {set(self.outs.keys())}"
             )
         return PlotHiDDENOutput(self.adata, self.outs[k][0], self.outs[k][1])
 
-    def plot_scores(self) -> alt.Chart | alt.LayerChart:
+    def score_line(self) -> alt.Chart | alt.LayerChart:
         """
         method used to generate a line plot of scores for tested hyperparameters
         """

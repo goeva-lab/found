@@ -71,14 +71,14 @@ sce_s4_class <- methods::getClass("SingleCellExperiment", where = "SingleCellExp
 seurat_s4_class <- methods::getClass("Seurat", where = "SeuratObject")
 
 conv_HiDDEN <- function(HiDDEN_out) {
-  list("p_hat" = reticulate::py_to_r(HiDDEN_out[0]), "labs" = reticulate::py_to_r(HiDDEN_out[1]))
+  list("p_hat" = c(reticulate::py_to_r(HiDDEN_out[0])), "labs" = c(reticulate::py_to_r(HiDDEN_out[1])))
 }
 
 conv_HiDDENt <- function(HiDDENt_outs) {
   chosen <- reticulate::py_to_r(HiDDENt_outs[0])
   out_l <- lapply(
     reticulate::py_to_r(HiDDENt_outs[1]),
-    function(out) list("p_hat" = out[[1]], "labs" = out[[2]], "score" = out[[3]])
+    function(out) list("p_hat" = c(out[[1]]), "labs" = c(out[[2]]), "score" = out[[3]])
   )
 
   names(out_l) <- tryCatch(

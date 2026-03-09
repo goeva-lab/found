@@ -10,13 +10,6 @@ import pandas as pd
 from .adapters import Pipeline, wrap_gby_fn
 from .methods import bin_kmeans, reg_logit, run_pca
 from .tune import Tuner
-from .types import BoolArr, NumArr
-
-
-def remap[T: np.ndarray[tuple[int], np.dtype]](adj_bool: BoolArr, orig_label: T | pd.Series, control_val: object) -> T:
-    return np.where(adj_bool, orig_label, control_val)  # pyright: ignore[reportReturnType, reportArgumentType, reportCallIssue]
-    # ignore NECESSITY - np.where broadcasting does
-    # not maintain array size in type information
 
 
 def prep_grps(
@@ -77,7 +70,7 @@ def HiDDEN(
     control_val: object,
     algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
     **kwargs,
-) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype]]:
+) -> tuple[pd.Series, pd.Series]:
     """
     runs HiDDEN on a given :py:class:`~anndata.AnnData` object.
 
@@ -94,12 +87,8 @@ def HiDDEN(
     p_hat, labs, _ = algo(V=x.obs[cond_col].ne(control_val).to_numpy(), **kwargs)
 
     return (
-        p_hat,
-        remap(
-            labs,
-            x.obs[cond_col],  # pyright: ignore[reportArgumentType]
-            control_val,
-        ),
+        pd.Series(p_hat, index=x.obs.index),
+        x.obs[cond_col].where(labs, control_val),  # pyright: ignore[reportReturnType]
     )
 
 
@@ -117,7 +106,7 @@ def HiDDENg(
     | None = None,
     grp_specific_args: Mapping[object, dict[str, object]] | None = None,
     **kwargs,
-) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype]]:
+) -> tuple[pd.Series, pd.Series]:
     """
     runs HiDDEN on a given :py:class:`~anndata.AnnData` object, given some set of grouping factors.
 
@@ -146,12 +135,8 @@ def HiDDENg(
     p_hat, labs, _ = zip(*(gfn(grp, **(kwargs | grp_specific_args[grp])) for grp in grp_idx))
 
     return (
-        np.concat(p_hat)[out_ord],  # pyright: ignore[reportReturnType]
-        remap(
-            np.concat(labs)[out_ord],  # pyright: ignore[reportArgumentType]
-            x.obs[cond_col],  # pyright: ignore[reportArgumentType]
-            control_val,
-        ),
+        pd.Series(np.concat(p_hat)[out_ord], index=x.obs.index),  # pyright: ignore[reportReturnType]
+        x.obs[cond_col].where(np.concat(labs)[out_ord], control_val),  # pyright: ignore[reportReturnType]
     )
 
 
@@ -163,7 +148,7 @@ def HiDDENt[P, S](
     tuner: Tuner[P, S],
     algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
     **kwargs,
-) -> tuple[P, Mapping[P, tuple[NumArr, np.ndarray[tuple[int], np.dtype], S]]]:
+) -> tuple[P, Mapping[P, tuple[pd.Series, pd.Series, S]]]:
     """
     runs HiDDEN on a given :py:class:`~anndata.AnnData` object, trying to optimize for a specific set of dimensions using provided :py:class:`~found.tune.Tuner`.
 
@@ -189,12 +174,8 @@ def HiDDENt[P, S](
         best_param,
         {
             k: (
-                Y,
-                remap(
-                    W,
-                    x.obs[cond_col],  # pyright: ignore[reportArgumentType]
-                    control_val,
-                ),
+                pd.Series(Y, index=x.obs.index),
+                x.obs[cond_col].where(W, control_val),  # pyright: ignore[reportReturnType]
                 s,
             )
             for k, (Y, W, s) in outs.items()
@@ -205,7 +186,7 @@ def HiDDENt[P, S](
 class ByParamAccessor[G, P, S](Protocol):
     def __call__(
         self, mapping: Mapping[G, P] | None = None, default: P | None = None
-    ) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype], Mapping[G, S]]: ...
+    ) -> tuple[pd.Series, pd.Series, Mapping[G, S]]: ...
 
 
 def HiDDENgt[P, S, G](
@@ -226,7 +207,7 @@ def HiDDENgt[P, S, G](
 ) -> tuple[
     Mapping[G, P],
     ByParamAccessor[G, P, S],
-    Callable[[G], Mapping[P, tuple[NumArr, np.ndarray[tuple[int], np.dtype], S]]],
+    Callable[[G], Mapping[P, tuple[pd.Series, pd.Series, S]]],
 ]:
     """
     runs HiDDEN on a given :py:class:`~anndata.AnnData` object, given some set of grouping factors, trying to optimize for a specific set of dimensions using provided :py:class:`~found.tune.Tuner`.
@@ -277,7 +258,7 @@ def HiDDENgt[P, S, G](
 
     def acc_by_param(
         mapping: Mapping[G, P] | None = None, default: P | None = None
-    ) -> tuple[NumArr, np.ndarray[tuple[int], np.dtype], Mapping[G, S]]:
+    ) -> tuple[pd.Series, pd.Series, Mapping[G, S]]:
         if mapping is None:
             mapping = dict()
         if default is None:
@@ -291,37 +272,48 @@ def HiDDENgt[P, S, G](
             assert out is not None
             return out
 
-        return (
-            np.concat(  # pyright: ignore[reportReturnType]
-                [
-                    outs[g][  # fmt: skip
-                        get(g)  # pyright: ignore[reportArgumentType]
-                    ][0]
-                    for g in grp_idx.keys()
-                ]
-            )[out_ord],
-            remap(
-                np.concat([outs[g][get(g)][1] for g in grp_idx.keys()])[out_ord],  # pyright: ignore[reportArgumentType]
-                x.obs[cond_col],  # pyright: ignore[reportArgumentType]
+        return (  # pyright: ignore[reportReturnType]
+            pd.Series(
+                np.concat(
+                    [
+                        outs[g][
+                            get(
+                                g  # pyright: ignore[reportArgumentType]
+                            )
+                        ][0]
+                        for g in grp_idx.keys()
+                    ]
+                )[out_ord],
+                index=x.obs.index,
+            ),
+            x.obs[cond_col].where(  # pyright: ignore[reportReturnType]
+                np.concat(
+                    [
+                        outs[g][
+                            get(
+                                g  # pyright: ignore[reportArgumentType]
+                            )
+                        ][1]
+                        for g in grp_idx.keys()
+                    ]
+                )[out_ord],
                 control_val,
             ),
             {
-                g: outs[g][  # fmt: sip
-                    get(g)  # pyright: ignore[reportArgumentType]
+                g: outs[g][
+                    get(
+                        g  # pyright: ignore[reportArgumentType]
+                    )
                 ][2]
                 for g in grp_idx.keys()
             },
         )
 
-    def acc_by_grp(grp: G) -> Mapping[P, tuple[NumArr, np.ndarray[tuple[int], np.dtype], S]]:
+    def acc_by_grp(grp: G) -> Mapping[P, tuple[pd.Series, pd.Series, S]]:
         return {
             k: (
-                Y,
-                remap(
-                    W,
-                    x[grp_idx[grp]].obs[cond_col],  # pyright: ignore[reportArgumentType]
-                    control_val,
-                ),
+                pd.Series(Y, index=x.obs.index[grp_idx[grp]]),
+                x[grp_idx[grp]].obs[cond_col].where(W, control_val),  # pyright: ignore[reportReturnType]
                 s,
             )
             for k, (Y, W, s) in outs[grp].items()

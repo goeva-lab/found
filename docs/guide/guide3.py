@@ -119,7 +119,7 @@ pl.PlotTunerOutput(
     adata[adata.obs["cell"] == "Megakaryocytes"],  # we subset our paired anndata value to only megakaryocytes
     sel["Megakaryocytes"],  # we provided the selected `k` value by indexing the group to choice mapping returned by HiDDENgt
     mk_out_only,
-).plot_scores().show()
+).score_line().show()
 
 # %% [markdown]
 # finally, it is good to note that {py:func}`~found.find.HiDDENg` (and {py:func}`~found.find.HiDDENgt`) accept a `grp_specific_args` argument, which provides the ability to inject arguments into the pipeline in a group specific basis.

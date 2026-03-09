@@ -19,7 +19,7 @@ from pathlib import Path
 from urllib.request import urlopen
 from warnings import catch_warnings
 
-import numpy as np
+import pandas as pd
 import scanpy as sc
 
 import found
@@ -37,7 +37,7 @@ else:
     base_url = "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE276570&format=file&file="
     with catch_warnings(category=FutureWarning, action="ignore"):
         adata = sc.read_h5ad(BytesIO(urlopen(f"{base_url}GSE276570_endo_object.h5ad").read()))  # pyright: ignore[reportArgumentType]
-    adata.obs["injection"] = np.where(adata.obs["Condition"] == 1, "LPC", "saline")
+    adata.obs["injection"] = pd.Categorical.from_codes(adata.obs["Condition"].eq(1).astype(int), ["saline", "LPC"])
     adata.write_h5ad(pth)
 
 print(adata)
@@ -88,13 +88,13 @@ plt_nulldist = pl.PlotTunerOutput(adata, *outs_nulldist)
 plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 
 # %% [markdown]
-# {py:func}`~found.pl.PlotTunerOutput` provides a plot_scores function which we can
+# {py:func}`~found.pl.PlotTunerOutput` provides {py:meth}`~found.pl.PlotTunerOutput.score_line` which we can
 # use to assess the changes in scores across tested k values
 # %%
 (
-    plt_fix.plot_scores().properties(title="scores for fix point tuning")
-    | plt_nulldist.plot_scores().properties(title="scores for p_hat distance from null")
-    | plt_phatdist.plot_scores().properties(title="scores for p_hat distance between groups")
+    plt_fix.score_line().properties(title="scores for fix point tuning")
+    | plt_nulldist.score_line().properties(title="scores for p_hat distance from null")
+    | plt_phatdist.score_line().properties(title="scores for p_hat distance between groups")
 ).show()
 
 # %% [markdown]

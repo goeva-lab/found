@@ -165,7 +165,7 @@ sel, out = found.HiDDENt(
 # however, given that our data was subset to a very low number of cells for demonstration purposes, these results cannot be interpreted further.
 
 # %%
-pl.PlotTunerOutput(adata, sel, out).plot_scores().show()
+pl.PlotTunerOutput(adata, sel, out).score_line().show()
 
 # %% [markdown]
 # this {py:func}`~found.adapters.step_fn` wrapping mechanism is actually used internally during {py:class}`~found.adapters.Pipeline` construction!
