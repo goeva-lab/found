@@ -209,7 +209,10 @@ class PlotAdata:
         )
 
         if discrete is not None:
-            chart = chart.encode(facet_ax("discrete").spacing(0).title(None).header(**hdict))
+            facet_enc = facet_ax("discrete:N").spacing(0).title(None).header(**hdict)
+            if hasattr(dens_data["discrete"], "cat"):
+                facet_enc = facet_enc.sort(dens_data["discrete"].cat.categories)
+            chart = chart.encode(facet_enc)
 
         if split is not None:
             chart = chart.encode(
@@ -341,9 +344,9 @@ class PlotHiDDENOutput:
             df = df.transform(lambda x: x / x.sum())
 
         c = alt.Chart(df.to_frame().reset_index()).encode(
-            (alt.Y if vertical else alt.X)(col),
-            alt.Color("label", sort=[ctrl_str, unaff_str, aff_str]),
-            alt.Order("color_label_sort_index:Q", sort="descending" if vertical else "ascending"),
+            (alt.Y if vertical else alt.X)(f"{col}:Q"),
+            alt.Color("label:N").sort([ctrl_str, unaff_str, aff_str]),
+            alt.Order("color_label_sort_index:Q").sort("descending" if vertical else "ascending"),
         )
 
         if group_by is not None:
