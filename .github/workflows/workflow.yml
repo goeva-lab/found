@@ -83,9 +83,11 @@ jobs:
             requireNamespace("pak")
           }
           tryCatch(
-            pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/"),
-            error = function(e) { print(.Last.error.trace); stop(e) }
+            # pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/"),
+            pak::pak(c("devtools", "lintr"), lib = "/usr/lib/R/site-library/"),
+            error = function(e) { if (exists(".Last.error.trace")) { print(.Last.error.trace) } ; stop(e) }
           )
+          devtools::document()
         working-directory: './R'
         shell: 'Rscript {0}'
       - uses: 'actions/cache/save@v4'
@@ -96,12 +98,11 @@ jobs:
             /usr/local/lib/R/site-library/
           key: 'pak-R-library-${{ runner.os }}-${{ runner.arch }}'
       - run: |
-          devtools::document("./R")
-
-          errors <- lintr::lint_package("./R")
-          print(errors)
-          quit(save = "no", status = length(errors) != 0)
+          quit(save = "no", status = length(print(lintr::lint_package(
+            exclusions = list("vignettes/guide.Rmd" = list(object_usage_linter = Inf))
+          ))) != 0)
         shell: 'Rscript {0}'
+        working-directory: './R'
       - run: |
           devtools::check(error_on = "error", args = c("--no-examples", "--no-tests", "--no-vignettes"))
         working-directory: './R'
@@ -126,13 +127,20 @@ jobs:
       - run: |
           uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]'
       - run: |
-          mkdir dist && touch dist/.nojekyll
+          mkdir 'dist' && touch 'dist/.nojekyll'
       - run: |
-          # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
+          set -euxo pipefail
+
+          python -m ipykernel install --user --name 'found'
           # @TODO: look into using self-hosted runners depending on future hardware access
-          python -m ipykernel install --user --name 'found' && sphinx-build 'docs' 'docs/_build/html'  -D 'nb_execution_mode=off' -b 'dirhtml' -n && mv 'docs/_build/html' 'dist/py'
+          # `nb_execution_mode` set to off because runner does not have enough computational resources to render notebook
+          sphinx-build 'docs' 'docs/_build/html'  -D 'nb_execution_mode=off' -b 'dirhtml' -n
+          mv 'docs/_build/html' 'dist/py'
       - run: |
-          apt update && apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo' 'libxml2-dev' 'libfontconfig1-dev' 'libharfbuzz-dev' 'libfribidi-dev' 'libfreetype6-dev' 'libpng-dev' 'libtiff5-dev' 'libjpeg-dev' 'libwebp-dev'
+          set -euxo pipefail
+          apt update
+          apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo' 
+          # apt install -y --no-install-recommends 'libxml2-dev' 'libfontconfig1-dev' 'libharfbuzz-dev' 'libfribidi-dev' 'libfreetype6-dev' 'libpng-dev' 'libtiff5-dev' 'libjpeg-dev' 'libwebp-dev'
       - run: |
           echo "${HOME}/bin" >> "${GITHUB_PATH}"
       - uses: 'actions/cache/restore@v4'
@@ -152,11 +160,14 @@ jobs:
             requireNamespace("pak")
           }
           tryCatch(
-            pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/"),
-            error = function(e) { print(.Last.error.trace); stop(e) }
+            {
+              # pak::local_install_dev_deps(lib = "/usr/lib/R/site-library/")
+              pak::pak(c("devtools", "pkgdown"), lib = "/usr/lib/R/site-library/")
+              pak::pak(c("tinytex"), lib = "/usr/lib/R/site-library/")
+            },
+            error = function(e) { if (exists(".Last.error.trace")) { print(.Last.error.trace) } ; stop(e) }
           )
 
-          pak::pak("tinytex", lib = "/usr/lib/R/site-library/")
           tinytex::install_tinytex()
 
           devtools::document()

@@ -2,10 +2,11 @@
 name = "found"
 version = "0.1.0"
 dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
     "anndata>=0.12",
     "scikit-learn",
-    "scipy",
-    "numpy",
     "altair[all]",
 ]
 requires-python = ">=3.12"
@@ -22,7 +23,6 @@ dev = [
     "ipykernel",
     "ipywidgets",
     "scanpy[leiden]",
-    "pandas",
     "pyLemur",
 ]
 
