@@ -66,18 +66,18 @@ print(adata)
 # it can be of interest to run HiDDEN in a grouped fashion, splitting a dataset
 # according to some discrete variable and then running HiDDEN on each subset separately.
 #
-# as this is a very common workflow, `found` provides two entrypoints to handle this for the user: {py:func}`~found.find.HiDDENg` and {py:func}`~found.find.HiDDENgt`, the latter providing hyper-parameter tuning
+# as this is a very common workflow, `found` provides two entrypoints to handle this for the user: {py:func}`~found.find.HiDDENg` and {py:func}`~found.find.HiDDENgt`, the latter providing hyper-parameter tuning *and* grouping
 # %%
 p_hat, labs = found.HiDDENg(adata, "stim", "ctrl", "cell", Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans), X=adata.X, k=20)
 plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 
 # %%
-plt[lambda a: a.obs["stim"] == "stim"].bin_bar("stim", "ctrl", "cell")
+plt.bin_bar("stim", "ctrl", "cell")
 
 # %% [markdown]
 # we see that megakaryocytes show the most relabeling, so we plot the p_hat values for that cell type specifically
 # %%
-plt[lambda a: a.obs["cell"] == "Megakaryocytes"].reg_vln("stim").properties(width=120)
+plt[lambda a: a.obs["cell"] == "Megakaryocytes"].reg_vln("stim")
 
 # %% [markdown]
 # the above workflow assumes that a hyperparameter k for the pipeline is a) known and b) fixed for all cell types.
@@ -108,10 +108,10 @@ print(sel)
 # %%
 p_hat, labs, scores = by_param(sel)
 
-pl.PlotHiDDENOutput(adata, p_hat, labs)[lambda a: a.obs["stim"] == "stim"].bin_bar("stim", "ctrl", "cell")
+pl.PlotHiDDENOutput(adata, p_hat, labs).bin_bar("stim", "ctrl", "cell")
 
 # %% [markdown]
-# we can also explore the evolution of score values for specifically megakaryocytes, and see that setting k to 6 seems to yield optimal results
+# we can also explore the evolution of score values for specifically megakaryocytes, and see that setting `k` to `6` seems to yield optimal results
 
 # %%
 mk_out_only = by_grp("Megakaryocytes")
@@ -124,7 +124,7 @@ pl.PlotTunerOutput(
 # %% [markdown]
 # finally, it is good to note that {py:func}`~found.find.HiDDENg` (and {py:func}`~found.find.HiDDENgt`) accept a `grp_specific_args` argument, which provides the ability to inject arguments into the pipeline in a group specific basis.
 #
-# we can use this here to run {py:func}`~found.find.HiDDENg` with different k values per group (using the values selected by {py:func}`~found.find.HiDDENgt`).
+# we can use this here to run {py:func}`~found.find.HiDDENg` with different `k` values per group (using the values selected by {py:func}`~found.find.HiDDENgt`).
 
 # %%
 p_hat, labs = found.HiDDENg(

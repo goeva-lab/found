@@ -86,7 +86,7 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 # we can index into the {py:class}`~found.pl.PlotHiDDENOutput` object to only plot a subset of the data (similar to {py:attr}`~pandas.DataFrame.loc` in {py:class}`~pandas.DataFrame`).
 # here, we use this to plot p_hat distributions (via {py:meth}`~found.pl.PlotHiDDENOutput.reg_vln`) for the three patients where we see the most relabeling, w/o and w/ splitting by the refined labels:
 # %%
-subset_plt = plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])]
+subset_plt = plt[lambda a: a.obs["sample_ID"].isin(["SMM-4", "SMM-5", "SMM-10"])]
 (
     subset_plt.reg_vln("sample_ID", split_mode=False).properties(width=120)
     | subset_plt.reg_vln("sample_ID").properties(width=120)

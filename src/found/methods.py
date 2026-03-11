@@ -434,7 +434,7 @@ def bin_kmeans(
 
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
-    :param kmeans_args: additional arguments to pass to :py:class:`~sklearn.linear_model.LogisticRegression` (defaults: ``n_init``: ``"auto"``)
+    :param kmeans_args: additional arguments to pass to :py:class:`~sklearn.cluster.KMeans` (defaults: ``n_init``: ``"auto"``)
     :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)
     """
 
