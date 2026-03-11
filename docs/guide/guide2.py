@@ -61,31 +61,25 @@ algo = Pipeline.from_proc_ad("X_pca", m.reg_logit, m.bin_kmeans)
 # here we initialize a variety of tuners, and will compare their results
 start_k = 3
 tuner_fix = FixPointTuner(4, start_k, 0.02)
-tuner_nulldist = NaiveMaxScoreTuner(m.score_nulldist, range(start_k, 31))
-tuner_phatdist = NaiveMaxScoreTuner(m.score_phatdiff_dist, range(start_k, 31))
+tuner_null_dist = NaiveMaxScoreTuner(m.score_null_dist, range(start_k, 31))
+tuner_p_hat_dist = NaiveMaxScoreTuner(m.score_dist_diff, range(start_k, 31))
 
-# ⚠️  the `from_proc_ad` constructor creates a pipeline which expects an `adata` argument!
-# ⚠️            |_____________________________________________________________
-# ⚠️                                                                         |
-# ⚠️                                                                         V
+# ⚠️ {py:meth}`~found.adapters.Pipeline.from_proc_ad` creates a pipeline which expects an `adata` argument!
+#                                                                            ↓
 outs_fix = found.HiDDENt(adata, "injection", "saline", tuner_fix, algo, adata=adata)
 
-# ⚠️  the `score_nulldist` function _requires_ a `pipeline_algo` argument to be provided, so we must inject that as well
-# ⚠️            |____________________________________________________________________________________________
-# ⚠️                                                                                                        |
-# ⚠️                                                                                                        V
-outs_nulldist = found.HiDDENt(adata, "injection", "saline", tuner_nulldist, algo, adata=adata, pipeline_algo=algo)
+# ⚠️ {py:func}`~found.methods.score_null_dist` _requires_ a `pipeline_algo` argument to be provided, so we must inject when calling the pipeline!
+#                                                                                                           ↓
+outs_null_dist = found.HiDDENt(adata, "injection", "saline", tuner_null_dist, algo, adata=adata, pipeline_algo=algo)
 
-# ⚠️  the `score_phatdiff_emd` has an _optional_ `score_weight_vsctl` but we can override it via injection as well
-# ⚠️            |_________________________________________________________________________________________________
-# ⚠️                                                                                                             |
-# ⚠️                                                                                                             V
-outs_phatdist = found.HiDDENt(adata, "injection", "saline", tuner_phatdist, algo, adata=adata, score_weight_vsctl=0.25)
+# ⚠️ {py:func}`~found.methods.score_dist_diff` has an _optional_ `score_weight_vsctl` argument but we can override it via injection!
+#                                                                                                                ↓
+outs_p_hat_dist = found.HiDDENt(adata, "injection", "saline", tuner_p_hat_dist, algo, adata=adata, score_weight_vsctl=0.25)
 
 # initialize corresponding plotting objects
 plt_fix = pl.PlotTunerOutput(adata, *outs_fix)
-plt_nulldist = pl.PlotTunerOutput(adata, *outs_nulldist)
-plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
+plt_null_dist = pl.PlotTunerOutput(adata, *outs_null_dist)
+plt_p_hat_dist = pl.PlotTunerOutput(adata, *outs_p_hat_dist)
 
 # %% [markdown]
 # {py:func}`~found.pl.PlotTunerOutput` provides {py:meth}`~found.pl.PlotTunerOutput.score_line` which we can
@@ -93,8 +87,8 @@ plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 # %%
 (
     plt_fix.score_line().properties(title="scores for fix point tuning")
-    | plt_nulldist.score_line().properties(title="scores for p_hat distance from null")
-    | plt_phatdist.score_line().properties(title="scores for p_hat distance between groups")
+    | plt_null_dist.score_line().properties(title="scores for p_hat distance from null")
+    | plt_p_hat_dist.score_line().properties(title="scores for p_hat distance between groups")
 ).show()
 
 # %% [markdown]
@@ -102,28 +96,27 @@ plt_phatdist = pl.PlotTunerOutput(adata, *outs_phatdist)
 # tested hyperparameters to get a corresponding {py:func}`~found.pl.PlotTunerOutput` object.
 # %%
 
-case_mask = adata.obs["injection"] == "LPC"
 start = plt_fix[start_k]
-fixk = plt_fix[plt_fix.sel]
-nulldistk = plt_nulldist[plt_nulldist.sel]
-phatdistk = plt_phatdist[plt_phatdist.sel]
+fix_point_k = plt_fix[plt_fix.sel]
+null_dist_k = plt_null_dist[plt_null_dist.sel]
+p_hat_dist_k = plt_p_hat_dist[plt_p_hat_dist.sel]
 
 # %% [markdown]
 # here we use this to visualize percent relabeling for the initial tested k, as well as the different ks that were selected for by different tuners
 # %%
 (
-    start[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {start_k}", width=120)
-    | fixk[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_fix.sel}", width=120)
-    | nulldistk[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_nulldist.sel}", width=120)
-    | phatdistk[case_mask].labs_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_phatdist.sel}", width=120)
+    start.bin_bar("injection", "saline", "animal_id").properties(title=f"k = {start_k}", width=120)
+    | fix_point_k.bin_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_fix.sel}", width=120)
+    | null_dist_k.bin_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_null_dist.sel}", width=120)
+    | p_hat_dist_k.bin_bar("injection", "saline", "animal_id").properties(title=f"k = {plt_p_hat_dist.sel}", width=120)
 ).show()
 
 # %% [markdown]
-# we can also assess phat distributions across different ks
+# we can also assess p_hat distributions across different ks
 # %%
 (
-    start.phat_vln("injection").properties(title=f"k = {start_k}", width=60)
-    | fixk.phat_vln("injection").properties(title=f"k = {plt_fix.sel}", width=60)
-    | nulldistk.phat_vln("injection").properties(title=f"k = {plt_nulldist.sel}", width=60)
-    | phatdistk.phat_vln("injection").properties(title=f"k = {plt_phatdist.sel}", width=60)
+    start.reg_vln("injection").properties(title=f"k = {start_k}", width=60)
+    | fix_point_k.reg_vln("injection").properties(title=f"k = {plt_fix.sel}", width=60)
+    | null_dist_k.reg_vln("injection").properties(title=f"k = {plt_null_dist.sel}", width=60)
+    | p_hat_dist_k.reg_vln("injection").properties(title=f"k = {plt_p_hat_dist.sel}", width=60)
 ).configure_title(anchor="middle").show()

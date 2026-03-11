@@ -86,7 +86,7 @@ def run_lemur(adata: ad.AnnData, k: int, lemur_design: str, lemur_grouping: pd.S
     return mod.embedding  # pyright: ignore[reportReturnType]
 
 
-phat, labs = found.HiDDEN(
+p_hat, labs = found.HiDDEN(
     adata,
     "stim",
     "ctrl",

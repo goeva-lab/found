@@ -68,41 +68,43 @@ algo = Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans, True)
 p_hat, labs = found.HiDDEN(adata, "disease_stage", "NBM", algo, k=30, X=adata.X)
 
 # %% [markdown]
-# to evaluate our pipeline results, we use the provided plotting API
+# to evaluate our pipeline results, we can use the provided plotting API via PlotHiDDENOutput
+# this class provides two core methods for evaluating the two sets of HiDDEN outputs:
+# - {py:meth}`~found.pl.PlotHiDDENOutput.reg_vln`: generates a violin plot of regression score distributions (referred to as p_hat) w/ optional splitting based on the HiDDEN-refined labels
+# - {py:meth}`~found.pl.PlotHiDDENOutput.bin_bar`: generates a bar plot showing levels of control / case / HiDDEN-relabeled cells w/ optional scaling to show proportions of cell numbers instead of total counts
 # %%
 plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 
 # %% [markdown]
-# evaluating the standard pipeline results, we see strong agreement for the MM samples,
-# but a lot less for the SMM samples, with the HiDDEN model consistently predicting a higher amount
-# of neoplastic cells as compared to the "ground truth" manual annotations:
+# evaluating the binarized pipeline results via {py:meth}`~found.pl.PlotHiDDENOutput.bin_bar` (evaluating both proportions and counts),
+# we see strong agreement for the MM samples, but a lot less for the SMM samples, with the HiDDEN model consistently predicting
+# a higher amount of neoplastic cells as compared to the "ground truth" manual annotations.
 # %%
-plt.labs_bar("disease_stage_gt", "NBM", "sample_ID").show()
+(plt.bin_bar("disease_stage_gt", "NBM", "sample_ID") | plt.bin_bar("disease_stage_gt", "NBM", "sample_ID", scale=False)).show()
 
 # %% [markdown]
 # we can index into the {py:class}`~found.pl.PlotHiDDENOutput` object to only plot a subset of the data (similar to {py:attr}`~pandas.DataFrame.loc` in {py:class}`~pandas.DataFrame`).
-# here, we use this to plot p_hat distributions for the three patients where we see the most relabeling, first without splitting by the refined labels, then with splitting:
+# here, we use this to plot p_hat distributions (via {py:meth}`~found.pl.PlotHiDDENOutput.reg_vln`) for the three patients where we see the most relabeling, w/o and w/ splitting by the refined labels:
 # %%
 subset_plt = plt[lambda a: a.obs["sample_ID"].isin(["SMM-3", "SMM-8", "SMM-10"])]
 (
-    subset_plt.phat_vln("sample_ID", split_mode=False).properties(width=120)
-    | subset_plt.phat_vln("sample_ID").properties(width=120)
+    subset_plt.reg_vln("sample_ID", split_mode=False).properties(width=120)
+    | subset_plt.reg_vln("sample_ID").properties(width=120)
 ).show()
 
 # %% [markdown]
 # it might be of interest to ask if per-patient batch effects have serious effects on HiDDEN outputs, and if accounting for them could increase the accuracy/sensitivity of our outputs.
 # to attempt this, we can try to have the binarization step be done in a per-patient fashion.
 #
-# note: this should not be taken as general advice to follow when troubleshooting found-generated labels, instead proper batch correction methods such as batch-adjusted dimensionality reduction should most likely be considered instead.
-# however, our interest here is mainly to use this opportunity to demonstrate found's pipeline modification/extension functionality, so we will proceed accordingly.
+# note: this should not be taken as general advice to follow when troubleshooting `found`-generated labels, instead proper batch correction methods such as batch-adjusted dimensionality reduction should most likely be considered instead.
+# however, our interest here is mainly to use this opportunity to demonstrate `found`'s pipeline modification/extension functionality, so we will proceed accordingly.
 # %%
 # note: this new functionality requires patient metadata, which we make available as a function argument
 # importantly, we will then need to "inject" this information into the pipeline when calling invoking it
 
 
-#                                          patient metadata declared here
-#                                                       |
-#                                                       V
+#                                      ⚠️ patient metadata declaration in function arguments
+#                                                             ↓
 def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> BoolArr:
     out = V.copy()
 
@@ -110,10 +112,7 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
         mask = patient_meta.eq(patient).to_numpy()
         if not V[mask].any():
             continue
-        out[mask] = m.bin_kmeans(
-            Y[mask],  # pyright: ignore[reportArgumentType]
-            V[mask],  # pyright: ignore[reportArgumentType]
-        )
+        out[mask] = m.bin_kmeans(Y[mask], V[mask])
 
     return out.astype(bool)
 
@@ -121,7 +120,6 @@ def per_patient_kmeans_bin(Y: NumArr, V: BoolArr, patient_meta: pd.Series) -> Bo
 # we use the `.update` method which returns a new version of the pipeline based off an existing with specified components replaced
 algo = algo.update(binr_fn=per_patient_kmeans_bin)
 
-# ⚠️ important: we need to "inject" the patient metadata value into our pipeline
 p_hat, labs = found.HiDDEN(
     adata,
     "disease_stage",
@@ -129,10 +127,8 @@ p_hat, labs = found.HiDDEN(
     algo,
     k=30,
     X=adata.X,
-    #  ⚠️ introduction of new variables/data into pipeline
-    #  ⚠️ is done via extra arguments at invocation point
-    #           |
-    #           V
+    # ⚠️ introduction of new variables/data into pipeline is done via extra arguments at invocation point
+    #           ↓
     patient_meta=adata.obs["sample_ID"],
 )
 plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
@@ -140,4 +136,4 @@ plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 # %% [markdown]
 # assessing the new outputs, as expected, we see almost no difference with our initial results:
 # %%
-plt.labs_bar("disease_stage_gt", "NBM", "sample_ID").show()
+plt.bin_bar("disease_stage_gt", "NBM", "sample_ID").show()

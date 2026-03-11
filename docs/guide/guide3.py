@@ -68,16 +68,16 @@ print(adata)
 #
 # as this is a very common workflow, `found` provides two entrypoints to handle this for the user: {py:func}`~found.find.HiDDENg` and {py:func}`~found.find.HiDDENgt`, the latter providing hyper-parameter tuning
 # %%
-phat, labs = found.HiDDENg(adata, "stim", "ctrl", "cell", Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans), X=adata.X, k=20)
-plt = pl.PlotHiDDENOutput(adata, phat, labs)
+p_hat, labs = found.HiDDENg(adata, "stim", "ctrl", "cell", Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans), X=adata.X, k=20)
+plt = pl.PlotHiDDENOutput(adata, p_hat, labs)
 
 # %%
-plt[lambda a: a.obs["stim"] == "stim"].labs_bar("stim", "ctrl", "cell")
+plt[lambda a: a.obs["stim"] == "stim"].bin_bar("stim", "ctrl", "cell")
 
 # %% [markdown]
 # we see that megakaryocytes show the most relabeling, so we plot the p_hat values for that cell type specifically
 # %%
-plt[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim").properties(width=120)
+plt[lambda a: a.obs["cell"] == "Megakaryocytes"].reg_vln("stim").properties(width=120)
 
 # %% [markdown]
 # the above workflow assumes that a hyperparameter k for the pipeline is a) known and b) fixed for all cell types.
@@ -89,7 +89,7 @@ sel, by_param, by_grp = found.HiDDENgt(
     "stim",
     "ctrl",
     "cell",
-    NaiveMaxScoreTuner(m.score_phatdiff, range(2, 20, 2)),
+    NaiveMaxScoreTuner(m.score_ks_diff, range(2, 20, 2)),
     Pipeline(m.run_pca, m.reg_logit, m.bin_kmeans, cachable_dimr=True),
     X=adata.X,
 )
@@ -106,9 +106,9 @@ print(sel)
 # here we can plot the re-mixed together outputs of {py:func}`~found.find.HiDDENgt` given the optimal hyperparameter for each cell type
 
 # %%
-phat, labs, scores = by_param(sel)
+p_hat, labs, scores = by_param(sel)
 
-pl.PlotHiDDENOutput(adata, phat, labs)[lambda a: a.obs["stim"] == "stim"].labs_bar("stim", "ctrl", "cell")
+pl.PlotHiDDENOutput(adata, p_hat, labs)[lambda a: a.obs["stim"] == "stim"].bin_bar("stim", "ctrl", "cell")
 
 # %% [markdown]
 # we can also explore the evolution of score values for specifically megakaryocytes, and see that setting k to 6 seems to yield optimal results
@@ -127,7 +127,7 @@ pl.PlotTunerOutput(
 # we can use this here to run {py:func}`~found.find.HiDDENg` with different k values per group (using the values selected by {py:func}`~found.find.HiDDENgt`).
 
 # %%
-phat, labs = found.HiDDENg(
+p_hat, labs = found.HiDDENg(
     adata,
     "stim",
     "ctrl",
@@ -139,6 +139,6 @@ phat, labs = found.HiDDENg(
 
 pl.PlotHiDDENOutput(
     adata,
-    phat,
+    p_hat,
     labs,
-)[lambda a: a.obs["cell"] == "Megakaryocytes"].phat_vln("stim").properties(width=120).show()
+)[lambda a: a.obs["cell"] == "Megakaryocytes"].reg_vln("stim").properties(width=120).show()

@@ -232,13 +232,13 @@ class PlotHiDDENOutput:
     can be indexed to plot only a subset of the data.
 
     :param adata: object containing input data
-    :param phat: HiDDEN-generated p hat values
-    :param labs: HiDDEN-adjusted condition labels
+    :param p_hat: HiDDEN-generated p_hat values (regression step outputs)
+    :param labs: HiDDEN-adjusted condition labels (binarization step outputs)
     :param layer: name of layer to use when accessing layer-specific data from ``self.adata``, ``X`` slot is used if set to ``None``
     """
 
     adata: ad.AnnData
-    phat: pd.Series
+    p_hat: pd.Series
     labs: pd.Series
     layer: str | None = field(kw_only=True, default=None)
 
@@ -258,12 +258,12 @@ class PlotHiDDENOutput:
 
         return type(self)(
             self.adata[idx],
-            self.phat[idx],  # pyright: ignore[reportArgumentType]
+            self.p_hat[idx],  # pyright: ignore[reportArgumentType]
             self.labs[idx],  # pyright: ignore[reportArgumentType]
             layer=self.layer,
         )
 
-    def phat_vln(
+    def reg_vln(
         self,
         group_by: str | pd.Series | None = None,
         split_mode: Literal[False, "area", "width", "n"] = "n",
@@ -271,7 +271,7 @@ class PlotHiDDENOutput:
         n: int = 100,
     ) -> alt.Chart:
         """
-        method used to generate violin plots of p hat values
+        method used to generate violin plots of p_hat values
 
         :param group_by: key in self.adata to group violin plot by
         :param split_mode: if the violin plot should be split by the refined HiDDEN labels, and if yes, how should the splits be scaled
@@ -281,7 +281,7 @@ class PlotHiDDENOutput:
         """
         return (
             self.__pl.vln(
-                pd.Series(self.phat, name="HiDDEN_phat"),
+                pd.Series(self.p_hat, name="HiDDEN_p_hat"),
                 group_by,
                 pd.Series(self.labs, name="HiDDEN_labs"),
                 rescale_by=split_mode,
@@ -290,7 +290,7 @@ class PlotHiDDENOutput:
             )
             if split_mode is not False
             else self.__pl.vln(
-                pd.Series(self.phat, name="HiDDEN_phat"),
+                pd.Series(self.p_hat, name="HiDDEN_p_hat"),
                 group_by,
                 None,
                 vertical=vertical,
@@ -298,7 +298,7 @@ class PlotHiDDENOutput:
             )
         )
 
-    def labs_bar(
+    def bin_bar(
         self,
         orig_labs: str | pd.Series,
         ctrl_val: object,
@@ -337,7 +337,7 @@ class PlotHiDDENOutput:
         else:
             df = df.groupby("label", observed=True)
 
-        col = "fraction" if scale else "count"
+        col = "proportion" if scale else "count"
 
         df = df.agg("size").rename(col)  # pyright: ignore[reportCallIssue, reportArgumentType]
 

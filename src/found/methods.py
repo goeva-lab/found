@@ -42,10 +42,10 @@ def log1p[T: MatrixLike](X: T) -> T:
     """
 
     if isinstance(X, sp.csr_array):
-        X = X.tocsr().log1p()  # pyright: ignore[reportAttributeAccessIssue]
+        X = X.log1p()  # pyright: ignore[reportAttributeAccessIssue]
         assert isinstance(X, sp.csr_array)
     elif isinstance(X, sp.csc_array):
-        X = X.tocsc().log1p()  # pyright: ignore[reportAttributeAccessIssue]
+        X = X.log1p()  # pyright: ignore[reportAttributeAccessIssue]
         assert isinstance(X, sp.csc_array)
     # ignore NECESSITY - pyright can't detect log1p method on sparse matrix types
     # because method is added dynamically, as observed here:
@@ -503,22 +503,20 @@ def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.n
     return pvals
 
 
-def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float, signif_cutoff: float = 0.05) -> Integral:
+def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float, signif_cutoff: float = 0.05) -> np.integer:
+    # mannwhitneyu_pvals returns nans for failed comparisons, but np.nan < x = False for all x so this works
     return np.sum((mannwhitneyu_pvals(lhs, rhs, lfc_cutoff)) < signif_cutoff)  # pyright: ignore[reportReturnType]
 
 
-def score_deg(
-    X: MatrixLike,
-    W: BoolArr,
-    deg_cutoff: float = 1.5,
-) -> Integral:
+def score_deg(X: MatrixLike, W: BoolArr, lfc_cutoff: float = 1.5, sig_cutoff: float = 0.05) -> np.integer:
     """
     implements a heuristic to score label adjustment based on number of DEGs produced by new labels.
 
     :param X: input cell by gene matrix
-    :param V: 1-d boolean array of condition labels (True corresponds to case, False to control)
     :param W: 1-d boolean array of adjusted condition labels (True corresponds to case, False to control)
-    :return: number of DEGs between conditions (as determined by a Bonferroni-corrected Mann-Whitney U test p value of less than 0.05 and an absolute log2 fold change of more than 1.5)
+    :param lfc_cutoff: threshold log2 fold change value for a gene to be considered a DEG
+    :param sig_cutoff: threshold Bonferroni-corrected Mann-Whitney U-test p value for a gene to be considered a DEG
+    :return: number of DEGs (as determined by a Bonferroni-corrected Mann-Whitney U-test p value of less than ``sig_cutoff`` and an absolute log2 fold change of more than ``lfc_cutoff``)
     """
 
     lhs, rhs = X[~W, :], X[W, :]
@@ -527,7 +525,8 @@ def score_deg(
         rhs,  # pyright: ignore[reportArgumentType]
         # ignore NECESSITY - pyright can't tell that lhs/rhs are of type MatrixLike
         # due to type hints on indexing not sufficiently preserving type info
-        deg_cutoff,
+        lfc_cutoff,
+        sig_cutoff,
     )
 
 
@@ -535,44 +534,44 @@ def score_deg2(
     X: MatrixLike,
     V: BoolArr,
     W: BoolArr,
-    score_weight_relab: float = 1.0,
     score_weight_vsctl: float = 1.0,
-    deg_cutoff: float = 1.5,
+    lfc_cutoff: float = 1.5,
+    sig_cutoff: float = 0.05,
 ) -> Integral:
     """
     implements a heuristic to score label adjustment based on number of DEGs produced by new labels using two comparisons.
     specifically two comparisons are run, and the return value is a weighted difference of:
 
-    1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)
-    2) control cells vs case cells labeled unaffected (difference should be as small as possible)
+    1) case cells labeled affected vs case cells labeled unaffected (amount should be as large as possible)
+    2) control cells vs case cells labeled unaffected (amount should be as small as possible)
 
     :param X: input cell by gene matrix
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
     :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)
-    :param score_weight_relab: weight given to number of DEGs in first comparison
+    :param lfc_cutoff: threshold log2 fold change value for a gene to be considered a DEG
+    :param sig_cutoff: threshold Bonferroni-corrected Mann-Whitney U-test p value for a gene to be considered a DEG
     :param score_weight_vsctl: weight given to number of DEGs in second comparison
-    :return: ``score_weight_relab`` * number of DEGs in first comparison - ``score_weight_vsctl`` * number of DEGs in second comparison
+    :return: number of DEGs in first comparison - ``score_weight_vsctl`` * number of DEGs in second comparison
     """
     case_only_expr = X[V, :]
     case_only_vhat = W[V]
     ctl_only_expr = X[~V, :]
 
-    return (
-        mannwhitneyu_ndeg(
-            # X values from labeled unaffected
-            case_only_expr[~case_only_vhat],  # pyright: ignore[reportOperatorIssue, reportArgumentType]
-            # X values from labeled affected
-            case_only_expr[case_only_vhat],  # pyright: ignore[reportArgumentType]
-            deg_cutoff,
-        )
-        * score_weight_relab
+    return mannwhitneyu_ndeg(
+        # X values from labeled unaffected
+        case_only_expr[~case_only_vhat],  # pyright: ignore[reportOperatorIssue, reportArgumentType]
+        # X values from labeled affected
+        case_only_expr[case_only_vhat],  # pyright: ignore[reportArgumentType]
+        lfc_cutoff,
+        sig_cutoff,
     ) - (
         mannwhitneyu_ndeg(
             # X values from true control
             ctl_only_expr,  # pyright: ignore[reportArgumentType]
             # X values from labeled unaffected
             case_only_expr[~case_only_vhat],  # pyright: ignore[reportArgumentType]
-            deg_cutoff,
+            lfc_cutoff,
+            sig_cutoff,
         )
         * score_weight_vsctl
     )
@@ -580,11 +579,10 @@ def score_deg2(
     # enough to show that they confirm to MatrixLike shape
 
 
-def score_phatdiff(
+def score_ks_diff(
     Y: NumArr,
     V: BoolArr,
     W: BoolArr,
-    score_weight_relab: float = 1.0,
     score_weight_vsctl: float = 1.0,
 ) -> NumericScalar:
     """
@@ -597,31 +595,27 @@ def score_phatdiff(
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
     :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)
-    :param score_weight_relab: weight given to KS stat of the first comparison
     :param score_weight_vsctl: weight given to KS stat of the second comparison
-    :return: ``score_weight_relab`` * KS stat of first comparison - ``score_weight_vsctl`` * KS stat of second comparison
+    :return: KS stat of first comparison - ``score_weight_vsctl`` * KS stat of second comparison
     """
     case_only_pred = Y[V]
     case_only_vhat = W[V]
     ctl_only_pred = Y[~V]
 
-    return (
-        ks_2samp(
-            # Y values from labeled unaffected
-            case_only_pred[~case_only_vhat],
-            # Y values from labeled affected
-            case_only_pred[case_only_vhat],
-            alternative="greater",
-            # `ks_2samp` alternative refers to the CDFs of `data1`/`data2`
-            # the trend in which is inversely related to the trend of
-            # the means of `data1`/`data2`. as such, since our alternative
-            # hypothesis is that labeled unaffected cells have a p_hat
-            # distribution less than that of labeled affected cells,
-            # the alternative argument is set to "greater", as
-            # the trend for their respective CDFs would be inverted
-        ).statistic  # pyright: ignore[reportAttributeAccessIssue]
-        * score_weight_relab
-    ) - (
+    return ks_2samp(
+        # Y values from labeled unaffected
+        case_only_pred[~case_only_vhat],
+        # Y values from labeled affected
+        case_only_pred[case_only_vhat],
+        alternative="greater",
+        # `ks_2samp` alternative refers to the CDFs of `data1`/`data2`
+        # the trend in which is inversely related to the trend of
+        # the means of `data1`/`data2`. as such, since our alternative
+        # hypothesis is that labeled unaffected cells have a p_hat
+        # distribution less than that of labeled affected cells,
+        # the alternative argument is set to "greater", as
+        # the trend for their respective CDFs would be inverted
+    ).statistic - (  # pyright: ignore[reportAttributeAccessIssue]
         ks_2samp(
             # Y values from true control
             ctl_only_pred,
@@ -646,12 +640,11 @@ def symm_kl_div(lhs: NumArr, rhs: NumArr) -> NumericScalar:
     return np.sum(kl_div(lhs, rhs)) + np.sum(kl_div(rhs, lhs))
 
 
-def score_phatdiff_dist(
+def score_dist_diff(
     Y: NumArr,
     V: BoolArr,
     W: BoolArr,
     distance_fn: Callable[[NumArr, NumArr], NumericScalar] = wasserstein_distance,
-    score_weight_relab: float = 1.0,
     score_weight_vsctl: float = 1.0,
 ) -> NumericScalar:
     """
@@ -665,9 +658,8 @@ def score_phatdiff_dist(
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
     :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)
     :param distance_fn: distance function used to calculate distribution difference between p_hat values (defaults to earth's mover distance, as computed by :py:func:`~scipy.stats.wasserstein_distance`)
-    :param score_weight_relab: weight given to difference of the first comparison
-    :param score_weight_vsctl: weight given to difference of the second comparison
-    :return: ``score_weight_relab`` * statistic from first comparison - ``score_weight_vsctl`` * statistic from second comparison
+    :param score_weight_vsctl: weight given to result of second comparison
+    :return: statistic from first comparison - ``score_weight_vsctl`` * statistic from second comparison
     """
     case_only_vhat = W[V]
     if len(np.unique(case_only_vhat)) == 1:
@@ -676,14 +668,11 @@ def score_phatdiff_dist(
     case_only_pred = Y[V]
     ctl_only_pred = Y[~V]
 
-    return (
-        distance_fn(
-            # Y values from labeled unaffected
-            case_only_pred[~case_only_vhat],  # pyright: ignore[reportArgumentType]
-            # Y values from labeled affected
-            case_only_pred[case_only_vhat],  # pyright: ignore[reportArgumentType]
-        )
-        * score_weight_relab
+    return distance_fn(
+        # Y values from labeled unaffected
+        case_only_pred[~case_only_vhat],  # pyright: ignore[reportArgumentType]
+        # Y values from labeled affected
+        case_only_pred[case_only_vhat],  # pyright: ignore[reportArgumentType]
     ) - (
         distance_fn(
             # Y values from true control
@@ -697,7 +686,7 @@ def score_phatdiff_dist(
     # enough to show that they confirm to NumArr shape
 
 
-def score_nulldist(
+def score_null_dist(
     Y: NumArr,
     V: BoolArr,
     pipeline_algo: Pipeline,
