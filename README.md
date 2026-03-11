@@ -2,11 +2,6 @@
 
 this repository provides an implementation of a method for refining case-control labels in single-cell -omics data, as decribed in [Goeva et al, 2024](https://doi.org/10.1038/s41467-024-53666-8)
 
-## R bridge
-
-an R package providing high-level bindings to the python package is provided, for more documentation on it, please see [`./R/README.md`](./R/README.md).
-documentation below is all regarding the python package.
-
 ## disclaimer
 
 API is subject to breaking changes under 0ver, no releases cut so far, breaking changes are pushed to main
@@ -33,6 +28,11 @@ this image can be downloaded via the following command (replace `docker` w/ `pod
 ```bash
 docker pull 'ghcr.io/goeva-lab/found'
 ```
+
+## R bridge
+
+an R package providing high-level bindings to the python package is provided, for more documentation on it, please see [`./R/README.md`](./R/README.md).
+documentation below is all regarding the python package.
 
 ## documentation
 
