@@ -208,16 +208,16 @@ class PlotAdata:
 
         if discrete is not None:
             facet_enc = facet_ax("discrete:N").spacing(0).title(None).header(**hdict)
-            if hasattr(dens_data["discrete"], "cat"):
-                facet_enc = facet_enc.sort(dens_data["discrete"].cat.categories)
+            if hasattr(data["discrete"], "cat"):
+                facet_enc = facet_enc.sort(data["discrete"].cat.categories)
             chart = chart.encode(facet_enc)
 
         if split is not None:
             col_enc = alt.Color("split:N").title(
                 split if isinstance(split, str) else (str(split.name) if split.name is not None else None)
             )
-            if hasattr(dens_data["split"], "cat"):
-                col_enc = col_enc.sort(dens_data["split"].cat.categories)
+            if hasattr(data["split"], "cat"):
+                col_enc = col_enc.sort(data["split"].cat.categories)
             chart = chart.encode(col_enc)
 
         return chart
@@ -281,16 +281,16 @@ class PlotHiDDENOutput:
         """
         return (
             self.__pl.vln(
-                pd.Series(self.p_hat, name="HiDDEN_p_hat"),
+                pd.Series(self.p_hat, name="HiDDEN p_hat"),
                 group_by,
-                pd.Series(self.labs, name="HiDDEN_labs"),
+                pd.Series(self.labs, name="HiDDEN labels"),
                 rescale_by=split_mode,
                 vertical=vertical,
                 n=n,
             )
             if split_mode is not False
             else self.__pl.vln(
-                pd.Series(self.p_hat, name="HiDDEN_p_hat"),
+                pd.Series(self.p_hat, name="HiDDEN p_hat"),
                 group_by,
                 None,
                 vertical=vertical,
