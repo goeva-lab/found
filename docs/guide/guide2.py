@@ -19,8 +19,8 @@ from pathlib import Path
 from urllib.request import urlopen
 from warnings import catch_warnings
 
+import anndata as ad
 import pandas as pd
-import scanpy as sc
 
 import found
 from found import methods as m
@@ -32,13 +32,13 @@ RANDOM_STATE = 42
 found.set_seed(RANDOM_STATE)
 
 if (pth := Path("../_build/.cache/GSE276570.h5ad")).exists():
-    adata = sc.read_h5ad(pth)
+    adata = ad.read_h5ad(pth)
 else:
     base_url = "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE276570&format=file&file="
     with catch_warnings(category=FutureWarning, action="ignore"):
-        adata = sc.read_h5ad(BytesIO(urlopen(f"{base_url}GSE276570_endo_object.h5ad").read()))  # pyright: ignore[reportArgumentType]
-    adata.obs["injection"] = pd.Categorical.from_codes(adata.obs["Condition"].eq(1).astype(int), ["saline", "LPC"])
-    adata.write_h5ad(pth)
+        adata = ad.read_h5ad(BytesIO(urlopen(f"{base_url}GSE276570_endo_object.h5ad").read()))  # ty:ignore[invalid-argument-type]
+    adata.obs["injection"] = pd.Categorical.from_codes(adata.obs["Condition"].eq(1).astype(int), ["saline", "LPC"])  # ty:ignore[unresolved-attribute]
+    adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
 
 print(adata)
 

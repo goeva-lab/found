@@ -23,7 +23,8 @@ NumericScalar = int | float | np.floating | np.integer
 def strip_generic(tp: type | UnionType | GenericAlias) -> type | UnionType:
     # recursive case for handling UnionType
     if isinstance(tp, UnionType):
-        return Union[*map(strip_generic, get_args(tp))]
+        return Union[*map(strip_generic, get_args(tp))]  # ty:ignore[invalid-type-form]
+        # ignore NECESSITY - ???
 
     if isinstance(tp, GenericAlias):
         if not isinstance(tp.__origin__, type | UnionType):
@@ -37,13 +38,14 @@ def strip_generic(tp: type | UnionType | GenericAlias) -> type | UnionType:
 
 def wcall[T](w: dict[str, object], fn: Callable[..., T], strict: bool) -> T:
     kwargs = dict()
+    fn_name = getattr(fn, "__name__", "[NO NAME FOUND]")
     for p in signature(fn).parameters.values():
         match p.kind:
             case p.KEYWORD_ONLY | p.POSITIONAL_OR_KEYWORD:
                 if p.name in w:
                     if strict and p.annotation is not iempty and not vtype_check(w[p.name], p.annotation):
                         raise TypeError(
-                            f"function: `{fn.__name__}` expected value of type "
+                            f"function: `{fn_name}` expected value of type "
                             f"`{p.annotation}` to be provided for argument `{p.name}`"
                             f", but value {w[p.name]} of type {type(w[p.name])} was provided instead"
                         )
@@ -52,7 +54,7 @@ def wcall[T](w: dict[str, object], fn: Callable[..., T], strict: bool) -> T:
                 kwargs |= w
             case _:
                 raise TypeError(
-                    f"function: `{fn.__name__}` has a strictly positional argument {p.name}"
+                    f"function: `{fn_name}` has a strictly positional argument {p.name}"
                     f", which cannot be run through the pipeline mechanism of this library"
                 )
 
@@ -89,6 +91,7 @@ def check_sequence(seq: Iterable[tuple[Callable, tuple[str, *tuple[str, ...]]]],
     w_types: dict[str, tuple[object | None, None | (type | UnionType)]] = {k: (v, None) for k, v in init_w.items()}
 
     for fn, out_names in seq:
+        fn_name = getattr(fn, "__name__", "[NO NAME FOUND]")
         sig = signature(fn)
         for p in sig.parameters.values():
             # cannot type check on **kwargs arguments
@@ -97,27 +100,27 @@ def check_sequence(seq: Iterable[tuple[Callable, tuple[str, *tuple[str, ...]]]],
 
             if p.kind in (p.POSITIONAL_ONLY, p.VAR_POSITIONAL):
                 raise TypeError(
-                    f"function: `{fn.__name__}` has a strictly positional argument {p.name}"
+                    f"function: `{fn_name}` has a strictly positional argument {p.name}"
                     f", which cannot be run through the pipeline mechanism of this library"
                 )
 
             if p.name not in w_types:
                 if p.default is iempty:
                     raise ValueError(
-                        f"pipeline called with missing arguments, provided function {fn.__name__} expects presence of {p.name}, but it was not provided"
+                        f"pipeline called with missing arguments, provided function {fn_name} expects presence of {p.name}, but it was not provided"
                     )
                 continue
             if strict and p.annotation is not iempty:
                 fst, snd = w_types[p.name]
                 if fst is not None and not vtype_check(fst, p.annotation):
                     raise TypeError(
-                        f"function: `{fn.__name__}` expected value of type "
+                        f"function: `{fn_name}` expected value of type "
                         f"`{p.annotation}` to be provided for argument `{p.name}`"
                         f", but value {fst} of type {type(fst)} was provided instead"
                     )
                 elif snd is not None and not ttype_check(snd, p.annotation):
                     raise TypeError(
-                        f"function: `{fn.__name__}` expected value of type "
+                        f"function: `{fn_name}` expected value of type "
                         f"`{p.annotation}` to be provided for argument `{p.name}`"
                         f", but value of type {snd} was provided instead"
                     )
@@ -125,9 +128,9 @@ def check_sequence(seq: Iterable[tuple[Callable, tuple[str, *tuple[str, ...]]]],
         if annot is iempty:
             if len(out_names) > 1:
                 for name in out_names:
-                    w_types[name] = (None, Any)  # pyright: ignore[reportArgumentType]
+                    w_types[name] = (None, Any)
             else:
-                w_types[out_names[0]] = (None, Any)  # pyright: ignore[reportArgumentType]
+                w_types[out_names[0]] = (None, Any)
         else:
             if strict:
                 if len(out_names) > 1:
@@ -138,13 +141,13 @@ def check_sequence(seq: Iterable[tuple[Callable, tuple[str, *tuple[str, ...]]]],
                         else issubclass(base_annot, tuple)
                     ):
                         raise ValueError(
-                            f"pipeline function {fn.__name__} is expected to return {len(out_names)} values, "
+                            f"pipeline function {fn_name} is expected to return {len(out_names)} values, "
                             f"but the provided annotation for the function shows an atomic return of {annot}"
                         )
                     expected_outs = get_args(annot)
                     if len(expected_outs) != len(out_names):
                         raise ValueError(
-                            f"pipeline function {fn.__name__} is expected to return {len(out_names)} values, "
+                            f"pipeline function {fn_name} is expected to return {len(out_names)} values, "
                             f"but the provided annotation indicates a total of {len(expected_outs)} values"
                         )
                     for name, tp in zip(out_names, expected_outs):

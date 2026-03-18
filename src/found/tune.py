@@ -63,7 +63,8 @@ class NaiveMaxScoreTuner(Tuner):
 
             def dimr(k: int) -> FloatMtx:
                 nonlocal cache
-                return cache[:, :k]  # pyright: ignore[reportIndexIssue]
+                return cache[:, :k]  # ty:ignore[not-subscriptable]
+                # ignore NECESSITY - isinstance check above guarantees indexability
 
             algo = algo.update(dimr_fn=dimr)
 
@@ -124,13 +125,14 @@ class FixPointTuner[T: float](Tuner):
 
             def dimr(k: int) -> FloatMtx:
                 nonlocal cache
-                if k > cache.shape[1]:  # pyright: ignore[reportAttributeAccessIssue]
+                if k > cache.shape[1]:
                     cache = wcall(
                         kwargs | {"k": k + self.min_stable},
                         out_to_dict(fn, getattr(fn, _INTERNAL_WRAP_ATTR_NAME)),
                         algo.strict,
                     )["Z"]
-                return cache[:, :k]  # pyright: ignore[reportReturnType, reportIndexIssue]
+                return cache[:, :k]  # ty:ignore[not-subscriptable]
+                # ignore NECESSITY - isinstance check above guarantees indexability
 
             algo = algo.update(dimr_fn=dimr)
 

@@ -26,11 +26,12 @@ def mult_preserve_type[T: MatrixLike](lhs: T, rhs: np.ndarray) -> T:
     o = lhs * rhs
 
     if isinstance(lhs, sp.csr_array):
-        o = o.tocsr()  # pyright: ignore[reportAttributeAccessIssue]
+        o = o.tocsr()
     elif isinstance(lhs, sp.csc_array):
-        o = o.tocsc()  # pyright: ignore[reportAttributeAccessIssue]
+        o = o.tocsc()
 
-    return o  # pyright: ignore[reportReturnType]
+    assert isinstance(o, type(lhs))
+    return o
 
 
 def log1p[T: MatrixLike](X: T) -> T:
@@ -42,21 +43,20 @@ def log1p[T: MatrixLike](X: T) -> T:
     """
 
     if isinstance(X, sp.csr_array):
-        X = X.log1p()  # pyright: ignore[reportAttributeAccessIssue]
+        X = X.log1p()  # ty:ignore[unresolved-attribute]
         assert isinstance(X, sp.csr_array)
     elif isinstance(X, sp.csc_array):
-        X = X.log1p()  # pyright: ignore[reportAttributeAccessIssue]
+        X = X.log1p()  # ty:ignore[unresolved-attribute]
         assert isinstance(X, sp.csc_array)
-    # ignore NECESSITY - pyright can't detect log1p method on sparse matrix types
+    # ignore NECESSITY - typchecker can't detect log1p method on sparse matrix types
     # because method is added dynamically, as observed here:
     # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
     # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52
     else:
-        X = np.log1p(X)  # pyright: ignore[reportAssignmentType]
-        # ignore NECESSITY - log1p method type hint does not preserve shape type hint
+        X = np.log1p(X)  # ty:ignore[no-matching-overload]
+        # ignore NECESSITY - typechecker doesn't narrow X to an ndarray
 
-    return X  # pyright: ignore[reportReturnType]
-    # ignore NECESSITY - ???
+    return X
 
 
 def scale_rs[T: MatrixLike](X: T) -> T:
@@ -66,7 +66,8 @@ def scale_rs[T: MatrixLike](X: T) -> T:
     :param X: input matrix
     :return: scaled matrix
     """
-    per_cell_sum = X.sum(axis=1)
+    per_cell_sum = X.sum(axis=1)  # ty:ignore[invalid-argument-type]
+    # ignore NECESSITY - ???
     avg_counts_per_cell = per_cell_sum.mean()
     size_fact = per_cell_sum / avg_counts_per_cell
 
@@ -87,11 +88,11 @@ def scale_sd[T: MatrixLike](X: T) -> T:
     """
 
     if isinstance(X, np.ndarray):
-        stdev = np.std(X, axis=0)
+        stdev = np.std(X, axis=0)  # ty:ignore[no-matching-overload]
+        # ignore NECESSITY - ???
     else:
-        _, var = sparsefuncs.mean_variance_axis(X, axis=0)  # pyright: ignore[reportArgumentType, reportAssignmentType, reportGeneralTypeIssues]
-        # ignore NECESSITY - sparsefuncs.mean_variance_axis return type set to
-        # Unknown, however type is documented to be 2-tuple given these arguments
+        _, var = sparsefuncs.mean_variance_axis(X, axis=0)
+        # note: sparsefuncs.mean_variance_axis return type set to Unknown, however type is documented to be 2-tuple given these arguments
         stdev = np.sqrt(var)
 
     # silence warnings about reciprocal for zero, filled with zeros elsewhere
@@ -111,7 +112,8 @@ def vst_shiftlog[T: MatrixLike](X: T, overdispersion: float = 0.05) -> T:
     :param overdispersion: overdispersion factor
     :return: variance stabilized matrix
     """
-    per_cell_sum = X.sum(axis=1)
+    per_cell_sum = X.sum(axis=1)  # ty:ignore[invalid-argument-type]
+    # ignore NECESSITY - ???
     size_fact = per_cell_sum / np.exp(np.mean(np.log(per_cell_sum)))
 
     # silence warnings about reciprocal for zero, filled with zeros elsewhere
@@ -198,12 +200,8 @@ def run_nmf(
     if pre_nmf_tf is not None:
         X = pre_nmf_tf(X)
 
-    m = NMF(
-        k,  # pyright: ignore[reportArgumentType]
-        random_state=get_seed(),
-        **(nmf_args or {}),
-    )
-    z = m.fit_transform(X)  # pyright: ignore[reportArgumentType]
+    m = NMF(k, random_state=get_seed(), **(nmf_args or {}))
+    z = m.fit_transform(X)
 
     return z, m.components_.T
 
@@ -221,7 +219,7 @@ def sklearn_wrap[T: HasFitBinClass, U: FloatMtx](
     score_fn: Callable[
         [T, U],
         np.ndarray[tuple[int], np.dtype[np.floating]],
-    ] = lambda m, z: m.predict_proba(z)[  # pyright: ignore[reportAttributeAccessIssue]
+    ] = lambda m, z: m.predict_proba(z)[
         # ignore NECESSITY - predict_proba method not present on HasFitBinClass
         # on purpose to allow for compatibility with SVM use case, but is _generally_ present
         # so it is useful to keep this as default argument value to avoid repetition of below snippet
@@ -369,7 +367,7 @@ def reg_rf(
     return sklearn_wrap(
         Z,
         V,
-        RandomForestClassifier(  # pyright: ignore[reportArgumentType]
+        RandomForestClassifier(  # ty:ignore[invalid-argument-type]
             # ignore NECESSITY - `RandomForestClassifier.classes_` attribute is set to be list[Unknown], not just ndarray
             random_state=get_seed(),
             **(rf_args or {}),
@@ -442,7 +440,7 @@ def bin_kmeans(
         KMeans(
             n_clusters=2,
             random_state=get_seed(),
-            **({"n_init": "auto"} | (kmeans_args or {})),  # pyright: ignore[reportArgumentType]
+            **({"n_init": "auto"} | (kmeans_args or {})),
         ),
         V,
         Y[V],
@@ -471,18 +469,16 @@ def bin_gmm(Y: NumArr, V: BoolArr, gmm_args: dict[str, Any] | None = None) -> Bo
 
 
 def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.ndarray[tuple[int], np.dtype[np.floating]]:
-    assert lhs.shape[1] == rhs.shape[1], (  # pyright: ignore[reportOptionalSubscript]
-        # ignore NECESSITY - spmatrix.shape is not annotated
-        "lhs/rhs number of features must be equal"
-    )
+    assert lhs.shape[1] == rhs.shape[1], "lhs/rhs number of features must be equal"
 
-    ngenes = lhs.shape[1]  # pyright: ignore[reportOptionalSubscript]
-    # ignore NECESSITY - spmatrix.shape is not annotated
+    ngenes = lhs.shape[1]
 
     if isinstance(lhs, np.ndarray):
-        lhs_mean, rhs_mean = np.mean(lhs, axis=0), np.mean(rhs, axis=0)  # pyright: ignore[reportCallIssue, reportArgumentType]
+        lhs_mean, rhs_mean = np.mean(lhs, axis=0), np.mean(rhs, axis=0)  # ty:ignore[no-matching-overload]
+        # ignore NECESSITY - ???
     else:
-        lhs_mean, rhs_mean = lhs.mean(axis=0), rhs.mean(axis=0)
+        lhs_mean, rhs_mean = lhs.mean(axis=0), rhs.mean(axis=0)  # ty:ignore[invalid-argument-type]
+        # ignore NECESSITY - ???
 
     # remove genes for which log2fc is not sensical
     # (i.e. mean of zero in either condition)
@@ -490,14 +486,13 @@ def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.n
     # remove genes where log2FC is less than 1.5
     mask[mask] = np.abs(np.log2(rhs_mean[mask] / lhs_mean[mask])) > lfc_cutoff
 
-    lhs, rhs = lhs[:, mask], rhs[:, mask]  # pyright: ignore[reportAssignmentType]
-    # ignore NECESSITY - pyright can't tell that lhs/rhs are of type MatrixLike
+    lhs, rhs = lhs[:, mask], rhs[:, mask]  # ty:ignore[invalid-argument-type]
+    # ignore NECESSITY - typechecker can't tell that lhs/rhs are of type MatrixLike
     # due to type hints on indexing not sufficiently preserving type info
 
     # mannwhitneyu does not work on sparse arrays
     if not isinstance(lhs, np.ndarray):
-        lhs, rhs = lhs.todense(), rhs.todense()  # pyright: ignore[reportAssignmentType, reportAttributeAccessIssue]
-        # ignore NECESSITY - pyright can't tell that lhs/rhs are of type sparray
+        lhs, rhs = lhs.todense(), rhs.todense()
 
     pvals = np.full((ngenes,), np.nan)
     pvals[mask] = mannwhitneyu(lhs, rhs, axis=0).pvalue * ngenes
@@ -506,7 +501,8 @@ def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.n
 
 def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float, signif_cutoff: float = 0.05) -> np.integer:
     # mannwhitneyu_pvals returns nans for failed comparisons, but np.nan < x = False for all x so this works
-    return np.sum((mannwhitneyu_pvals(lhs, rhs, lfc_cutoff)) < signif_cutoff)  # pyright: ignore[reportReturnType]
+    return np.sum((mannwhitneyu_pvals(lhs, rhs, lfc_cutoff)) < signif_cutoff)  # ty:ignore[invalid-return-type]
+    # ignore NECESSITY - ???
 
 
 def score_deg(X: MatrixLike, W: BoolArr, lfc_cutoff: float = 1.5, sig_cutoff: float = 0.05) -> np.integer:
@@ -521,14 +517,7 @@ def score_deg(X: MatrixLike, W: BoolArr, lfc_cutoff: float = 1.5, sig_cutoff: fl
     """
 
     lhs, rhs = X[~W, :], X[W, :]
-    return mannwhitneyu_ndeg(
-        lhs,  # pyright: ignore[reportArgumentType]
-        rhs,  # pyright: ignore[reportArgumentType]
-        # ignore NECESSITY - pyright can't tell that lhs/rhs are of type MatrixLike
-        # due to type hints on indexing not sufficiently preserving type info
-        lfc_cutoff,
-        sig_cutoff,
-    )
+    return mannwhitneyu_ndeg(lhs, rhs, lfc_cutoff, sig_cutoff)
 
 
 def score_deg2(
@@ -560,24 +549,22 @@ def score_deg2(
 
     return mannwhitneyu_ndeg(
         # X values from labeled unaffected
-        case_only_expr[~case_only_vhat],  # pyright: ignore[reportOperatorIssue, reportArgumentType]
+        case_only_expr[~case_only_vhat],
         # X values from labeled affected
-        case_only_expr[case_only_vhat],  # pyright: ignore[reportArgumentType]
+        case_only_expr[case_only_vhat],
         lfc_cutoff,
         sig_cutoff,
     ) - (
         mannwhitneyu_ndeg(
             # X values from true control
-            ctl_only_expr,  # pyright: ignore[reportArgumentType]
+            ctl_only_expr,
             # X values from labeled unaffected
-            case_only_expr[~case_only_vhat],  # pyright: ignore[reportArgumentType]
+            case_only_expr[~case_only_vhat],
             lfc_cutoff,
             sig_cutoff,
         )
         * score_weight_vsctl
     )
-    # ignore NECESSITY - ndarray indexing type bounds not specific
-    # enough to show that they confirm to MatrixLike shape
 
 
 def score_ks_diff(
@@ -616,17 +603,15 @@ def score_ks_diff(
         # distribution less than that of labeled affected cells,
         # the alternative argument is set to "greater", as
         # the trend for their respective CDFs would be inverted
-    ).statistic - (  # pyright: ignore[reportAttributeAccessIssue]
+    ).statistic - (
         ks_2samp(
             # Y values from true control
             ctl_only_pred,
             # Y values from labeled unaffected
             case_only_pred[~case_only_vhat],
-        ).statistic  # pyright: ignore[reportAttributeAccessIssue]
+        ).statistic
         * score_weight_vsctl
     )
-    # ignore NECESSITY - `scipy.stats.ks_2samp` lacking proper
-    # annotation on return type (currently set to _)
 
 
 def symm_kl_div(lhs: NumArr, rhs: NumArr) -> NumericScalar:
@@ -671,20 +656,18 @@ def score_dist_diff(
 
     return distance_fn(
         # Y values from labeled unaffected
-        case_only_pred[~case_only_vhat],  # pyright: ignore[reportArgumentType]
+        case_only_pred[~case_only_vhat],
         # Y values from labeled affected
-        case_only_pred[case_only_vhat],  # pyright: ignore[reportArgumentType]
+        case_only_pred[case_only_vhat],
     ) - (
         distance_fn(
             # Y values from true control
-            ctl_only_pred,  # pyright: ignore[reportArgumentType]
+            ctl_only_pred,
             # Y values from labeled unaffected
-            case_only_pred[~case_only_vhat],  # pyright: ignore[reportArgumentType]
+            case_only_pred[~case_only_vhat],
         )
         * score_weight_vsctl
     )
-    # ignore NECESSITY - ndarray indexing type bounds not specific
-    # enough to show that they confirm to NumArr shape
 
 
 def score_null_dist(
@@ -716,7 +699,7 @@ def score_null_dist(
                         kwargs | {"V": rng.permuted(V)},
                         out_to_dict(pipeline_algo.regr_fn, getattr(pipeline_algo.regr_fn, _INTERNAL_WRAP_ATTR_NAME)),
                         pipeline_algo.strict,
-                    )["Y"],  # pyright: ignore[reportArgumentType]
+                    )["Y"],  # ty:ignore[invalid-argument-type]
                     # ignore NECESSITY - Y should always be a NumArr
                     Y,
                 )

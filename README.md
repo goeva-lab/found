@@ -8,7 +8,7 @@ API is subject to breaking changes under 0ver, no releases cut so far, breaking 
 
 ## planned future features / TODO
 
-- support for more underlying data types within methods (e.g. zarr arrays, HDF5 arrays, etc.)
+- support for more underlying data types within methods (e.g. zarr arrays, HDF5 arrays as matrix types, etc.)
 - native support for multinomial/ordinal condition labels (both in entrypoints and method implementations)
 
 ## installation
@@ -55,6 +55,6 @@ to avoid doing this, you can pass `-D nb_execution_mode=off` to the above `sphin
 
 ## development/contributing
 
-this project uses [`ruff`](https://docs.astral.sh/ruff/installation/) for formatting and [`basedpyright`](https://docs.basedpyright.com/latest/installation/command-line-and-language-server/) for linting.
+this project uses [`ruff`](https://docs.astral.sh/ruff/installation/) for formatting and [`ty`](https://docs.astral.sh/ty/installation/) for linting.
 
-please ensure that any contributions pass formatting/linting checks accordingly, as determined by `ruff check` and `basedpyright --warnings`.
+please ensure that any contributions pass formatting/linting checks accordingly, as determined by `ruff check` and `ty check`.

@@ -20,8 +20,8 @@ from io import BytesIO
 from pathlib import Path
 from urllib.request import urlopen
 
+import anndata as ad
 import pandas as pd
-import scanpy as sc
 from scipy.io import mmread
 from scipy.sparse import hstack
 
@@ -35,20 +35,20 @@ RANDOM_STATE = 42
 found.set_seed(RANDOM_STATE)
 
 if (pth := Path("../_build/.cache/GSE96583.h5ad")).exists():
-    adata = sc.read_h5ad(pth)
+    adata = ad.read_h5ad(pth)
 else:
     base_url = "https://www.ncbi.nlm.nih.gov/geo/download/"
-    adata = sc.AnnData(
+    adata = ad.AnnData(
         hstack(
             [
-                mmread(BytesIO(decompress(urlopen(url).read()))).tocsc()  # pyright: ignore[reportAttributeAccessIssue]
+                mmread(BytesIO(decompress(urlopen(url).read()))).tocsc()
                 for url in [
                     f"{base_url}?acc=GSM2560248&format=file&file=GSM2560248_2.1.mtx.gz",
                     f"{base_url}?acc=GSM2560249&format=file&file=GSM2560249_2.2.mtx.gz",
                 ]
             ]
         ).T,
-        obs=pd.read_csv(f"{base_url}?acc=GSE96583&format=file&file=GSE96583_batch2.total.tsne.df.tsv.gz", sep="\t")  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+        obs=pd.read_csv(f"{base_url}?acc=GSE96583&format=file&file=GSE96583_batch2.total.tsne.df.tsv.gz", sep="\t")
         .reset_index(names="barcode", drop=False)
         .assign(barcode=lambda x: x["stim"] + "_" + x["barcode"].str.extract("([ACTG]+-1)", expand=False))
         .set_index("barcode")[["stim", "cluster", "cell", "multiplets"]],
@@ -57,8 +57,8 @@ else:
         .rename_axis("ENSEMBL", axis="index")
         .rename({1: "SYMBOL"}, axis="columns"),
     )
-    adata = adata[~adata.obs["cell"].isna()].copy()
-    adata.write_h5ad(pth)
+    adata = adata[~adata.obs["cell"].isna()].copy()  # ty:ignore[unresolved-attribute]
+    adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
 
 print(adata)
 

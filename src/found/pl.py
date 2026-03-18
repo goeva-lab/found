@@ -19,11 +19,13 @@ def mk_range(d, n: int) -> np.ndarray[tuple[int], np.dtype[np.floating]]:
 
 def kde(d, n: int) -> np.ndarray[tuple[int], np.dtype[np.floating]]:
     if d.size <= 1:
-        return np.repeat(1.0, n)  # pyright: ignore[reportReturnType]
+        return np.repeat(1.0, n)
     return gaussian_kde(d)(mk_range(d, n))
 
 
 class PlotAdata:
+    # @TODO: add type specifications for fields, do verification
+
     def __init__(self, adata: ad.AnnData | None, layer: str | None = None):
         if adata is not None:
             if layer is not None:
@@ -54,9 +56,11 @@ class PlotAdata:
             return self.__cache[key]
 
         if key in self.__idx:
-            o = self.__mtx[:, self.__idx.get_loc(key)]
+            o = self.__mtx[:, self.__idx.get_loc(key)]  # ty:ignore[not-subscriptable]
+            # ignore NECESSITY - adata.X type specifications are so broad
             if isinstance(o, sp.sparray | sp.spmatrix):
-                o = o.todense()  # pyright: ignore[reportAttributeAccessIssue]
+                o = o.todense()  # ty:ignore[unresolved-attribute]
+                # ignore NECESSITY - ???
                 o = np.asarray(o).reshape(-1)
             return self.__ret_cache(key, o)
 
@@ -90,13 +94,7 @@ class PlotAdata:
                 except (ValueError, TypeError):
                     pass
                 else:
-                    schema = schema.sort(
-                        np.unique(  # pyright: ignore[reportCallIssue]
-                            to_num,  # pyright: ignore[reportArgumentType]
-                        )
-                        .astype(type(df[schema._kwds["shorthand"]][0]))
-                        .tolist()
-                    )
+                    schema = schema.sort(np.unique(to_num).astype(type(df[schema._kwds["shorthand"]][0])).tolist())
 
             schemas.append(schema)
 
@@ -179,14 +177,14 @@ class PlotAdata:
 
         if vertical:
             dens_ax, refl_ax, val_ax, facet_ax = alt.X, alt.X2, alt.Y, alt.Column
-            mdict: dict = {  # type annotation to avoid narrowing, which would lead to error in mark_area call
-                "orient": "horizontal"
-            }
-            hdict = {"orient": "bottom", "labelAnchor": "middle", "labelPadding": 2}
+            mdict = {"orient": "horizontal"}
+            # annotation needed to avoid narrowing by typecheker
+            hdict: dict = {"orient": "bottom", "labelAnchor": "middle", "labelPadding": 2}
         else:
             dens_ax, refl_ax, val_ax, facet_ax = alt.Y, alt.Y2, alt.X, alt.Row
             mdict = {"orient": "vertical"}
-            hdict = {"labelPadding": 2, "labelAngle": 0, "labelAlign": "left"}
+            # annotation needed to avoid narrowing by typecheker
+            hdict: dict = {"labelPadding": 2, "labelAngle": 0, "labelAlign": "left"}
 
         chart = (
             alt.Chart(dens_data.sort_values("val"), view=alt.ViewConfig(stroke=None))
@@ -258,8 +256,8 @@ class PlotHiDDENOutput:
 
         return type(self)(
             self.adata[idx],
-            self.p_hat[idx],  # pyright: ignore[reportArgumentType]
-            self.labs[idx],  # pyright: ignore[reportArgumentType]
+            self.p_hat[idx],
+            self.labs[idx],
             layer=self.layer,
         )
 
@@ -339,7 +337,7 @@ class PlotHiDDENOutput:
 
         col = "proportion" if scale else "count"
 
-        df = df.agg("size").rename(col)  # pyright: ignore[reportCallIssue, reportArgumentType]
+        df = df.agg("size").rename(col)
 
         if scale:
             if group_by is not None:
@@ -353,7 +351,8 @@ class PlotHiDDENOutput:
         )
 
         if group_by is not None:
-            c = c.encode((alt.X if vertical else alt.Y)(group_by.name))  # pyright: ignore[reportArgumentType]
+            c = c.encode((alt.X if vertical else alt.Y)(group_by.name))  # ty:ignore[invalid-argument-type]
+            # ignore NECESSITY - typechecker does not catch group_by.name isinstance check verifying it to be a string
 
         return c.mark_bar()
 

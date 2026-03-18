@@ -42,14 +42,14 @@ else:
     adata = ad.AnnData(
         hstack(
             [
-                mmread(BytesIO(decompress(urlopen(url).read()))).tocsc()  # pyright: ignore[reportAttributeAccessIssue]
+                mmread(BytesIO(decompress(urlopen(url).read()))).tocsc()
                 for url in [
                     f"{base_url}?acc=GSM2560248&format=file&file=GSM2560248_2.1.mtx.gz",
                     f"{base_url}?acc=GSM2560249&format=file&file=GSM2560249_2.2.mtx.gz",
                 ]
             ]
         ).T,
-        obs=pd.read_csv(f"{base_url}?acc=GSE96583&format=file&file=GSE96583_batch2.total.tsne.df.tsv.gz", sep="\t")  # pyright: ignore[reportAttributeAccessIssue, reportArgumentType]
+        obs=pd.read_csv(f"{base_url}?acc=GSE96583&format=file&file=GSE96583_batch2.total.tsne.df.tsv.gz", sep="\t")
         .reset_index(names="barcode", drop=False)
         .assign(barcode=lambda x: x["stim"] + "_" + x["barcode"].str.extract("([ACTG]+-1)", expand=False))
         .set_index("barcode")[["stim", "cluster", "cell", "multiplets"]],
@@ -58,8 +58,8 @@ else:
         .rename_axis("ENSEMBL", axis="index")
         .rename({1: "SYMBOL"}, axis="columns"),
     )
-    adata = adata[~adata.obs["cell"].isna()].copy()
-    adata.write_h5ad(pth)
+    adata = adata[~adata.obs["cell"].isna()].copy()  # ty:ignore[unresolved-attribute]
+    adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
 
 print(adata)
 # %% [markdown]
@@ -83,7 +83,7 @@ def run_lemur(adata: ad.AnnData, k: int, lemur_design: str, lemur_grouping: pd.S
     mod.fit(verbose=False)
     mod.align_with_grouping(lemur_grouping, verbose=False)
 
-    return mod.embedding  # pyright: ignore[reportReturnType]
+    return mod.embedding  # ty:ignore[invalid-return-type]
 
 
 p_hat, labs = found.HiDDEN(
@@ -120,10 +120,7 @@ def run_lemur_w_model_out(adata: ad.AnnData, k: int, lemur_design: str, lemur_gr
 
     # ⚠️ we can now return both the embeddings and the model itself
     # ⚠️ important: the order in the tuple has to match the argument provided to the `step_fn` decorator!
-    return (
-        mod.embedding,  # pyright: ignore[reportReturnType]
-        mod,
-    )
+    return (mod.embedding, mod)  # ty:ignore[invalid-return-type]
 
 
 # ⚠️ we use the "named" lemur_mod output of `run_lemur_w_model_out` in our score function!
@@ -137,14 +134,8 @@ def score_lemur_counters(lemur_mod: LEMUR, V: BoolArr, W: BoolArr) -> np.floatin
     # maximize the mean squared difference between LEMUR counterfactuals and actual expression for the HiDDEN-kept cells
     # while minimizing the mean squared difference between LEMUR counterfactuals and actual expression for the HiDDEN-relabeled cells
 
-    relab_dist = (
-        lemur_mod.predict(new_condition=lemur_mod.cond(stim="ctrl"))[only_relab]  # pyright: ignore[reportIndexIssue]
-        - lemur_mod.data_matrix[only_relab]
-    )
-    kept_dist = (
-        lemur_mod.predict(new_condition=lemur_mod.cond(stim="ctrl"))[only_kept]  # pyright: ignore[reportIndexIssue]
-        - lemur_mod.data_matrix[only_kept]
-    )
+    relab_dist = lemur_mod.predict(new_condition=lemur_mod.cond(stim="ctrl"))[only_relab] - lemur_mod.data_matrix[only_relab]
+    kept_dist = lemur_mod.predict(new_condition=lemur_mod.cond(stim="ctrl"))[only_kept] - lemur_mod.data_matrix[only_kept]
 
     return np.mean(np.square(kept_dist)) - np.mean(np.square(relab_dist))
 

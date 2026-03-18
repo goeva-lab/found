@@ -16,7 +16,7 @@ def out_to_dict[*I](func: Callable[[*I], tuple], out_names: tuple[str, ...]) -> 
     def w(*args: *I, **kwargs) -> dict[str, object]:
         o = func(*args, **kwargs)
         assert len(o) == len(out_names), (
-            f"function {func.__name__} was decorated with named outputs {out_names} "
+            f"function {getattr(func, '__name__', '[NO NAME FOUND]')} was decorated with named outputs {out_names} "
             f"of length {len(out_names)}, but returned {o}, of length {len(out_names)}"
         )
         return {k: v for k, v in zip(out_names, o)}
@@ -43,7 +43,7 @@ def step_fn[Fn: Callable[..., tuple]](*out_names: str) -> Callable[[Fn], Fn]:
 
         setattr(c, _INTERNAL_WRAP_ATTR_NAME, out_names)
 
-        return c  # pyright: ignore[reportReturnType]
+        return c  # ty:ignore[invalid-return-type]
         # ignore NECESSITY - from the definition of c, we can
         # see that it will replicate the type signature of func
 
@@ -178,8 +178,7 @@ class Pipeline:
         """
 
         def dimr_fn(adata: ad.AnnData, k: int | None = None) -> FloatMtx:
-            dimr: FloatMtx = adata.obsm[dimr_key]  # pyright: ignore[reportAssignmentType]
-            # ignore NECESSITY - isinstance check through strip_generic not understood by type checker
+            dimr: FloatMtx = adata.obsm[dimr_key]
             assert isinstance(dimr, strip_generic(FloatMtx)), (
                 f'expected adata.obsm["{dimr}"] to be of type {FloatMtx}, got {type(dimr)} instead'
             )
@@ -187,9 +186,7 @@ class Pipeline:
                 assert dimr.shape[1] >= k, (
                     f'provided dimensionality reduction matrix in adata.obsm["{dimr}"] is of shape {dimr.shape}, but a {k}-d space was queried'
                 )
-            return dimr[:, :k]  # pyright: ignore[reportReturnType]
-            # ignore NECESSITY - numpy indexing does not preserve array shape
-            # `:`-index keeps first dimension, and `:k`-index also preserves second dimension
+            return dimr[:, :k]
 
         return cls(dimr_fn, regr_fn, binr_fn, True, *([] if strict is None else [strict]))
 
@@ -212,7 +209,7 @@ def wrap_gby_fn[T, G](
         for k in new_args:
             # materialize anndata view before it is repeatedly accessed downstream
             if isinstance(new_args[k], ad.AnnData):
-                new_args[k] = new_args[k].copy()  # pyright: ignore[reportAttributeAccessIssue]
+                new_args[k] = new_args[k].copy()  # ty:ignore[unresolved-attribute]
                 # ignore NECESSITY: new_args[k] check above ensures type is AnnData
 
             # more specializations here
