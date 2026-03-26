@@ -142,7 +142,7 @@ jobs:
           # general R dependencies
           apt install -y --no-install-recommends 'r-base-dev' 'libcurl4-openssl-dev' 'texinfo'
           # package dependencies, needed due to `pkg.sysreqs` disable
-          apt install -y --no-install-recommends 'libxml2-dev' 'libfontconfig1-dev' 'libharfbuzz-dev' 'libfribidi-dev' 'libfreetype6-dev' 'libpng-dev' 'libtiff5-dev' 'libjpeg-dev' 'libwebp-dev' 'pandoc'
+          apt install -y --no-install-recommends 'libxml2-dev' 'libfontconfig1-dev' 'libharfbuzz-dev' 'libfribidi-dev' 'libfreetype6-dev' 'libpng-dev' 'libtiff5-dev' 'libjpeg-dev' 'libwebp-dev' 'pandoc' 'libuv1-dev'
       - run: |
           echo "${HOME}/bin" >> "${GITHUB_PATH}"
       - uses: 'actions/cache/restore@v4'
