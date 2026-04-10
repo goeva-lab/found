@@ -10,11 +10,7 @@ run apt -y update &&  \
     rm -rf /var/lib/apt/lists/*
 
 
-# @TODO: remove this if/when unnecessary
-# explanation: uv 0.11 seems to have introduced a regression where the GNU_STACK header is set to `X` (as shown by `patchelf --print-execstack`) on the relevant python dylib
-# this specifically seems to lead to reticulate being unable to load the python dylib during initialization (can be confirmed by running `patchelf --clear-execstack`)
-# as such, pinning uv to 0.10 until this is resolved (no mentions of this issue could be found across other projects as of 2026-03-26)
-copy --from=ghcr.io/astral-sh/uv:0.10 /uv /bin
+copy --from=ghcr.io/astral-sh/uv /uv /bin
 
 env UV_NO_CACHE=true
 env UV_MANAGED_PYTHON=true
