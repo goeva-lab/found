@@ -269,7 +269,9 @@ def HiDDENgt[P, S, G](
             pd.Series(
                 np.concat(
                     [
-                        outs[g][
+                        outs[  # ty:ignore[invalid-argument-type]
+                            g
+                        ][
                             get(g)  # ty:ignore[invalid-argument-type]
                         ][0]
                         for g in grp_idx.keys()
@@ -282,7 +284,9 @@ def HiDDENgt[P, S, G](
                 #                    validatiing that x.obs should always be pd.DataFrame
                 np.concat(
                     [
-                        outs[g][
+                        outs[  # ty:ignore[invalid-argument-type]
+                            g
+                        ][
                             get(g)  # ty:ignore[invalid-argument-type]
                         ][1]
                         for g in grp_idx.keys()
@@ -291,7 +295,9 @@ def HiDDENgt[P, S, G](
                 control_val,
             ),
             {
-                g: outs[g][
+                g: outs[  # ty:ignore[invalid-argument-type]
+                    g
+                ][
                     get(g)  # ty:ignore[invalid-argument-type]
                 ][2]
                 for g in grp_idx.keys()
@@ -300,7 +306,8 @@ def HiDDENgt[P, S, G](
         # ignore NECESSITY - g should be of type G? could use more validation
 
     def acc_by_grp(grp: G) -> Mapping[P, tuple[pd.Series, pd.Series, S]]:
-        return {
+        return {  # ty:ignore[invalid-return-type]
+            # ignore NECESSITY - type of outs is dict[Unknown, Unknown]
             k: (
                 pd.Series(Y, index=x.obs.index[grp_idx[grp]]),
                 x[grp_idx[grp]]
@@ -316,7 +323,8 @@ def HiDDENgt[P, S, G](
             for k, (Y, W, s) in outs[grp].items()
         }
 
-    return (
+    return (  # ty:ignore[invalid-return-type]
+        # ignore NECESSITY - ???
         best_params,
         acc_by_param,
         acc_by_grp,
