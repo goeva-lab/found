@@ -53,7 +53,7 @@ def log1p[T: MatrixLike](X: T) -> T:
     # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138
     # https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52
     else:
-        X = np.log1p(X)  # ty:ignore[no-matching-overload]
+        X = np.log1p(X)  # ty:ignore[invalid-assignment]
         # ignore NECESSITY - typechecker doesn't narrow X to an ndarray
 
     return X

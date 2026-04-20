@@ -306,7 +306,7 @@ def HiDDENgt[P, S, G](
         # ignore NECESSITY - g should be of type G? could use more validation
 
     def acc_by_grp(grp: G) -> Mapping[P, tuple[pd.Series, pd.Series, S]]:
-        return {  # ty:ignore[invalid-return-type]
+        return {
             # ignore NECESSITY - type of outs is dict[Unknown, Unknown]
             k: (
                 pd.Series(Y, index=x.obs.index[grp_idx[grp]]),
