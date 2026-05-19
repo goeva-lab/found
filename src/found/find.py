@@ -279,9 +279,7 @@ def HiDDENgt[P, S, G](
                 )[out_ord],
                 index=x.obs.index,
             ),
-            x.obs[cond_col].where(  # ty:ignore[unresolved-attribute]
-                # ignore NECESSITY - typechecker does not catch isinstance check at top of function
-                #                    validatiing that x.obs should always be pd.DataFrame
+            x.obs[cond_col].where(
                 np.concat(
                     [
                         outs[  # ty:ignore[invalid-argument-type]
@@ -312,9 +310,7 @@ def HiDDENgt[P, S, G](
                 pd.Series(Y, index=x.obs.index[grp_idx[grp]]),
                 x[grp_idx[grp]]
                 .obs[cond_col]
-                .where(  # ty:ignore[unresolved-attribute]
-                    # ignore NECESSITY - typechecker does not catch isinstance check at top of function
-                    #                    validatiing that x.obs should always be pd.DataFrame
+                .where(
                     W,
                     control_val,
                 ),

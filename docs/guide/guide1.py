@@ -38,7 +38,7 @@ else:
         obs=pd.read_csv(f"{base_url}GSE193531_cell-level-metadata.csv.gz").set_index("index").loc[gex.index],
     )
     # subset to only disease stages of interest
-    adata = adata[adata.obs["disease_stage"].isin(["MM", "NBM", "SMM"])].copy()  # ty:ignore[unresolved-attribute]
+    adata = adata[adata.obs["disease_stage"].isin(["MM", "NBM", "SMM"])].copy()
 
     # use CSR array for counts to improve memory use
     adata.X = sp.csr_array(adata.X)
@@ -48,11 +48,11 @@ else:
     adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
 
 # create a set of labels adjusted using original annotations
-adata.obs["disease_stage_gt"] = np.where(adata.obs["normal_or_neoplastic"] == "neoplastic", adata.obs["disease_stage"], "NBM")  # ty:ignore[no-matching-overload]
+adata.obs["disease_stage_gt"] = np.where(adata.obs["normal_or_neoplastic"] == "neoplastic", adata.obs["disease_stage"], "NBM")
 adata.obs["sample_ID"] = pd.Categorical(
     adata.obs["sample_ID"],
     categories=sorted(
-        sorted(adata.obs["sample_ID"].unique(), key=lambda s: int(s.split("-", 1)[1])),  # ty:ignore[unresolved-attribute]
+        sorted(adata.obs["sample_ID"].unique(), key=lambda s: int(s.split("-", 1)[1])),
         key=lambda s: s.split("-", 1)[0],
     ),
     ordered=True,

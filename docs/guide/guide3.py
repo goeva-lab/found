@@ -57,7 +57,7 @@ else:
         .rename_axis("ENSEMBL", axis="index")
         .rename({1: "SYMBOL"}, axis="columns"),
     )
-    adata = adata[~adata.obs["cell"].isna()].copy()  # ty:ignore[unresolved-attribute]
+    adata = adata[~adata.obs["cell"].isna()].copy()
     adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
 
 print(adata)
