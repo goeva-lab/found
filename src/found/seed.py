@@ -12,9 +12,10 @@ def mk() -> tuple[Callable[[int | None], None], Callable[[], int | None]]:
 
         :param seed: integer seed, must be within [0, 4294967295], set to None to remove fixed seeding
         """
-        nonlocal __RAND_SEED
-        if seed is not None and (seed < 0 or seed > 4294967295):
+        if (seed is not None) and ((seed < 0) or (seed > 4294967295)):
             raise ValueError(f"provided seed {seed} outside of allowed range [0, 4294967295]")
+
+        nonlocal __RAND_SEED
         __RAND_SEED = seed
 
     def get_seed() -> int | None:
