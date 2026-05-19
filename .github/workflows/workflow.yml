@@ -47,10 +47,11 @@ jobs:
       - uses: 'actions/checkout@v6'
       - uses: 'astral-sh/setup-uv@v8.1.0'
       - run: |
-          uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]' 'ty'
+          uv pip install -p '/workdir/found/.venv/bin/python' '.[dev]'
       - uses: 'astral-sh/ruff-action@v4.0.0'
       - run: |
-          ty check --output-format github
+          uv pip install -p '/workdir/found/.venv/bin/python' --upgrade 'ty'
+          ty check --output-format 'github'
   lint_R:
     needs: 
       - 'build_docker'
