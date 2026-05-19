@@ -428,7 +428,7 @@ def bin_kmeans(
     kmeans_args: dict[str, Any] | None = None,
 ) -> BoolArr:
     """
-    runs k-means clustering to binarize continuous scores into boolean labels.
+    runs k-means based clustering to binarize continuous scores into boolean labels.
 
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
@@ -449,7 +449,7 @@ def bin_kmeans(
 
 def bin_gmm(Y: NumArr, V: BoolArr, gmm_args: dict[str, Any] | None = None) -> BoolArr:
     """
-    runs k-means clustering to binarize continuous scores into boolean labels.
+    runs gaussian mixture modeling based clustering to binarize continuous scores into boolean labels.
 
     :param Y: 1-d float array of condition scores (p_hat)
     :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)
