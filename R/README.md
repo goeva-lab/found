@@ -8,7 +8,7 @@ very unfinished, more testing is needed before general use can be advised, API i
 
 ## installation
 
-after installing the python library (see [`../README.md`](../README.md)), the R wrapper can be installed via the following command using the [`pak`](https://pak.r-lib.org/#arrow_down-installation) library:
+after installing the python library (see [`https://goeva-lab.ccbr.utoronto.ca/found/py`](https://goeva-lab.ccbr.utoronto.ca/found/py) for relevant documentation), the R wrapper can be installed via the following command using the [`pak`](https://pak.r-lib.org/#arrow_down-installation) library:
 
 ```R
 pak::pak("github::goeva-lab/found/R")
@@ -16,7 +16,9 @@ pak::pak("github::goeva-lab/found/R")
 
 ## documentation
 
-to build documentation a local copy of the repo must first be downloaded, then the [`devtools`](https://devtools.r-lib.org/#installation) package can be used to install the package locally and build Rmarkdown documentation.
+a build of the documentation is publicly available at: [`https://goeva-lab.ccbr.utoronto.ca/found/R`](https://goeva-lab.ccbr.utoronto.ca/found/R).
+
+to build it locally (and run associated notebooks), a copy of the repo must be downloaded and dev dependencies must be installed:
 
 ```bash
 git clone 'git@github.com:goeva-lab/found' && cd found/R

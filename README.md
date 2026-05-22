@@ -32,12 +32,14 @@ docker pull 'ghcr.io/goeva-lab/found'
 
 ## R bridge
 
-an R package providing high-level bindings to the python package is provided, for more documentation on it, please see [`./R/README.md`](./R/README.md).
-documentation below is all regarding the python package.
+an R package providing high-level bindings to the python package is provided, for more documentation on it, please see [`https://goeva-lab.ccbr.utoronto.ca/found/R`](https://goeva-lab.ccbr.utoronto.ca/found/R).
+all materials below are regarding the python package.
 
 ## documentation
 
-to build documentation (and run associated notebooks), a local copy of the repo must be downloaded, dev dependencies must be installed, and a kernel based on the configured venv must be installed:
+a build of the documentation is publicly available at: [`https://goeva-lab.ccbr.utoronto.ca/found/py`](https://goeva-lab.ccbr.utoronto.ca/found/py).
+
+to build it locally (and run associated notebooks), a copy of the repo must be downloaded, dev dependencies must be installed, and a kernel based on the configured venv must be installed:
 
 ```bash
 git clone 'git@github.com:goeva-lab/found' && cd found
