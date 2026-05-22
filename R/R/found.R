@@ -464,4 +464,6 @@ S7::method(HiDDENgt, seurat_s4_class) <- function(
       "by_grp" = function(grp) conv_HiDDENt(reticulate::tuple(outs[0][grp], outs[2](grp)))[["outs"]]
     )
   }
+
+  S7::methods_register()
 }
