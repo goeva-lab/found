@@ -165,7 +165,7 @@ class Pipeline:
         strict: bool | None = None,
     ) -> Self:
         """
-        convenience constructor for creating a :py:class:`~found.adapters.Pipeline`\\ where the `dimr_fn` step fetches data from a specified :py:class:`~anndata.AnnData` :py:attr:`~anndata.AnnData.obsm` slot.
+        convenience constructor for creating a :py:class:`~found.adapters.Pipeline` where the `dimr_fn` step fetches data from a specified :py:class:`~anndata.AnnData` :py:attr:`~anndata.AnnData.obsm` slot.
 
         resulting :py:class:`~found.adapters.Pipeline` must be called with a named argument ``adata`` providing an :py:class:`~anndata.AnnData` object.
 
