@@ -66,7 +66,7 @@ def scale_rs[T: MatrixLike](X: T) -> T:
     :param X: input matrix
     :return: scaled matrix
     """
-    per_cell_sum = X.sum(axis=1)  # ty:ignore[invalid-argument-type]
+    per_cell_sum = X.sum(axis=1)  # ty:ignore[invalid-argument-type, no-matching-overload]
     # ignore NECESSITY - ???
     avg_counts_per_cell = per_cell_sum.mean()
     size_fact = per_cell_sum / avg_counts_per_cell
@@ -88,8 +88,7 @@ def scale_sd[T: MatrixLike](X: T) -> T:
     """
 
     if isinstance(X, np.ndarray):
-        stdev = np.std(X, axis=0)  # ty:ignore[no-matching-overload]
-        # ignore NECESSITY - ???
+        stdev = np.std(X, axis=0)
     else:
         _, var = sparsefuncs.mean_variance_axis(X, axis=0)
         # note: sparsefuncs.mean_variance_axis return type set to Unknown, however type is documented to be 2-tuple given these arguments
@@ -112,7 +111,7 @@ def vst_shiftlog[T: MatrixLike](X: T, overdispersion: float = 0.05) -> T:
     :param overdispersion: overdispersion factor
     :return: variance stabilized matrix
     """
-    per_cell_sum = X.sum(axis=1)  # ty:ignore[invalid-argument-type]
+    per_cell_sum = X.sum(axis=1)  # ty:ignore[invalid-argument-type, no-matching-overload]
     # ignore NECESSITY - ???
     size_fact = per_cell_sum / np.exp(np.mean(np.log(per_cell_sum)))
 
@@ -477,8 +476,7 @@ def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.n
         lhs_mean, rhs_mean = np.mean(lhs, axis=0), np.mean(rhs, axis=0)  # ty:ignore[no-matching-overload]
         # ignore NECESSITY - ???
     else:
-        lhs_mean, rhs_mean = lhs.mean(axis=0), rhs.mean(axis=0)  # ty:ignore[invalid-argument-type]
-        # ignore NECESSITY - ???
+        lhs_mean, rhs_mean = lhs.mean(axis=0), rhs.mean(axis=0)  # ty:ignore[invalid-argument-type, no-matching-overload]
 
     # remove genes for which log2fc is not sensical
     # (i.e. mean of zero in either condition)
@@ -501,8 +499,7 @@ def mannwhitneyu_pvals[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float) -> np.n
 
 def mannwhitneyu_ndeg[T: MatrixLike](lhs: T, rhs: T, lfc_cutoff: float, signif_cutoff: float = 0.05) -> np.integer:
     # mannwhitneyu_pvals returns nans for failed comparisons, but np.nan < x = False for all x so this works
-    return np.sum((mannwhitneyu_pvals(lhs, rhs, lfc_cutoff)) < signif_cutoff)  # ty:ignore[invalid-return-type]
-    # ignore NECESSITY - ???
+    return np.sum((mannwhitneyu_pvals(lhs, rhs, lfc_cutoff)) < signif_cutoff)
 
 
 def score_deg(X: MatrixLike, W: BoolArr, lfc_cutoff: float = 1.5, sig_cutoff: float = 0.05) -> np.integer:

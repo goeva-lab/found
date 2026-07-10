@@ -45,7 +45,7 @@ else:
 
     # write to cache
     pth.parent.mkdir(parents=True, exist_ok=True)
-    adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
+    adata.write_h5ad(pth)
 
 # create a set of labels adjusted using original annotations
 adata.obs["disease_stage_gt"] = np.where(adata.obs["normal_or_neoplastic"] == "neoplastic", adata.obs["disease_stage"], "NBM")

@@ -38,7 +38,7 @@ else:
     with catch_warnings(category=FutureWarning, action="ignore"):
         adata = ad.read_h5ad(BytesIO(urlopen(f"{base_url}GSE276570_endo_object.h5ad").read()))  # ty:ignore[invalid-argument-type]
     adata.obs["injection"] = pd.Categorical.from_codes(adata.obs["Condition"].eq(1).astype(int), ["saline", "LPC"])
-    adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
+    adata.write_h5ad(pth)
 
 print(adata)
 

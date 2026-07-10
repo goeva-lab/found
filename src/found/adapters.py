@@ -178,7 +178,8 @@ class Pipeline:
         """
 
         def dimr_fn(adata: ad.AnnData, k: int | None = None) -> FloatMtx:
-            dimr: FloatMtx = adata.obsm[dimr_key]
+            dimr: FloatMtx = adata.obsm[dimr_key]  # ty:ignore[invalid-assignment]
+            # ignore NECESSITY: ???
             assert isinstance(dimr, strip_generic(FloatMtx)), (
                 f'expected adata.obsm["{dimr}"] to be of type {FloatMtx}, got {type(dimr)} instead'
             )

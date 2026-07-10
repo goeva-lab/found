@@ -58,7 +58,7 @@ else:
         .rename({1: "SYMBOL"}, axis="columns"),
     )
     adata = adata[~adata.obs["cell"].isna()].copy()
-    adata.write_h5ad(pth)  # ty:ignore[invalid-argument-type]
+    adata.write_h5ad(pth)
 
 print(adata)
 

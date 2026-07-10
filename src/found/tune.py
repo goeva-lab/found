@@ -68,7 +68,7 @@ class NaiveMaxScoreTuner(Tuner):
 
             algo = algo.update(dimr_fn=dimr)
 
-        res = dict()
+        res: Mapping[int, tuple[NumArr, BoolArr, NumericScalar]] = dict()
         for k in sorted(k_range, reverse=True):
             _, _, w = algo(k=k, **kwargs)
             score = wcall(w, self.score_fn, algo.strict)
@@ -125,7 +125,8 @@ class FixPointTuner[T: float](Tuner):
 
             def dimr(k: int) -> FloatMtx:
                 nonlocal cache
-                if k > cache.shape[1]:
+                if k > cache.shape[1]:  # ty:ignore[unresolved-attribute]
+                    # ignore NECESSITY - ???
                     cache = wcall(
                         kwargs | {"k": k + self.min_stable},
                         out_to_dict(fn, getattr(fn, _INTERNAL_WRAP_ATTR_NAME)),
@@ -136,7 +137,7 @@ class FixPointTuner[T: float](Tuner):
 
             algo = algo.update(dimr_fn=dimr)
 
-        res = dict()
+        res: Mapping[int, tuple[NumArr, BoolArr, T]] = dict()
         k = self.start_k
         tick = 0
         pct_change = 1.0
