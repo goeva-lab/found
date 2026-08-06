@@ -28,7 +28,7 @@ def strip_generic(tp: type | UnionType | GenericAlias) -> type | UnionType:
 
     if isinstance(tp, GenericAlias):
         if not isinstance(tp.__origin__, type | UnionType):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004
                 f"type {tp.__origin__} is unsupported for checking, please disable strict type checking or file an issue"
             )
         return tp.__origin__
@@ -37,7 +37,7 @@ def strip_generic(tp: type | UnionType | GenericAlias) -> type | UnionType:
 
 
 def wcall[T](w: dict[str, object], fn: Callable[..., T], strict: bool) -> T:
-    kwargs = dict()
+    kwargs = {}
     fn_name = getattr(fn, "__name__", "[NO NAME FOUND]")
     for p in signature(fn).parameters.values():
         match p.kind:
@@ -83,7 +83,7 @@ def ttype_check(t: type | UnionType | GenericAlias, annot: type | UnionType | Ge
 
     # @TODO: add explicit handling for isinstance-incompatible types (e.g. non-runtime-checkable Protocol)
     if isinstance(t, UnionType):
-        return all(map(lambda t: issubclass(t, annot), get_args(t)))
+        return all(issubclass(t, annot) for t in get_args(t))
     return issubclass(t, annot)
 
 
@@ -136,7 +136,7 @@ def check_sequence(seq: Iterable[tuple[Callable, tuple[str, *tuple[str, ...]]]],
                 if len(out_names) > 1:
                     base_annot = strip_generic(annot)
                     if not (
-                        all(map(lambda x: issubclass(x, tuple), get_args(base_annot)))
+                        all(issubclass(x, tuple) for x in get_args(base_annot))
                         if isinstance(base_annot, UnionType)
                         else issubclass(base_annot, tuple)
                     ):

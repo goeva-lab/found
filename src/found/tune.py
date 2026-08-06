@@ -68,7 +68,7 @@ class NaiveMaxScoreTuner(Tuner):
 
             algo = algo.update(dimr_fn=dimr)
 
-        res: Mapping[int, tuple[NumArr, BoolArr, NumericScalar]] = dict()
+        res: Mapping[int, tuple[NumArr, BoolArr, NumericScalar]] = {}
         for k in sorted(k_range, reverse=True):
             _, _, w = algo(k=k, **kwargs)
             score = wcall(w, self.score_fn, algo.strict)
@@ -137,7 +137,7 @@ class FixPointTuner[T: float](Tuner):
 
             algo = algo.update(dimr_fn=dimr)
 
-        res: Mapping[int, tuple[NumArr, BoolArr, T]] = dict()
+        res: Mapping[int, tuple[NumArr, BoolArr, T]] = {}
         k = self.start_k
         tick = 0
         pct_change = 1.0

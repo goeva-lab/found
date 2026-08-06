@@ -207,11 +207,10 @@ def wrap_gby_fn[T, G](
     def f(grp: G, /, **kwargs) -> T:
         new_args = {k: v(kwargs[k], grps[grp]) for k, v in which_args.items()}
 
-        for k in new_args:
+        for k, v in new_args.items():
             # materialize anndata view before it is repeatedly accessed downstream
-            if isinstance(new_args[k], ad.AnnData):
-                new_args[k] = new_args[k].copy()  # ty:ignore[unresolved-attribute]
-                # ignore NECESSITY: new_args[k] check above ensures type is AnnData
+            if isinstance(v, ad.AnnData) and v.is_view:
+                new_args[k] = v.copy()
 
             # more specializations here
 

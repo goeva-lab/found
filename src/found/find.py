@@ -11,6 +11,8 @@ from .adapters import Pipeline, wrap_gby_fn
 from .methods import bin_kmeans, reg_logit, run_pca
 from .tune import Tuner
 
+LOGPCAEMB_LOGITREG_KMEANSBIN_PIPELINE = Pipeline(run_pca, reg_logit, bin_kmeans, True)
+
 
 def prep_grps(
     obs: pd.DataFrame,
@@ -40,7 +42,7 @@ def prep_grps(
                 f"only values of {unique_per_grp} for group {g}"
             )
 
-    fidx = lambda v, i: v[i]  # noqa: E731
+    fidx = lambda v, i: v[i]
     if which_grouped is None:
         which_grouped = {
             k: fidx
@@ -64,7 +66,7 @@ def HiDDEN(
     /,
     cond_col: str,
     control_val: object,
-    algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
+    algo: Pipeline = LOGPCAEMB_LOGITREG_KMEANSBIN_PIPELINE,
     **kwargs,
 ) -> tuple[pd.Series, pd.Series]:
     """
@@ -93,7 +95,7 @@ def HiDDENg(
     cond_col: str,
     control_val: object,
     group_by: str | tuple[str],
-    algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
+    algo: Pipeline = LOGPCAEMB_LOGITREG_KMEANSBIN_PIPELINE,
     which_grouped: str
     | tuple[str]
     | list[str]
@@ -141,7 +143,7 @@ def HiDDENt[P, S](
     cond_col: str,
     control_val: object,
     tuner: Tuner[P, S],
-    algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
+    algo: Pipeline = LOGPCAEMB_LOGITREG_KMEANSBIN_PIPELINE,
     **kwargs,
 ) -> tuple[P, Mapping[P, tuple[pd.Series, pd.Series, S]]]:
     """
@@ -186,7 +188,7 @@ def HiDDENgt[P, S, G](
     control_val: object,
     group_by: str | tuple[str],
     tuner: Tuner[P, S],
-    algo: Pipeline = Pipeline(run_pca, reg_logit, bin_kmeans, True),
+    algo: Pipeline = LOGPCAEMB_LOGITREG_KMEANSBIN_PIPELINE,
     which_grouped: str
     | tuple[str]
     | list[str]
@@ -236,8 +238,7 @@ def HiDDENgt[P, S, G](
             gfn(
                 grp,
                 **(
-                    kwargs  # fmt: skip
-                    | grp_specific_args[grp]  # ty:ignore[invalid-argument-type]
+                    kwargs | grp_specific_args[grp]  # ty:ignore[invalid-argument-type]
                     # ignore NECESSITY - grp should always be hashable? could use more validation
                 ),
             )
@@ -252,15 +253,14 @@ def HiDDENgt[P, S, G](
     ) -> tuple[pd.Series, pd.Series, Mapping[G, S]]:
 
         if mapping is None:
-            mapping = dict()
-        if default is None:
-            if set(mapping.keys()) != set(grp_idx.keys()):
-                raise ValueError(
-                    f"provided mapping {mapping} does not span all present groups {grp_idx.keys()} and no default was provided"
-                )
+            mapping = {}
+        if (default is None) and (set(mapping.keys()) != set(grp_idx.keys())):
+            raise ValueError(
+                f"provided mapping {mapping} does not span all present groups {grp_idx.keys()} and no default was provided"
+            )
 
         def get(g: G) -> P:
-            out = mapping[g] if g in mapping else default
+            out = mapping.get(g, default)
             assert out is not None
             return out
 
@@ -274,7 +274,7 @@ def HiDDENgt[P, S, G](
                         ][
                             get(g)  # ty:ignore[invalid-argument-type]
                         ][0]
-                        for g in grp_idx.keys()
+                        for g in grp_idx
                     ]
                 )[out_ord],
                 index=x.obs.index,
@@ -287,7 +287,7 @@ def HiDDENgt[P, S, G](
                         ][
                             get(g)  # ty:ignore[invalid-argument-type]
                         ][1]
-                        for g in grp_idx.keys()
+                        for g in grp_idx
                     ]
                 )[out_ord],
                 control_val,
@@ -298,7 +298,7 @@ def HiDDENgt[P, S, G](
                 ][
                     get(g)  # ty:ignore[invalid-argument-type]
                 ][2]
-                for g in grp_idx.keys()
+                for g in grp_idx
             },
         )
         # ignore NECESSITY - g should be of type G? could use more validation

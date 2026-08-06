@@ -21,6 +21,17 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "conf.py"]
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["static"]
 
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "source repository",
+            "url": "https://github.com/goeva-lab/found",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        }
+    ]
+}
+
 html_css_files = ["custom.css"]
 
 nb_custom_formats = {".py": ["jupytext.reads", {"fmt": "py:percent"}]}

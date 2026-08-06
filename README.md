@@ -44,13 +44,13 @@ to build it locally (and run associated notebooks), a copy of the repo must be d
 ```bash
 git clone 'git@github.com:goeva-lab/found' && cd found
 uv pip install -e '.[dev]'
-uv run --frozen -m ipykernel install --user --name found
+uv run --no-sync --frozen -m ipykernel install --user --name found
 ```
 
 [`sphinx`](https://www.sphinx-doc.org/en/master/) is used to build a documentation website, which can be built and previewed locally at [localhost:8000](http://localhost:8000) via the following command (assuming current directory is a clone of this repository):
 
 ```bash
-uv run --frozen sphinx-autobuild './docs' './docs/_build/html' -b 'dirhtml' -n --watch './src'
+uv run --no-sync --frozen sphinx-autobuild './docs' './docs/_build/html' -b 'dirhtml' -n --watch './src'
 ```
 
 note: this will run and execute all guide vignettes, which can be very computationally expensive.

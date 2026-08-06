@@ -80,7 +80,7 @@ class PlotAdata:
 
     def encode(self, *encode_args: alt.SchemaBase) -> alt.Chart:
         conf = {k._kwds["shorthand"].replace(".", "_"): k._kwds["shorthand"] for k in encode_args}
-        chk = set(map(lambda k: k._kwds["shorthand"], encode_args))
+        chk = {k._kwds["shorthand"] for k in encode_args}
         assert len(chk) == len(conf), f"configuration schema ambiguous, please rename columns: {chk - set(conf.values())}"
 
         df = {k: self.get_data(v) for k, v in conf.items()}
@@ -101,10 +101,10 @@ class PlotAdata:
         return alt.Chart(pd.DataFrame(df)).encode(*schemas)
 
     def point(self, *encode_args: alt.SchemaBase, **mark_args) -> alt.Chart:
-        return self.encode(*encode_args).mark_point(**({"filled": True, "opacity": 1} | mark_args))
+        return self.encode(*encode_args).mark_point(**({"filled": True, "opacity": 1} | mark_args))  # ty: ignore[invalid-return-type, invalid-argument-type]
 
     def line(self, *encode_args: alt.SchemaBase, **mark_args) -> alt.Chart:
-        return self.encode(*encode_args).mark_line(**mark_args)
+        return self.encode(*encode_args).mark_line(**mark_args)  # ty: ignore[invalid-return-type]
 
     def vln(
         self,
@@ -177,16 +177,16 @@ class PlotAdata:
 
         if vertical:
             dens_ax, refl_ax, val_ax, facet_ax = alt.X, alt.X2, alt.Y, alt.Column
-            mdict = {"orient": "horizontal"}
+            mdict: dict = {"orient": "horizontal"}
             # annotation needed to avoid narrowing by typecheker
             hdict: dict = {"orient": "bottom", "labelAnchor": "middle", "labelPadding": 2}
         else:
             dens_ax, refl_ax, val_ax, facet_ax = alt.Y, alt.Y2, alt.X, alt.Row
-            mdict = {"orient": "vertical"}
+            mdict: dict = {"orient": "vertical"}
             # annotation needed to avoid narrowing by typecheker
             hdict: dict = {"labelPadding": 2, "labelAngle": 0, "labelAlign": "left"}
 
-        chart = (
+        chart: alt.Chart = (  # ty: ignore[invalid-assignment]
             alt.Chart(dens_data.sort_values("val"), view=alt.ViewConfig(stroke=None))
             .encode(
                 dens_ax("density:Q")
@@ -354,7 +354,7 @@ class PlotHiDDENOutput:
             c = c.encode((alt.X if vertical else alt.Y)(group_by.name))  # ty:ignore[invalid-argument-type]
             # ignore NECESSITY - typechecker does not catch group_by.name isinstance check verifying it to be a string
 
-        return c.mark_bar()
+        return c.mark_bar()  # ty: ignore[invalid-return-type]
 
 
 @dataclass(frozen=True)
@@ -398,4 +398,4 @@ class PlotTunerOutput:
             )
         ).encode(alt.X("hyperparameter"), alt.Y("score"))
 
-        return c.mark_line() + c.encode(alt.Color("selected")).mark_point(filled=True, opacity=1)
+        return c.mark_line() + c.encode(alt.Color("selected")).mark_point(filled=True, opacity=1)  # ty: ignore[unsupported-operator]
