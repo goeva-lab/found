@@ -1,0 +1,1206 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>found.methods &#8212; found  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=d5bc78a3" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/found/methods';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../../genindex/" />
+    <link rel="search" title="Search" href="../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">found  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../guide/">
+    guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanation/">
+    explanations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/goeva-lab/found" title="source repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">source repository</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../guide/">
+    guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanation/">
+    explanations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/goeva-lab/found" title="source repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">source repository</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">found.methods</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for found.methods</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Integral</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">catch_warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">kl_div</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">ks_2samp</span><span class="p">,</span> <span class="n">mannwhitneyu</span><span class="p">,</span> <span class="n">wasserstein_distance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">check_is_fitted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">NMF</span><span class="p">,</span> <span class="n">PCA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.gaussian_process</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianProcessClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.mixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianMixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">LinearSVC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparsefuncs</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.adapters</span><span class="w"> </span><span class="kn">import</span> <span class="n">_INTERNAL_WRAP_ATTR_NAME</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">out_to_dict</span><span class="p">,</span> <span class="n">step_fn</span><span class="p">,</span> <span class="n">wcall</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.seed</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_seed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoolArr</span><span class="p">,</span> <span class="n">FloatMtx</span><span class="p">,</span> <span class="n">MatrixLike</span><span class="p">,</span> <span class="n">NumArr</span><span class="p">,</span> <span class="n">NumericScalar</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mult_preserve_type</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">lhs</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">lhs</span> <span class="o">*</span> <span class="n">rhs</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_array</span><span class="p">):</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">):</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">tocsc</span><span class="p">()</span>
+
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">lhs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">o</span>
+
+
+<div class="viewcode-block" id="log1p">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.log1p">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">log1p</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">X</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    matrix format aware log1p</span>
+
+<span class="sd">    :param X: input matrix</span>
+<span class="sd">    :return: ``log(X + 1)``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_array</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">log1p</span><span class="p">()</span>  <span class="c1"># ty:ignore[unresolved-attribute]</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_array</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">log1p</span><span class="p">()</span>  <span class="c1"># ty:ignore[unresolved-attribute]</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">)</span>
+    <span class="c1"># ignore NECESSITY - typchecker can&#39;t detect log1p method on sparse matrix types</span>
+    <span class="c1"># because method is added dynamically, as observed here:</span>
+    <span class="c1"># https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_data.py#L138</span>
+    <span class="c1"># https://github.com/scipy/scipy/blob/v1.15.3/scipy/sparse/_base.py#L52</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>  <span class="c1"># ty:ignore[invalid-assignment]</span>
+        <span class="c1"># ignore NECESSITY - typechecker doesn&#39;t narrow X to an ndarray</span>
+
+    <span class="k">return</span> <span class="n">X</span></div>
+
+
+
+<div class="viewcode-block" id="scale_rs">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.scale_rs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_rs</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">X</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns scaled version of input matrix with row-wise sums of 1</span>
+
+<span class="sd">    :param X: input matrix</span>
+<span class="sd">    :return: scaled matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">per_cell_sum</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># ty:ignore[invalid-argument-type, no-matching-overload]</span>
+    <span class="c1"># ignore NECESSITY - ???</span>
+    <span class="n">avg_counts_per_cell</span> <span class="o">=</span> <span class="n">per_cell_sum</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">size_fact</span> <span class="o">=</span> <span class="n">per_cell_sum</span> <span class="o">/</span> <span class="n">avg_counts_per_cell</span>
+
+    <span class="c1"># silence warnings about reciprocal for zero, filled with zeros elsewhere</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">):</span>
+        <span class="n">recip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">size_fact</span><span class="p">)</span>
+    <span class="n">recip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">size_fact</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">recip</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mult_preserve_type</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">recip</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="scale_sd">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.scale_sd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_sd</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">X</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns scaled version of input matrix with column-wise standard deviation of 1</span>
+
+<span class="sd">    :param X: input matrix</span>
+<span class="sd">    :return: scaled matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">stdev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">var</span> <span class="o">=</span> <span class="n">sparsefuncs</span><span class="o">.</span><span class="n">mean_variance_axis</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># note: sparsefuncs.mean_variance_axis return type set to Unknown, however type is documented to be 2-tuple given these arguments</span>
+        <span class="n">stdev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+    <span class="c1"># silence warnings about reciprocal for zero, filled with zeros elsewhere</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">):</span>
+        <span class="n">recip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">stdev</span><span class="p">)</span>
+    <span class="n">recip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">stdev</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">recip</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mult_preserve_type</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">recip</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:])</span></div>
+
+
+
+<div class="viewcode-block" id="vst_shiftlog">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.vst_shiftlog">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">vst_shiftlog</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">X</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">overdispersion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a variance stabilizing transform accounting for overdispersion, with size factors scaled to have a geometric mean of 1,</span>
+<span class="sd">    as recommended in `Ahlmann-Eltze et al. &lt;https://doi.org/10.1038/s41592-023-01814-1&gt;`_.</span>
+
+<span class="sd">    :param X: input matrix</span>
+<span class="sd">    :param overdispersion: overdispersion factor</span>
+<span class="sd">    :return: variance stabilized matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">per_cell_sum</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># ty:ignore[invalid-argument-type, no-matching-overload]</span>
+    <span class="c1"># ignore NECESSITY - ???</span>
+    <span class="n">size_fact</span> <span class="o">=</span> <span class="n">per_cell_sum</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">per_cell_sum</span><span class="p">)))</span>
+
+    <span class="c1"># silence warnings about reciprocal for zero, filled with zeros elsewhere</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">):</span>
+        <span class="n">recip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">size_fact</span><span class="p">)</span>
+    <span class="n">recip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">size_fact</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">recip</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">overdispersion</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">mult_preserve_type</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">recip</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">log1p</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">reciprocal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">overdispersion</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">X</span></div>
+
+
+
+<div class="viewcode-block" id="run_pca">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.run_pca">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_pca</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">MatrixLike</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">pre_pca_tf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">MatrixLike</span><span class="p">],</span> <span class="n">MatrixLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">X</span><span class="p">:</span> <span class="n">scale_sd</span><span class="p">(</span><span class="n">vst_shiftlog</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span>
+    <span class="n">pca_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FloatMtx</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs PCA as implemented in :py:class:`~sklearn.decomposition.PCA` using the ARPACK solver to provide PC-space embeddings for the input matrix.</span>
+<span class="sd">    an optional callback can be provided to transform data prior to PCA (e.g. variance stabilizing transform, scaling, etc.).</span>
+
+<span class="sd">    note: :py:class:`~sklearn.decomposition.PCA` w/ ARPACK handles center-ing internally, so the provided transform **should not** center provided data.</span>
+
+<span class="sd">    :param X: cell by gene matrix</span>
+<span class="sd">    :param k: dimensionality of the PCA to run</span>
+<span class="sd">    :param pre_pca_tf: optional callback to transform data matrix prior to PCA embedding, defaults to :py:func:`~found.methods.vst_shiftlog` followed by :py:func:`~found.methods.scale_sd`</span>
+<span class="sd">    :param pca_args: additional arguments to pass to :py:class:`~sklearn.decomposition.PCA`</span>
+<span class="sd">    :return: cell by k matrix representing cells in PC-space</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if dealing with spmatrix types, convert to sparray equivalents</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pre_pca_tf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">pre_pca_tf</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">PCA</span><span class="p">(</span>
+        <span class="n">k</span><span class="p">,</span>
+        <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+        <span class="n">svd_solver</span><span class="o">=</span><span class="s2">&quot;arpack&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="p">(</span><span class="n">pca_args</span> <span class="ow">or</span> <span class="p">{}),</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="run_nmf">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.run_nmf">[docs]</a>
+<span class="nd">@step_fn</span><span class="p">(</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;NMF_p&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_nmf</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">MatrixLike</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">pre_nmf_tf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">MatrixLike</span><span class="p">],</span> <span class="n">MatrixLike</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">X</span><span class="p">:</span> <span class="n">scale_sd</span><span class="p">(</span><span class="n">scale_rs</span><span class="p">(</span><span class="n">X</span><span class="p">)),</span>
+    <span class="n">nmf_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FloatMtx</span><span class="p">,</span> <span class="n">FloatMtx</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs NMF (decomposition of ``X`` into ``w @ h``) as implemented in :py:class:`~sklearn.decomposition.NMF` to provide NMF-cell-by-k-space coordinates for each cell.</span>
+
+<span class="sd">    note:</span>
+
+<span class="sd">    - ``w`` refers to the cell by k matrix</span>
+<span class="sd">    - ``h`` refers to the k by gene matrix</span>
+
+<span class="sd">    see :py:class:`~sklearn.decomposition.NMF` documentation for more details on meaning of arguments.</span>
+
+<span class="sd">    :param X: cell by gene matrix</span>
+<span class="sd">    :param k: k, specifying number of NMF components/programs</span>
+<span class="sd">    :param pre_nmf_tf: optional callback to transform data matrix prior to NMF embedding, defaults to :py:func:`~found.methods.scale_rs` followed by :py:func:`~found.methods.scale_sd`</span>
+<span class="sd">    :param nmf_args: additional arguments to pass to :py:class:`~sklearn.decomposition.NMF`</span>
+<span class="sd">    :return: 2-tuple of:</span>
+
+<span class="sd">        - cell by k matrix representing cells in NMF-cell-by-k-space (e.g. ``w``)</span>
+<span class="sd">        - gene by k matrix representing NMF-computed gene programs (e.g. ``h^T``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if dealing with spmatrix types, convert to sparray equivalents</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_matrix</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">csc_array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">pre_nmf_tf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">pre_nmf_tf</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span> <span class="o">**</span><span class="p">(</span><span class="n">nmf_args</span> <span class="ow">or</span> <span class="p">{}))</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">components_</span><span class="o">.</span><span class="n">T</span></div>
+
+
+
+<div class="viewcode-block" id="HasFitBinClass">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.HasFitBinClass">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasFitBinClass</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+    <span class="n">classes_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">]]</span>
+
+    <span class="n">fit</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">FloatMtx</span><span class="p">,</span> <span class="n">BoolArr</span><span class="p">],</span> <span class="n">Self</span><span class="p">]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sklearn_wrap</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">HasFitBinClass</span><span class="p">,</span> <span class="n">U</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">](</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
+    <span class="n">score_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
+        <span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="n">U</span><span class="p">],</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]],</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">z</span><span class="p">)[</span>
+        <span class="c1"># ignore NECESSITY - predict_proba method not present on HasFitBinClass</span>
+        <span class="c1"># on purpose to allow for compatibility with SVM use case, but is _generally_ present</span>
+        <span class="c1"># so it is useful to keep this as default argument value to avoid repetition of below snippet</span>
+        <span class="p">:,</span> <span class="n">m</span><span class="o">.</span><span class="n">classes_</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># classes_ is generated by np.unique, which returns the classes</span>
+        <span class="c1"># in sorted order, so True should always be the second class</span>
+        <span class="c1"># however we still perform the `.index` operation as a sanity check</span>
+    <span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">T</span><span class="p">]:</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">score_fn</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">Z</span><span class="p">),</span> <span class="n">model</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="reg_logit">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.reg_logit">[docs]</a>
+<span class="nd">@step_fn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reg_logit</span><span class="p">(</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">logit_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs a logistic regression to score cells as affected/unaffected by the condition.</span>
+
+<span class="sd">    :param Z: cell by k matrix (where k is some number of dimensions)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param logit_args: additional arguments to pass to :py:class:`~sklearn.linear_model.LogisticRegression` (defaults: ``solver``: ``&quot;newton-cg&quot;``, ``C``: :py:obj:`~numpy.inf`)</span>
+<span class="sd">    :return: 2-tuple of:</span>
+
+<span class="sd">        - 1-d float array of probability scores generated by the fitted model</span>
+<span class="sd">        - the fitted model object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">catch_warnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">,</span> <span class="n">lineno</span><span class="o">=</span><span class="mi">1170</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">sklearn_wrap</span><span class="p">(</span>
+            <span class="n">Z</span><span class="p">,</span>
+            <span class="n">V</span><span class="p">,</span>
+            <span class="n">LogisticRegression</span><span class="p">(</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+                <span class="o">**</span><span class="p">({</span><span class="s2">&quot;solver&quot;</span><span class="p">:</span> <span class="s2">&quot;newton-cg&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">}</span> <span class="o">|</span> <span class="p">(</span><span class="n">logit_args</span> <span class="ow">or</span> <span class="p">{})),</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reg_svm">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.reg_svm">[docs]</a>
+<span class="nd">@step_fn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reg_svm</span><span class="p">(</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">svm_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">SVC</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs a support vector machine classifier -based regression to score cells as affected/unaffected by the condition.</span>
+
+<span class="sd">    :param Z: cell by k matrix (where k is some number of dimensions)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param svm_args: additional arguments to pass to :py:class:`~sklearn.svm.SVC`</span>
+<span class="sd">    :return: 2-tuple of:</span>
+
+<span class="sd">        - 1-d float array of probability scores generated by the fitted model</span>
+<span class="sd">        - the fitted model object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sklearn_wrap</span><span class="p">(</span>
+        <span class="n">Z</span><span class="p">,</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">SVC</span><span class="p">(</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">(</span><span class="n">svm_args</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">z</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reg_lsvm">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.reg_lsvm">[docs]</a>
+<span class="nd">@step_fn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reg_lsvm</span><span class="p">(</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">lsvm_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">LinearSVC</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs a linear kernel support vector machine classifier -based regression to score cells as affected/unaffected by the condition.</span>
+
+<span class="sd">    :param Z: cell by k matrix (where k is some number of dimensions)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param lsvm_args: additional arguments to pass to :py:class:`~sklearn.svm.LinearSVC`</span>
+<span class="sd">    :return: 2-tuple of:</span>
+
+<span class="sd">        - 1-d float array of probability scores generated by the fitted model</span>
+<span class="sd">        - the fitted model object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sklearn_wrap</span><span class="p">(</span>
+        <span class="n">Z</span><span class="p">,</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">LinearSVC</span><span class="p">(</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">(</span><span class="n">lsvm_args</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="p">),</span>
+        <span class="k">lambda</span> <span class="n">m</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">z</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reg_gp">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.reg_gp">[docs]</a>
+<span class="nd">@step_fn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reg_gp</span><span class="p">(</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">gp_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">GaussianProcessClassifier</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs a Gaussian process classifier -based regression to score cells as affected/unaffected by the condition.</span>
+
+<span class="sd">    :param Z: cell by k matrix (where k is some number of dimensions)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param gp_args: additional arguments to pass to :py:class:`~sklearn.gaussian_process.GaussianProcessClassifier`</span>
+<span class="sd">    :return: 2-tuple of:</span>
+
+<span class="sd">        - 1-d float array of probability scores generated by the fitted model</span>
+<span class="sd">        - the fitted model object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sklearn_wrap</span><span class="p">(</span>
+        <span class="n">Z</span><span class="p">,</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">GaussianProcessClassifier</span><span class="p">(</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">(</span><span class="n">gp_args</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reg_rf">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.reg_rf">[docs]</a>
+<span class="nd">@step_fn</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">reg_rf</span><span class="p">(</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">rf_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs a random forest classifier -based regression to score cells as affected/unaffected by the condition.</span>
+
+<span class="sd">    :param Z: cell by k matrix (where k is some number of dimensions)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param rf_args: additional arguments to pass to :py:class:`~sklearn.ensemble.RandomForestClassifier`</span>
+<span class="sd">    :return: 2-tuple of:</span>
+
+<span class="sd">        - 1-d float array of probability scores generated by the fitted model</span>
+<span class="sd">        - the fitted model object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">sklearn_wrap</span><span class="p">(</span>
+        <span class="n">Z</span><span class="p">,</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">RandomForestClassifier</span><span class="p">(</span>  <span class="c1"># ty:ignore[invalid-argument-type]</span>
+            <span class="c1"># ignore NECESSITY - `RandomForestClassifier.classes_` attribute is set to be list[Unknown], not just ndarray</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">(</span><span class="n">rf_args</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasFitPredictClass</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;:meta hide-value:&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_predict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">]]:</span> <span class="o">...</span>
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HasPredictBinClass</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;:meta hide-value:&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArr</span><span class="p">:</span> <span class="o">...</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bin_model</span><span class="p">(</span>
+    <span class="n">Z</span><span class="p">:</span> <span class="n">FloatMtx</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">HasPredictBinClass</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArr</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;:meta hide-value:&quot;&quot;&quot;</span>
+
+    <span class="c1"># when possible, check the model is fitted, can&#39;t be checked</span>
+    <span class="c1"># via argument typing since HasEstimator is a Protocol</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">from_clusts_to_labs</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">HasFitPredictClass</span><span class="p">,</span> <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span> <span class="n">case_only_Y_hat</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArr</span><span class="p">:</span>
+    <span class="n">clusts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">case_only_Y_hat</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">new_labs</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># cluster 0/1 doesn&#39;t necessarily match True/False label so</span>
+    <span class="c1"># check we check correspondence by using the mean of p_hat in each</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cl</span> <span class="o">:=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">clusts</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">clust_0_has_lower_mean</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">cl</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="p">(</span><span class="n">case_only_Y_hat</span><span class="p">[</span><span class="n">clusts</span> <span class="o">==</span> <span class="n">cl</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">clust_0_has_lower_mean</span> <span class="o">=</span> <span class="n">case_only_Y_hat</span><span class="p">[</span><span class="o">~</span><span class="n">clusts</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">case_only_Y_hat</span><span class="p">[</span><span class="n">clusts</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="c1"># we only reassign cells in the case condition</span>
+    <span class="n">new_labs</span><span class="p">[</span><span class="n">V</span><span class="p">]</span> <span class="o">=</span> <span class="n">clusts</span> <span class="k">if</span> <span class="n">clust_0_has_lower_mean</span> <span class="k">else</span> <span class="o">~</span><span class="n">clusts</span>
+
+    <span class="k">return</span> <span class="n">new_labs</span>
+
+
+<div class="viewcode-block" id="bin_kmeans">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.bin_kmeans">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bin_kmeans</span><span class="p">(</span>
+    <span class="n">Y</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">kmeans_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArr</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs k-means based clustering to binarize continuous scores into boolean labels.</span>
+
+<span class="sd">    :param Y: 1-d float array of condition scores (p_hat)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param kmeans_args: additional arguments to pass to :py:class:`~sklearn.cluster.KMeans` (defaults: ``n_init``: ``&quot;auto&quot;``)</span>
+<span class="sd">    :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">from_clusts_to_labs</span><span class="p">(</span>
+        <span class="n">KMeans</span><span class="p">(</span>
+            <span class="n">n_clusters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">({</span><span class="s2">&quot;n_init&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">}</span> <span class="o">|</span> <span class="p">(</span><span class="n">kmeans_args</span> <span class="ow">or</span> <span class="p">{})),</span>
+        <span class="p">),</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">V</span><span class="p">],</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="bin_gmm">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.bin_gmm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">bin_gmm</span><span class="p">(</span><span class="n">Y</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">,</span> <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span> <span class="n">gmm_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoolArr</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    runs gaussian mixture modeling based clustering to binarize continuous scores into boolean labels.</span>
+
+<span class="sd">    :param Y: 1-d float array of condition scores (p_hat)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param gmm_args: additional arguments to pass to :py:class:`~sklearn.mixture.GaussianMixture`</span>
+<span class="sd">    :return: 1-d boolean array of adjusted condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">from_clusts_to_labs</span><span class="p">(</span>
+        <span class="n">GaussianMixture</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">get_seed</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">(</span><span class="n">gmm_args</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="p">),</span>
+        <span class="n">V</span><span class="p">,</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">V</span><span class="p">],</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mannwhitneyu_pvals</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">lhs</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">lfc_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]]:</span>
+    <span class="k">assert</span> <span class="n">lhs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;lhs/rhs number of features must be equal&quot;</span>
+
+    <span class="n">ngenes</span> <span class="o">=</span> <span class="n">lhs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">lhs_mean</span><span class="p">,</span> <span class="n">rhs_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># ty:ignore[no-matching-overload]</span>
+        <span class="c1"># ignore NECESSITY - ???</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lhs_mean</span><span class="p">,</span> <span class="n">rhs_mean</span> <span class="o">=</span> <span class="n">lhs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">rhs</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># ty:ignore[invalid-argument-type, no-matching-overload]</span>
+
+    <span class="c1"># remove genes for which log2fc is not sensical</span>
+    <span class="c1"># (i.e. mean of zero in either condition)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">lhs_mean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">rhs_mean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># remove genes where log2FC is less than 1.5</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">rhs_mean</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">/</span> <span class="n">lhs_mean</span><span class="p">[</span><span class="n">mask</span><span class="p">]))</span> <span class="o">&gt;</span> <span class="n">lfc_cutoff</span>
+
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">lhs</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">],</span> <span class="n">rhs</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">]</span>  <span class="c1"># ty:ignore[invalid-argument-type]</span>
+    <span class="c1"># ignore NECESSITY - typechecker can&#39;t tell that lhs/rhs are of type MatrixLike</span>
+    <span class="c1"># due to type hints on indexing not sufficiently preserving type info</span>
+
+    <span class="c1"># mannwhitneyu does not work on sparse arrays</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">lhs</span><span class="o">.</span><span class="n">todense</span><span class="p">(),</span> <span class="n">rhs</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+
+    <span class="n">pvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">ngenes</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">pvals</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">mannwhitneyu</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">pvalue</span> <span class="o">*</span> <span class="n">ngenes</span>
+    <span class="k">return</span> <span class="n">pvals</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mannwhitneyu_ndeg</span><span class="p">[</span><span class="n">T</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">](</span><span class="n">lhs</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">lfc_cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">signif_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">:</span>
+    <span class="c1"># mannwhitneyu_pvals returns nans for failed comparisons, but np.nan &lt; x = False for all x so this works</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">mannwhitneyu_pvals</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">lfc_cutoff</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">signif_cutoff</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="score_deg">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.score_deg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_deg</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">,</span> <span class="n">W</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span> <span class="n">lfc_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">sig_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a heuristic to score label adjustment based on number of DEGs produced by new labels.</span>
+
+<span class="sd">    :param X: input cell by gene matrix</span>
+<span class="sd">    :param W: 1-d boolean array of adjusted condition labels (True corresponds to case, False to control)</span>
+<span class="sd">    :param lfc_cutoff: threshold log2 fold change value for a gene to be considered a DEG</span>
+<span class="sd">    :param sig_cutoff: threshold Bonferroni-corrected Mann-Whitney U-test p value for a gene to be considered a DEG</span>
+<span class="sd">    :return: number of DEGs (as determined by a Bonferroni-corrected Mann-Whitney U-test p value of less than ``sig_cutoff`` and an absolute log2 fold change of more than ``lfc_cutoff``)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">~</span><span class="n">W</span><span class="p">,</span> <span class="p">:],</span> <span class="n">X</span><span class="p">[</span><span class="n">W</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">mannwhitneyu_ndeg</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">lfc_cutoff</span><span class="p">,</span> <span class="n">sig_cutoff</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="score_deg2">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.score_deg2">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_deg2</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">MatrixLike</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">W</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">score_weight_vsctl</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">lfc_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">sig_cutoff</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Integral</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a heuristic to score label adjustment based on number of DEGs produced by new labels using two comparisons.</span>
+<span class="sd">    specifically two comparisons are run, and the return value is a weighted difference of:</span>
+
+<span class="sd">    1) case cells labeled affected vs case cells labeled unaffected (amount should be as large as possible)</span>
+<span class="sd">    2) control cells vs case cells labeled unaffected (amount should be as small as possible)</span>
+
+<span class="sd">    :param X: input cell by gene matrix</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param score_weight_vsctl: weight given to number of DEGs in second comparison</span>
+<span class="sd">    :param lfc_cutoff: threshold log2 fold change value for a gene to be considered a DEG</span>
+<span class="sd">    :param sig_cutoff: threshold Bonferroni-corrected Mann-Whitney U-test p value for a gene to be considered a DEG</span>
+<span class="sd">    :return: number of DEGs in first comparison - ``score_weight_vsctl`` * number of DEGs in second comparison</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">case_only_expr</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">V</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">case_only_vhat</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="n">V</span><span class="p">]</span>
+    <span class="n">ctl_only_expr</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="o">~</span><span class="n">V</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">mannwhitneyu_ndeg</span><span class="p">(</span>
+        <span class="c1"># X values from labeled unaffected</span>
+        <span class="n">case_only_expr</span><span class="p">[</span><span class="o">~</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="c1"># X values from labeled affected</span>
+        <span class="n">case_only_expr</span><span class="p">[</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="n">lfc_cutoff</span><span class="p">,</span>
+        <span class="n">sig_cutoff</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-</span> <span class="p">(</span>
+        <span class="n">mannwhitneyu_ndeg</span><span class="p">(</span>
+            <span class="c1"># X values from true control</span>
+            <span class="n">ctl_only_expr</span><span class="p">,</span>
+            <span class="c1"># X values from labeled unaffected</span>
+            <span class="n">case_only_expr</span><span class="p">[</span><span class="o">~</span><span class="n">case_only_vhat</span><span class="p">],</span>
+            <span class="n">lfc_cutoff</span><span class="p">,</span>
+            <span class="n">sig_cutoff</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="o">*</span> <span class="n">score_weight_vsctl</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="score_ks_diff">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.score_ks_diff">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_ks_diff</span><span class="p">(</span>
+    <span class="n">Y</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">W</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">score_weight_vsctl</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NumericScalar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a heuristic to score label adjustment based on the distribution difference (using the Kolmogorov-Smirnov statistic) between p_hat values.</span>
+<span class="sd">    specifically two comparisons are run, and the return value is a weighted difference of:</span>
+
+<span class="sd">    1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)</span>
+<span class="sd">    2) control cells vs case cells labeled unaffected (difference should be as small as possible)</span>
+
+<span class="sd">    :param Y: 1-d float array of condition scores (p_hat)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param score_weight_vsctl: weight given to KS stat of the second comparison</span>
+<span class="sd">    :return: KS stat of first comparison - ``score_weight_vsctl`` * KS stat of second comparison</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">case_only_pred</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">V</span><span class="p">]</span>
+    <span class="n">case_only_vhat</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="n">V</span><span class="p">]</span>
+    <span class="n">ctl_only_pred</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="o">~</span><span class="n">V</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">ks_2samp</span><span class="p">(</span>
+        <span class="c1"># Y values from labeled unaffected</span>
+        <span class="n">case_only_pred</span><span class="p">[</span><span class="o">~</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="c1"># Y values from labeled affected</span>
+        <span class="n">case_only_pred</span><span class="p">[</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="n">alternative</span><span class="o">=</span><span class="s2">&quot;greater&quot;</span><span class="p">,</span>
+        <span class="c1"># `ks_2samp` alternative refers to the CDFs of `data1`/`data2`</span>
+        <span class="c1"># the trend in which is inversely related to the trend of</span>
+        <span class="c1"># the means of `data1`/`data2`. as such, since our alternative</span>
+        <span class="c1"># hypothesis is that labeled unaffected cells have a p_hat</span>
+        <span class="c1"># distribution less than that of labeled affected cells,</span>
+        <span class="c1"># the alternative argument is set to &quot;greater&quot;, as</span>
+        <span class="c1"># the trend for their respective CDFs would be inverted</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">statistic</span> <span class="o">-</span> <span class="p">(</span>
+        <span class="n">ks_2samp</span><span class="p">(</span>
+            <span class="c1"># Y values from true control</span>
+            <span class="n">ctl_only_pred</span><span class="p">,</span>
+            <span class="c1"># Y values from labeled unaffected</span>
+            <span class="n">case_only_pred</span><span class="p">[</span><span class="o">~</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">statistic</span>
+        <span class="o">*</span> <span class="n">score_weight_vsctl</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="symm_kl_div">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.symm_kl_div">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">symm_kl_div</span><span class="p">(</span><span class="n">lhs</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NumericScalar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a symmetrized version of Kullback-Leibler (KL) divergence, by returning the sum of the KL divergence from ``lhs`` to ``rhs`` and from ``rhs`` to ``lhs``.</span>
+<span class="sd">    this symmetrized statistic is also known as the Jeffreys divergence.</span>
+
+<span class="sd">    :param lhs: 1-d N-length vector of probability values</span>
+<span class="sd">    :param rhs: 1-d N-length vector of probability values</span>
+<span class="sd">    :returns: KL divergence of ``lhs`` to ``rhs`` + KL divergence of ``rhs`` to ``lhs``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">kl_div</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">kl_div</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">lhs</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="score_dist_diff">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.score_dist_diff">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_dist_diff</span><span class="p">(</span>
+    <span class="n">Y</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">W</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">distance_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">NumArr</span><span class="p">],</span> <span class="n">NumericScalar</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein_distance</span><span class="p">,</span>
+    <span class="n">score_weight_vsctl</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NumericScalar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a heuristic to score label adjustment based on the distribution difference between p_hat values.</span>
+<span class="sd">    specifically two comparisons are run, and the return value is a weighted difference of:</span>
+
+<span class="sd">    1) case cells labeled affected vs case cells labeled unaffected (difference should be as large as possible)</span>
+<span class="sd">    2) control cells vs case cells labeled unaffected (difference should be as small as possible)</span>
+
+<span class="sd">    :param Y: 1-d float array of condition scores (p_hat)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param W: boolean array of adjusted condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param distance_fn: distance function used to calculate distribution difference between p_hat values (defaults to earth&#39;s mover distance, as computed by :py:func:`~scipy.stats.wasserstein_distance`)</span>
+<span class="sd">    :param score_weight_vsctl: weight given to result of second comparison</span>
+<span class="sd">    :return: statistic from first comparison - ``score_weight_vsctl`` * statistic from second comparison</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">case_only_vhat</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="n">V</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">case_only_vhat</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>  <span class="c1"># @TODO: figure out better strategy to deal with no/total relabeling</span>
+
+    <span class="n">case_only_pred</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="n">V</span><span class="p">]</span>
+    <span class="n">ctl_only_pred</span> <span class="o">=</span> <span class="n">Y</span><span class="p">[</span><span class="o">~</span><span class="n">V</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">distance_fn</span><span class="p">(</span>
+        <span class="c1"># Y values from labeled unaffected</span>
+        <span class="n">case_only_pred</span><span class="p">[</span><span class="o">~</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="c1"># Y values from labeled affected</span>
+        <span class="n">case_only_pred</span><span class="p">[</span><span class="n">case_only_vhat</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-</span> <span class="p">(</span>
+        <span class="n">distance_fn</span><span class="p">(</span>
+            <span class="c1"># Y values from true control</span>
+            <span class="n">ctl_only_pred</span><span class="p">,</span>
+            <span class="c1"># Y values from labeled unaffected</span>
+            <span class="n">case_only_pred</span><span class="p">[</span><span class="o">~</span><span class="n">case_only_vhat</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="o">*</span> <span class="n">score_weight_vsctl</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="score_null_dist">
+<a class="viewcode-back" href="../../../reference/methods/#found.methods.score_null_dist">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">score_null_dist</span><span class="p">(</span>
+    <span class="n">Y</span><span class="p">:</span> <span class="n">NumArr</span><span class="p">,</span>
+    <span class="n">V</span><span class="p">:</span> <span class="n">BoolArr</span><span class="p">,</span>
+    <span class="n">pipeline_algo</span><span class="p">:</span> <span class="n">Pipeline</span><span class="p">,</span>
+    <span class="n">n_iters</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">distance_fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NumArr</span><span class="p">,</span> <span class="n">NumArr</span><span class="p">],</span> <span class="n">NumericScalar</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein_distance</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NumericScalar</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implements a heuristic to score label adjustment based on a distance metric between p_hat values generated by the pipeline and</span>
+<span class="sd">    an approximation of null-distributed p_hat values (generated by re-running the pipeline regression step given randomly permuted condition labels).</span>
+
+<span class="sd">    :param Y: 1-d float array of condition scores (p_hat)</span>
+<span class="sd">    :param V: 1-d boolean array of condition labels (False corresponds to control, True to case)</span>
+<span class="sd">    :param pipeline_algo: pipeline class used to generate outputs</span>
+<span class="sd">    :param n_iters: number of iterations to run random sampling procedure over, returning average of all iterations</span>
+<span class="sd">    :param distance_fn: distance metric to use between &quot;null&quot; Y values and pipeline outputs (defaults to earth&#39;s mover distance, as computed by :py:func:`~scipy.stats.wasserstein_distance`)</span>
+<span class="sd">    :return: distance between pipeline generated p_hat values and p_hat values yielded by re-running regression on randomly permuted condition labels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">get_seed</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">distance_fn</span><span class="p">(</span>
+                    <span class="n">wcall</span><span class="p">(</span>
+                        <span class="n">kwargs</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;V&quot;</span><span class="p">:</span> <span class="n">rng</span><span class="o">.</span><span class="n">permuted</span><span class="p">(</span><span class="n">V</span><span class="p">)},</span>
+                        <span class="n">out_to_dict</span><span class="p">(</span><span class="n">pipeline_algo</span><span class="o">.</span><span class="n">regr_fn</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pipeline_algo</span><span class="o">.</span><span class="n">regr_fn</span><span class="p">,</span> <span class="n">_INTERNAL_WRAP_ATTR_NAME</span><span class="p">)),</span>
+                        <span class="n">pipeline_algo</span><span class="o">.</span><span class="n">strict</span><span class="p">,</span>
+                    <span class="p">)[</span><span class="s2">&quot;Y&quot;</span><span class="p">],</span>  <span class="c1"># ty:ignore[invalid-argument-type]</span>
+                    <span class="c1"># ignore NECESSITY - Y should always be a NumArr</span>
+                    <span class="n">Y</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_iters</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="o">/</span> <span class="n">n_iters</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, goeva lab.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

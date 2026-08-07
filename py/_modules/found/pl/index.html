@@ -1,0 +1,855 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>found.pl &#8212; found  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=d5bc78a3" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../../../_static/documentation_options.js?v=187304be"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/found/pl';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../../../genindex/" />
+    <link rel="search" title="Search" href="../../../search/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search/"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">found  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../guide/">
+    guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanation/">
+    explanations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/goeva-lab/found" title="source repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">source repository</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference/">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../guide/">
+    guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanation/">
+    explanations
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/goeva-lab/found" title="source repository" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">source repository</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">found.pl</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for found.pl</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Self</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">altair</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">alt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas.api.extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExtensionArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">sparse</span> <span class="k">as</span> <span class="n">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaussian_kde</span>
+
+<span class="n">alt</span><span class="o">.</span><span class="n">data_transformers</span><span class="o">.</span><span class="n">enable</span><span class="p">(</span><span class="s2">&quot;vegafusion&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mk_range</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]]:</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">kde</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">d</span><span class="p">)(</span><span class="n">mk_range</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PlotAdata</span><span class="p">:</span>
+    <span class="c1"># @TODO: add type specifications for fields, do verification</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adata</span><span class="p">:</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">adata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">layers</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__mtx</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">adata</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__mtx</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">X</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__idx</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__meta</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__meta_m</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__meta_p</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__ret_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExtensionArray</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExtensionArray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mtx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;using get_data cannot be done when plotting object has not been initialized with an anndata object&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__idx</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mtx</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__idx</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>  <span class="c1"># ty:ignore[not-subscriptable]</span>
+            <span class="c1"># ignore NECESSITY - adata.X type specifications are so broad</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparray</span> <span class="o">|</span> <span class="n">sp</span><span class="o">.</span><span class="n">spmatrix</span><span class="p">):</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>  <span class="c1"># ty:ignore[unresolved-attribute]</span>
+                <span class="c1"># ignore NECESSITY - ???</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ret_cache</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__meta</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__meta</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ret_cache</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+        <span class="n">split</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">key_b</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">split</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key_b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__meta_m</span><span class="p">:</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__meta_m</span><span class="p">[</span><span class="n">key_b</span><span class="p">][:,</span> <span class="n">idx</span><span class="p">]</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ret_cache</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;key </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> invalid&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">encode_args</span><span class="p">:</span> <span class="n">alt</span><span class="o">.</span><span class="n">SchemaBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">:</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">):</span> <span class="n">k</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">encode_args</span><span class="p">}</span>
+        <span class="n">chk</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">encode_args</span><span class="p">}</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">chk</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">conf</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;configuration schema ambiguous, please rename columns: </span><span class="si">{</span><span class="n">chk</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">set</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">conf</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">schemas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">encode_args</span><span class="p">:</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">])</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">schema</span><span class="p">)(</span><span class="o">**</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span> <span class="o">|</span> <span class="p">{</span><span class="s2">&quot;shorthand&quot;</span><span class="p">:</span> <span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)}))</span>
+            <span class="k">if</span> <span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;sort&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="n">alt</span><span class="o">.</span><span class="n">Undefined</span> <span class="ow">and</span> <span class="n">df</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;O&quot;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">to_num</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]])</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">to_num</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">schema</span><span class="o">.</span><span class="n">_kwds</span><span class="p">[</span><span class="s2">&quot;shorthand&quot;</span><span class="p">]][</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+            <span class="n">schemas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="o">*</span><span class="n">schemas</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">encode_args</span><span class="p">:</span> <span class="n">alt</span><span class="o">.</span><span class="n">SchemaBase</span><span class="p">,</span> <span class="o">**</span><span class="n">mark_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="o">*</span><span class="n">encode_args</span><span class="p">)</span><span class="o">.</span><span class="n">mark_point</span><span class="p">(</span><span class="o">**</span><span class="p">({</span><span class="s2">&quot;filled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="o">|</span> <span class="n">mark_args</span><span class="p">))</span>  <span class="c1"># ty: ignore[invalid-return-type, invalid-argument-type]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">encode_args</span><span class="p">:</span> <span class="n">alt</span><span class="o">.</span><span class="n">SchemaBase</span><span class="p">,</span> <span class="o">**</span><span class="n">mark_args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="o">*</span><span class="n">encode_args</span><span class="p">)</span><span class="o">.</span><span class="n">mark_line</span><span class="p">(</span><span class="o">**</span><span class="n">mark_args</span><span class="p">)</span>  <span class="c1"># ty: ignore[invalid-return-type]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">vln</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">continuous</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">discrete</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">split</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rescale_by</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;area&quot;</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+        <span class="n">vertical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;continuous&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">continuous</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">continuous</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">continuous</span><span class="o">.</span><span class="n">array</span><span class="p">}</span>
+            <span class="o">|</span> <span class="p">(</span>
+                <span class="p">{}</span>
+                <span class="k">if</span> <span class="n">discrete</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;discrete&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">discrete</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">discrete</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">discrete</span><span class="o">.</span><span class="n">array</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="o">|</span> <span class="p">({}</span> <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{</span><span class="s2">&quot;split&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">split</span><span class="o">.</span><span class="n">array</span><span class="p">})</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;split&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">==</span> <span class="mi">2</span>
+
+        <span class="n">gby</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">match</span> <span class="n">discrete</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="n">split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">case</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">gby</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="s2">&quot;split&quot;</span><span class="p">]</span>
+            <span class="k">case</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">gby</span> <span class="o">=</span> <span class="s2">&quot;split&quot;</span>
+            <span class="k">case</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">gby</span> <span class="o">=</span> <span class="s2">&quot;discrete&quot;</span>
+
+        <span class="k">if</span> <span class="n">gby</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dens_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">kde</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;continuous&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">),</span> <span class="s2">&quot;val&quot;</span><span class="p">:</span> <span class="n">mk_range</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;continuous&quot;</span><span class="p">],</span> <span class="n">n</span><span class="p">)})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dens_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="k">if</span> <span class="n">gby</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">gby</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">))[</span><span class="s2">&quot;continuous&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+                <span class="n">density</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">kde</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)),</span> <span class="n">val</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">mk_range</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rescale_by</span> <span class="o">==</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span>
+                <span class="n">counts</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">gby</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="s2">&quot;continuous&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">discrete</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">counts</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">dens_data</span> <span class="o">=</span> <span class="n">dens_data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span> <span class="o">/</span> <span class="n">e</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dens_data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>  <span class="c1"># for type checker, should always be true</span>
+
+            <span class="n">dens_data</span> <span class="o">=</span> <span class="n">dens_data</span><span class="o">.</span><span class="n">explode</span><span class="p">([</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rescale_by</span> <span class="o">==</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span>
+                <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;continuous&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">discrete</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dens_data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="s2">&quot;split&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">rescale_by</span> <span class="o">==</span> <span class="s2">&quot;width&quot;</span> <span class="k">else</span> <span class="s2">&quot;discrete&quot;</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">d</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density_refl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span>
+                <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;split&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;split&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">dens_data</span><span class="p">[</span><span class="s2">&quot;density_refl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">vertical</span><span class="p">:</span>
+            <span class="n">dens_ax</span><span class="p">,</span> <span class="n">refl_ax</span><span class="p">,</span> <span class="n">val_ax</span><span class="p">,</span> <span class="n">facet_ax</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">X2</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">Column</span>
+            <span class="n">mdict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;orient&quot;</span><span class="p">:</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">}</span>
+            <span class="c1"># annotation needed to avoid narrowing by typecheker</span>
+            <span class="n">hdict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;orient&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;labelAnchor&quot;</span><span class="p">:</span> <span class="s2">&quot;middle&quot;</span><span class="p">,</span> <span class="s2">&quot;labelPadding&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dens_ax</span><span class="p">,</span> <span class="n">refl_ax</span><span class="p">,</span> <span class="n">val_ax</span><span class="p">,</span> <span class="n">facet_ax</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">Y2</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">alt</span><span class="o">.</span><span class="n">Row</span>
+            <span class="n">mdict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;orient&quot;</span><span class="p">:</span> <span class="s2">&quot;vertical&quot;</span><span class="p">}</span>
+            <span class="c1"># annotation needed to avoid narrowing by typecheker</span>
+            <span class="n">hdict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;labelPadding&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;labelAngle&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;labelAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;left&quot;</span><span class="p">}</span>
+
+        <span class="n">chart</span><span class="p">:</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># ty: ignore[invalid-assignment]</span>
+            <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">dens_data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">),</span> <span class="n">view</span><span class="o">=</span><span class="n">alt</span><span class="o">.</span><span class="n">ViewConfig</span><span class="p">(</span><span class="n">stroke</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="n">dens_ax</span><span class="p">(</span><span class="s2">&quot;density:Q&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">impute</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[]</span> <span class="k">if</span> <span class="n">discrete</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">]),</span>
+                <span class="n">val_ax</span><span class="p">(</span><span class="s2">&quot;val:Q&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+                    <span class="n">continuous</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">continuous</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">continuous</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">continuous</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="n">refl_ax</span><span class="p">(</span><span class="s2">&quot;density_refl:Q&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">mark_area</span><span class="p">(</span><span class="o">**</span><span class="n">mdict</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">discrete</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">facet_enc</span> <span class="o">=</span> <span class="n">facet_ax</span><span class="p">(</span><span class="s2">&quot;discrete:N&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">spacing</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="o">**</span><span class="n">hdict</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;discrete&quot;</span><span class="p">],</span> <span class="s2">&quot;cat&quot;</span><span class="p">):</span>
+                <span class="n">facet_enc</span> <span class="o">=</span> <span class="n">facet_enc</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;discrete&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+            <span class="n">chart</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">facet_enc</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">split</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">col_enc</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Color</span><span class="p">(</span><span class="s2">&quot;split:N&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+                <span class="n">split</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">split</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">if</span> <span class="n">split</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;split&quot;</span><span class="p">],</span> <span class="s2">&quot;cat&quot;</span><span class="p">):</span>
+                <span class="n">col_enc</span> <span class="o">=</span> <span class="n">col_enc</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;split&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+            <span class="n">chart</span> <span class="o">=</span> <span class="n">chart</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">col_enc</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">chart</span>
+
+
+<div class="viewcode-block" id="PlotHiDDENOutput">
+<a class="viewcode-back" href="../../../reference/pl/#found.pl.PlotHiDDENOutput">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlotHiDDENOutput</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    class which when provided with pipeline outputs (see fields),</span>
+<span class="sd">    can be used to create various diagnostic plots.</span>
+
+<span class="sd">    can be indexed to plot only a subset of the data.</span>
+
+<span class="sd">    :param adata: object containing input data</span>
+<span class="sd">    :param p_hat: HiDDEN-generated p_hat values (regression step outputs)</span>
+<span class="sd">    :param labs: HiDDEN-adjusted condition labels (binarization step outputs)</span>
+<span class="sd">    :param layer: name of layer to use when accessing layer-specific data from ``self.adata``, ``X`` slot is used if set to ``None``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">adata</span><span class="p">:</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span>
+    <span class="n">p_hat</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+    <span class="n">labs</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">__pl</span><span class="p">:</span> <span class="n">PlotAdata</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="c1"># make sure to mangle private __pl field, see scheme defined here: https://peps.python.org/pep-0008/#method-names-and-instance-variables</span>
+            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">__pl&quot;</span><span class="p">,</span>
+            <span class="n">PlotAdata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adata</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s2">&quot;counts&quot;</span> <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">adata</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">Callable</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adata</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adata</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_hat</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+            <span class="n">layer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="PlotHiDDENOutput.reg_vln">
+<a class="viewcode-back" href="../../../reference/pl/#found.pl.PlotHiDDENOutput.reg_vln">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reg_vln</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">split_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;area&quot;</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+        <span class="n">vertical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        method used to generate violin plots of p_hat values</span>
+
+<span class="sd">        :param group_by: key in self.adata to group violin plot by</span>
+<span class="sd">        :param split_mode: if the violin plot should be split by the refined HiDDEN labels, and if yes, how should the splits be scaled</span>
+<span class="sd">            (options: ``&quot;area&quot;`` - meaning they have equivalent area, ``&quot;n&quot;`` - scaled by proportion of observations, ``&quot;width&quot;`` - min/max scaling so that they have the same width, ``False`` - no splitting)</span>
+<span class="sd">        :param vertical: should the plot be vertical (like a violin plot) or horizontal (e.g. like a density plot)</span>
+<span class="sd">        :param n: number of bins for density estimation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pl</span><span class="o">.</span><span class="n">vln</span><span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_hat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;HiDDEN p_hat&quot;</span><span class="p">),</span>
+                <span class="n">group_by</span><span class="p">,</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;HiDDEN labels&quot;</span><span class="p">),</span>
+                <span class="n">rescale_by</span><span class="o">=</span><span class="n">split_mode</span><span class="p">,</span>
+                <span class="n">vertical</span><span class="o">=</span><span class="n">vertical</span><span class="p">,</span>
+                <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">split_mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pl</span><span class="o">.</span><span class="n">vln</span><span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_hat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;HiDDEN p_hat&quot;</span><span class="p">),</span>
+                <span class="n">group_by</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="n">vertical</span><span class="o">=</span><span class="n">vertical</span><span class="p">,</span>
+                <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlotHiDDENOutput.bin_bar">
+<a class="viewcode-back" href="../../../reference/pl/#found.pl.PlotHiDDENOutput.bin_bar">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bin_bar</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">orig_labs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">ctrl_val</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
+        <span class="n">group_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vertical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        method used to generate stacked bar plots showing levels of case, control, and HiDDEN-adjusted labels</span>
+
+<span class="sd">        :param orig_labs: key in ``self.adata`` for original condition labels</span>
+<span class="sd">        :param ctrl_val: value corresponding to control in condition labels</span>
+<span class="sd">        :param group_by: optional key in ``self.adata`` to group calculation by</span>
+<span class="sd">        :param vertical: should the plot be vertical (i.e. metric on Y axis, groups on X axis) or horizontal (i.e. metric on X axis, groups on Y axis)</span>
+<span class="sd">        :param scale: should columns height be scaled by group size (i.e. turns into representation of group fractions instead raw numbers)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">orig_labs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">orig_labs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pl</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">orig_labs</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">orig_labs</span><span class="p">)</span>
+
+        <span class="n">ctrl_str</span><span class="p">,</span> <span class="n">unaff_str</span><span class="p">,</span> <span class="n">aff_str</span> <span class="o">=</span> <span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="s2">&quot;case: HiDDEN - unaffected&quot;</span><span class="p">,</span> <span class="s2">&quot;case: HiDDEN - affected&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labs</span> <span class="o">==</span> <span class="n">ctrl_val</span><span class="p">),</span> <span class="n">unaff_str</span><span class="p">,</span> <span class="n">aff_str</span><span class="p">))</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span>
+                    <span class="n">orig_labs</span> <span class="o">==</span> <span class="n">ctrl_val</span><span class="p">,</span> <span class="n">ctrl_str</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">group_by</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pl</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">group_by</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">group_by</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">group_by</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">group_by</span>
+
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">group_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">],</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">col</span> <span class="o">=</span> <span class="s2">&quot;proportion&quot;</span> <span class="k">if</span> <span class="n">scale</span> <span class="k">else</span> <span class="s2">&quot;count&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">scale</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">group_by</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">())</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">alt</span><span class="o">.</span><span class="n">Y</span> <span class="k">if</span> <span class="n">vertical</span> <span class="k">else</span> <span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">)(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">:Q&quot;</span><span class="p">),</span>
+            <span class="n">alt</span><span class="o">.</span><span class="n">Color</span><span class="p">(</span><span class="s2">&quot;label:N&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="n">ctrl_str</span><span class="p">,</span> <span class="n">unaff_str</span><span class="p">,</span> <span class="n">aff_str</span><span class="p">]),</span>
+            <span class="n">alt</span><span class="o">.</span><span class="n">Order</span><span class="p">(</span><span class="s2">&quot;color_label_sort_index:Q&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;descending&quot;</span> <span class="k">if</span> <span class="n">vertical</span> <span class="k">else</span> <span class="s2">&quot;ascending&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">group_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">encode</span><span class="p">((</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span> <span class="k">if</span> <span class="n">vertical</span> <span class="k">else</span> <span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">)(</span><span class="n">group_by</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>  <span class="c1"># ty:ignore[invalid-argument-type]</span>
+            <span class="c1"># ignore NECESSITY - typechecker does not catch group_by.name isinstance check verifying it to be a string</span>
+
+        <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">mark_bar</span><span class="p">()</span>  <span class="c1"># ty: ignore[invalid-return-type]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PlotTunerOutput">
+<a class="viewcode-back" href="../../../reference/pl/#found.pl.PlotTunerOutput">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlotTunerOutput</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    class which when provided with tuner outputs (see fields),</span>
+<span class="sd">    can be used to create various diagnostic plots.</span>
+
+<span class="sd">    can be indexed to return PlotHiDDENOutput objects for diagnostics on specific hyperparameters.</span>
+
+<span class="sd">    :param adata: object containing input data</span>
+<span class="sd">    :param sel: HiDDENt-returned selected hyperparameter configuration</span>
+<span class="sd">    :param outs: HiDDENt-returned output dictionary</span>
+<span class="sd">    :param layer: name of layer to use when accessing layer-specific data from ``self.adata``, ``X`` slot is used if set to ``None``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">adata</span><span class="p">:</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span>
+    <span class="n">sel</span><span class="p">:</span> <span class="nb">object</span>
+    <span class="n">outs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotHiDDENOutput</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;provided key must be one of evaluated hyperparameters, but </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> is not in </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">PlotHiDDENOutput</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">outs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="PlotTunerOutput.score_line">
+<a class="viewcode-back" href="../../../reference/pl/#found.pl.PlotTunerOutput.score_line">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">score_line</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span> <span class="o">|</span> <span class="n">alt</span><span class="o">.</span><span class="n">LayerChart</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        method used to generate a line plot of scores for tested hyperparameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">Chart</span><span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;hyperparameter&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">,</span>
+                    <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">params</span><span class="p">],</span>
+                    <span class="s2">&quot;selected&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">p</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sel</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">alt</span><span class="o">.</span><span class="n">X</span><span class="p">(</span><span class="s2">&quot;hyperparameter&quot;</span><span class="p">),</span> <span class="n">alt</span><span class="o">.</span><span class="n">Y</span><span class="p">(</span><span class="s2">&quot;score&quot;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">c</span><span class="o">.</span><span class="n">mark_line</span><span class="p">()</span> <span class="o">+</span> <span class="n">c</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">alt</span><span class="o">.</span><span class="n">Color</span><span class="p">(</span><span class="s2">&quot;selected&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">mark_point</span><span class="p">(</span><span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># ty: ignore[unsupported-operator]</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, goeva lab.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
